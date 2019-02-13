@@ -565,6 +565,17 @@
     }
 
     function validateWeight(weight) {
+        var minValue = 2;
+        var absMinValue = 1;
+        var maxValue = 250;
+        var absMaxValue = 300;
+
+        if(sessionStorage.programID == 12) {
+            minValue = 40;
+            absMinValue = 35;
+            maxValue = 250;
+            absMaxValue = 300;
+        }
         if (weight.trim().length < 1)
             return true;
 
@@ -588,9 +599,14 @@
             return false;
         }
 
-        if (weight < 2 || weight > 300) {
-            showMessage("Weight readings are outside the parameters.");
-            return false;
+        if (weight < minValue || weight < absMinValue) {
+            showMessage("Weight entered is less than minimum " + minValue + ".0");
+            return true;
+        }
+
+        if (weight > maxValue || weight > absMaxValue) {
+            showMessage("Weight entered is greater than maximum " + maxValue + ".0");
+            return true;
         }
 
         var afterDecimal = [];
@@ -683,6 +699,55 @@
         bp_diastolic = bp.split("/")[1];
         bp_systolic = bp.split("/")[0];
 
+        if(sessionStorage.programID == 12) {
+            // Validations specifically FOR ANC
+
+            if (bp_systolic >= 140 && bp_diastolic >= 90) {
+
+                showMessage("Client is at risk of pre-eclampsia, refer for urine protein test.");
+                return true;
+
+            }
+
+            if (bp_systolic < 120 || bp_systolic > 140) {
+
+                showMessage("Systolic reading is out of normal range");
+                return true;
+
+            }
+
+            if (bp_diastolic < 80 || bp_diastolic > 90) {
+
+                showMessage("Diastolic reading is out of normal range");
+                return true;
+
+            }
+
+            if ((bp_systolic >= 130 && bp_systolic <= 139) && (bp_diastolic >= 80 && bp_diastolic <= 89)) {
+
+                showMessage("Prehypertension");
+                return true;
+
+            }
+
+
+        } else {
+            // Validations NOT for ANC
+            if (bp_diastolic < 30 || bp_diastolic > 200) {
+
+                showMessage("Diastolic reading is out of normal range");
+                return false;
+
+            }
+
+            if (bp_systolic < 40 || bp_systolic > 250) {
+
+                showMessage("Systolic reading is out of normal range");
+                return true;
+
+            }
+        }
+
         if (!isNumeric(bp_systolic)) {
             showMessage("Not a valid systolic reading.");
             return false;
@@ -691,20 +756,6 @@
         if (!isNumeric(bp_diastolic)) {
             showMessage("Not a valid diastolic reading.");
             return false;
-        }
-
-        if (bp_diastolic < 30 || bp_diastolic > 200) {
-
-            showMessage("Diastolic reading it out of normal range");
-            return false;
-
-        }
-
-        if (bp_systolic < 40 || bp_systolic > 250) {
-
-            showMessage("Systolic reading it out of normal range");
-            return true;
-
         }
 
         return true;
@@ -861,7 +912,7 @@
     }
 
     function nextPage() {
-        nextEncounter(sessionStorage.patientID, 1);
+        nextEncounter(sessionStorage.patientID, sessionStorage.programID);
     }
 
     function changeNextBtnToSubmit() {
