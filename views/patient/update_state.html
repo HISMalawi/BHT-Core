@@ -8,7 +8,7 @@
 <script type="text/javascript" src="/assets/js/httpUtils.js"></script>
 <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
 <script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
-
+<script type="text/javascript" src="/assets/js/moment.js"></script>
 <link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
 
 <style>
@@ -32,6 +32,7 @@
 </style>
 
 <script>
+  var tstCurrentDate = moment(tstCurrentDate).format("YYYY-MM-DD");
   tt_cancel_destination = "/views/patient/programs.html?patient_id=" + sessionStorage.patientID;
 
 function passURL() {}
@@ -321,10 +322,116 @@ function fetchStatesUrl () {
       <form>
         <input type="text" name="states" id="states" 
           field_type="alpha" xhelpText="State" 
-          helpText="States" ajaxURL="/programs/1/workflows" 
+          helpText="States" ajaxURL="/programs/11/workflows" 
           setvalue="" tt_pageStyleClass="NoKeyboard" 
           tt_onLoad="passURL();" tt_onUnload="" objectType="states" />
 
+        <!-- Maternity  -->
+          <select id="discharged_to_where" name="discharged_to_where" helpText="Discharged to Where?"
+          condition = "$('touchscreenInput0').value == 'Discharged'">
+            <option></option>
+            <option>Home- Waiting</option>
+            <option>Another Health Facility</option>
+        </select>
+        <input type="text" name="health_facility" objectType="location"
+        id="health_facility" field_type="alpha"
+        key="health_facility" helpText="Which Health Facility"
+        ajaxURL="/locations?name="
+        key="health_facility" allowFreeText="true"
+        condition = "$('touchscreenInput0').value == 'Another Health Facility'" />
+
+        <input type="text" name="diagnosis" 
+        id="diagnosis" field_type="text" 
+        helpText="Select discharge diagnosis" 
+        tt_pageStyleClass="n qwertyKeyboardOnly" 
+        condition = "$('touchscreenInput0').value.toUpperCase() == 'DISCHARGED' " /> 
+
+        <!-- End discharged -->
+
+
+        <!-- Admitted -->
+        <select id="admission_section" name="admission_section" tt_onLoad="changeNextAdmitBTN();" 
+        helpText="Select Admission section" condition ="$('touchscreenInput0').value.toUpperCase() == 'ADMITTED'">
+            <option></option>
+            <option>Delivered in the ward</option>
+            <option>Delivered before arrival</option>
+            <option>Delivered in theatre</option>
+            <option>Delivered in Antenatal ward</option>
+        </select>
+        <!-- End admitted -->
+
+        <!-- End patient died -->
+
+        <!-- Procedures -->
+        <select id="procedure_done" name="procedure_done" tt_onLoad="changeNextBTN();" 
+        helpText="1<sup>st</sup> Procedure done"  condition ="$('touchscreenInput0').value.toUpperCase() == 'DELIVERED' || $('touchscreenInput0').value.toUpperCase() == 'DISCHARGED'" >
+            <option></option>
+            <option>None</option>
+            <option>Hysterectomy</option>
+            <option>Myomectomy</option>
+            <option>Bilateral tubal ligation</option>
+            <option>Biopsy</option>
+            <option>Ceclage</option>
+            <option>Cystectomy</option>
+            <option>Malsupilisation</option>
+            <option>Excision</option>
+            <option>Incision and drainage</option>
+            <option>Caesarean Section</option>
+            <option>Exam under anaesthesia</option>
+            <option>Evacuation/Manual vacuum aspiration</option>
+            <option>Dilation and curretage</option>
+            <option>Explatory laparatomy +/- adnexectomy</option>
+        </select>
+
+        <input type="text" name="procedure_diagnosis" 
+        id="procedure_diagnosis" field_type="alpha" 
+        helpText="Reason for Procedure" 
+        condition="$('procedure_done').value.toUpperCase() == 'HYSTERECTOMY'" />  -->
+
+         <input type="text" name="procedure_diagnosis1" 
+        id="procedure_diagnosis1" field_type="alpha" 
+        helpText="2nd Reason for Procedure" ajaxURL = "/encounters/procedure_diagnoses?procedure=biopsy&search_string="
+        condition="$('procedure_done').value.toUpperCase() == 'BIOPSY DIAGNOSIS'" /> 
+
+          <!-- PATIENT DIED -->
+        <input type="text" name="date_of_death" 
+        id="date_of_death" field_type="date" 
+        helpText="Date of Death" 
+        tt_pageStyleClass="date" 
+        condition = "$('touchscreenInput0').value.toUpperCase() == 'PATIENT DIED'" /> 
+
+        <input type="text" name="time_of_death" 
+        id="time_of_death" field_type="advancedTime" 
+        helpText="Time of Death" 
+        condition = "$('states').value.toUpperCase() == '113'" /> 
+
+        <select id="place_of_death" name="place_of_death" tt_onLoad="changeNextBTN();"
+        helpText="Place of Death" condition = "$('states').value.toUpperCase() == '113'"> 
+            <option></option>
+            <option>Home</option>
+            <option>Current Facility</option>
+            <option>On the Way</option>
+            <option>Other</option>
+        </select>
+
+        <input type="text" name="reason_of_death" 
+        id="reason_of_death" field_type="text" 
+        helpText="Select Reason of Death" 
+        tt_pageStyleClass="date" 
+        condition = "$('states').value.toUpperCase() == '113'" /> 
+
+        <select id="condition_at_death" name="condition_at_death" tt_onLoad="changeNextBTN();"
+        helpText="Condition at Death" condition = "$('states').value.toUpperCase() == '113'"> 
+            <option></option>
+            <option>Antenatal</option>
+            <option>Postpartum</option>
+            <option>Intrapartum</option>
+        </select>
+
+     <!-- End patient died -->
+    
+
+        <!-- End martenity -->
         <select objectType="location" ajaxURL="/locations?name=" 
           allowFreeText="true" 
           condition="$('touchscreenInput0').value == 'Patient transferred out'" 
