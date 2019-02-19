@@ -15,18 +15,46 @@ function showOrders() {
   xhttp.send();
 }
 
-var vl_result_count = 0;
+var vlCount = 0;
+
 function updateOrdersTable(orders) {
-  for (var x = 0; x < orders.reverse().length; x++) {
+  var VLdates = [];
+
+  for (var x = 0; x < orders.length; x++) {
     var tests = orders[x].tests;
-    if(vl_result_count == 2)
-      break;
 
     for (var i = 0; i < tests.length; i++) {
-      addVLorders(orders[x], tests[i]);
-      vl_result_count++;
+      var test_name = tests[i].test_type;
+      var test_values = tests[i].test_values;
+      if(test_name.match(/viral load/i) && test_values.length > 0) {
+        VLdates.push(new Date(moment(orders[x].date_ordered).format('YYYY-MM-DD')));
+      }
     }
   }
+
+  VLdates = VLdates.sort().reverse();
+	
+  for(var j = 0 ; j < VLdates.length ; j++) {
+    if(vlCount == 2)
+      break;
+
+    for (var x = 0; x < orders.length; x++) {
+      if(vlCount == 2)	      
+       break;
+
+      var tdate = moment(orders[x].date_ordered).format('DD/MMM/YYYY')
+      if(tdate !== moment(VLdates[j]).format('DD/MMM/YYYY'))
+        continue;
+
+      var tests = orders[x].tests;
+      for (var i = 0; i < tests.length; i++) {
+        addVLorders(orders[x], tests[i]);
+      }
+    }
+  
+  
+  }
+
 }
 
 function addVLorders(order, test) {
@@ -51,7 +79,7 @@ function addVLorders(order, test) {
     a.setAttribute('href','#');
     a.innerHTML = r;
     div.appendChild(a);
-    console.log(orders_tbody.innerHTML);
+    vlCount++;
   }
 }
 
