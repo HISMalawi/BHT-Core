@@ -5,7 +5,7 @@
     <meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
     <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
     <script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
-
+    <script type="text/javascript" src="/assets/js/generic_ajaxrequest.js"></script>
     <link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
 
     <script language="javascript">
@@ -838,6 +838,7 @@
                     field_type="alpha"
                     helpText="Please select facility name"
                     id="facility_name"
+                    tt_onLoad="setCurrentLocation();"
                     name="facility_name"></select>
 
             <select allowFreeText="false" helpText="Register guardian?"

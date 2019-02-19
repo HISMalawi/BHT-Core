@@ -213,6 +213,7 @@
                 if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
                 var obj = JSON.parse(this.responseText);
                 document.getElementById("facility-name").innerHTML = obj.name;
+                sessionStorage.currentLocation = obj.name;
                 }
             };
             xhttp.open("GET", url, true);
