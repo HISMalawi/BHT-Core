@@ -52,9 +52,12 @@ function searchID(e) {
 }
 
 function autoFocus() {
-  try {
-    document.getElementById("search-string").focus();
-  }catch(e) {}
+  if (sessionStorage.programID != undefined) {
+    try {
+      document.getElementById("search-string").focus();
+    }catch(e) {}
+  }
+  
 }
 
 function returnToFunction(search_string) {
