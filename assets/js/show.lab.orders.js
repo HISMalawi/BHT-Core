@@ -15,11 +15,16 @@ function showOrders() {
   xhttp.send();
 }
 
+var vl_result_count = 0;
 function updateOrdersTable(orders) {
-  for (var x = 0; x < orders.length; x++) {
+  for (var x = 0; x < orders.reverse().length; x++) {
     var tests = orders[x].tests;
+    if(vl_result_count == 2)
+      break;
+
     for (var i = 0; i < tests.length; i++) {
       addVLorders(orders[x], tests[i]);
+      vl_result_count++;
     }
   }
 }
