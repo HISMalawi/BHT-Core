@@ -335,29 +335,8 @@ function fetchStatesUrl () {
           field_type="alpha" xhelpText="State" 
           setvalue="" tt_pageStyleClass="NoKeyboard"
           ajaxURL="/programs/11/workflows" 
-          tt_onLoad="setProgramStates();" objectType="states" />
+          tt_onLoad="setProgramStates(); changeAbscounded();" objectType="states" />  
 
-        <!-- Discharged  -->
-        <select id="discharged_to_where" name="discharged_to_where" helpText="Discharged to Where?"
-          condition = "$('touchscreenInput0').value == 'Discharged'">
-            <option></option>
-            <option>Home- Waiting</option>
-            <option>Another Health Facility</option>
-        </select>
-        <input type="text" name="health_facility" objectType="location"
-        id="health_facility" field_type="alpha"
-        key="health_facility" helpText="Which Health Facility"
-        ajaxURL="/locations?name="
-        key="health_facility" allowFreeText="true"
-        condition = "$('states').value == 112" />
-
-        <input type="text" name="diagnosis" 
-        id="diagnosis" field_type="text" 
-        helpText="Select discharge diagnosis" 
-        tt_pageStyleClass="n qwertyKeyboardOnly" 
-        condition = "$('states').value == 112 " /> 
-
-        <!-- End discharged -->
 
         <!-- Admitted -->
         <select id="admission_section" name="admission_section" tt_onLoad="changeNextAdmitBTN();" 
@@ -369,12 +348,31 @@ function fetchStatesUrl () {
             <option>Delivered in Antenatal ward</option>
         </select>
         <!-- End admitted -->
+        <!-- Discharged  -->
+        <select id="discharged_to_where" name="discharged_to_where" helpText="Discharged to Where?"
+          condition = "$('touchscreenInput0').value == 'Discharged'">
+            <option></option>
+            <option>Home- Waiting</option>
+            <option>Another Health Facility</option>
+        </select> 
+        <input type="text" name="health_facility" objectType="location"
+        id="health_facility" field_type="alpha"
+        key="health_facility" helpText="Which Health Facility"
+        ajaxURL="/locations?name="
+        key="health_facility" allowFreeText="true"
+        condition = "$('states').value == 112 && $('discharged_to_where').value == 'Another Health Facility'" />
 
-        <!-- End patient died -->
+        <input type="text" name="diagnosis" 
+        id="diagnosis" field_type="text" 
+        helpText="Select discharge diagnosis" 
+        tt_pageStyleClass="n qwertyKeyboardOnly" 
+        condition ="$('states').value == 112 " /> 
+
+        <!-- End discharged -->
 
         <!-- Procedures -->
-        <select id="procedure_done" name="procedure_done" tt_onLoad="changeNextBTN();" 
-        helpText="1<sup>st</sup> Procedure done"  condition ="$('states').value == 112 || $('states').value == 111" >
+        <select id="procedure_done" name="procedure_done"
+        helpText="1<sup>st</sup> Procedure done"  condition ="$('states').value == '112' || $('states').value == '111'" tt_onLoad="changeNextButton();"  >
             <option></option>
             <option>None</option>
             <option>Hysterectomy</option>
@@ -389,11 +387,11 @@ function fetchStatesUrl () {
             <option>Caesarean Section</option>
             <option>Exam under anaesthesia</option>
             <option>Evacuation/Manual vacuum aspiration</option>
-            <option>Dilation and curretage</option>
+            <option>Dilation and curettage</option>
             <option>Explatory laparatomy +/- adnexectomy</option>
         </select>
 
-        <input type="text" name="procedure_diagnosis" 
+        <!-- <input type="text" name="procedure_diagnosis" 
         id="procedure_diagnosis" field_type="alpha" 
         helpText="Reason for Procedure" 
         condition="$('procedure_done').value.toUpperCase() == 'HYSTERECTOMY'" />  
@@ -479,7 +477,7 @@ function fetchStatesUrl () {
           id="procedure_diagnosis11" field_type="alpha" 
           ajaxURL = "/encounters/procedure_diagnoses?procedure=myomectomy&search_string="
           helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'LAPARATOMY DIAGNOSIS'" />   -->
+          condition="$('procedure_done').value.toUpperCase() == 'LAPARATOMY DIAGNOSIS'" />  -->
           <!-- END PROCEDURES -->
 
 
@@ -589,6 +587,30 @@ function fetchStatesUrl () {
       var nextButton =  document.getElementById('nextButton');
       nextButton.setAttribute("onmousedown","postAdmitOutcome();")
   }
+  function changeAbscounded(){
+    var nextButton =  document.getElementById('nextButton');
+    nextButton.setAttribute("onmousedown","postAbsoundOutcome();")
+  }
+  function postAbsoundOutcome(){
+    var  state = document.getElementById('touchscreenInput0').value;
+    if (state === 'Absconded') {
+          var currentTime = moment().format(' HH:mm:ss');
+          var encounter_datetime = moment(sessionStorage.sessionDate).format('YYYY-MM-DD');
+          encounter_datetime += currentTime;
+
+          var encounter = {
+              encounter_type_name: 'UPDATE OUTCOME',
+              encounter_type_id:  40,
+              patient_id: sessionStorage.patientID,
+              encounter_datetime: encounter_datetime
+          };
+
+          submitParameters(encounter, "/encounters", "postUpdateOutcomeObs");
+  
+    } else {
+        gotoNextPage();
+    }
+  }
 
   function postAdmitOutcome() {
   
@@ -610,107 +632,226 @@ function fetchStatesUrl () {
 
   function postUpdateOutcomeObs(encounter) {
 
-      console.log("I get here");
-      // var pmtctOnArvs = document.getElementById('pmtct_on_arvs').value;
-      // var periodOnArvs = document.getElementById('period_on_arvs').value;
+      var admitSection = document.getElementById('admission_section').value;
+      var dischargedWhere = document.getElementById('discharged_to_where').value;
+      var healthFacility = document.getElementById('health_facility').value;
+      var dischargeDiagnosis = document.getElementById('diagnosis').value;
+      var procedure = document.getElementById('procedure_done').value;
+      var procedureDiagnosis = document.getElementById('procedureDiagnosis');
+      var dischargedWhere = document.getElementById('discharged_to_where').value;
+      var dateOfDeath = document.getElementById('date_of_death').value;
+      var timeOfDeath = document.getElementById('time_of_death').value;
+      var placeOfDeath = document.getElementById('place_of_death').value;
+      var reasonOfDeath = document.getElementById('reason_of_death').value;
+      var conditionOfDeath = document.getElementById('condition_at_death').value;
+      var  state = document.getElementById('states').value;
+      var conceptAnswers = 
+       [
+          // Admission section
+          {
+              "deliveredInWard": 7428,
+              "deliveredBeforeArrival": 7429,
+              "deliveredInTheatre": 7428,
+              "deliveredInAntenatalWard": 7429
+          },
+          // Discharged to where
+          {
+              "homeWaiting": 7445,
+              "anotherHealthFacility": 1275
+          },
+          // procedure done
+          {
+              "none": 1107,
+              "hysterectomy": 5276,
+              "myomectomy": 7478,
+              "bilateralTubal":1719,
+              "biopsy": 3593,
+              "ceclage": 7470,
+              "cystectomy": 3742,
+              "marsupilisation": 7472,
+              "excision": 218,
+              "incisionDrainage": 7476,
+              "caesareanSection": 1171,
+              "examAnaesthesia": 7441,
+              "evacuationVacuum": 7139,
+              "dilation": 7475,
+              "laparatomy": 7470
+          },
 
-      // var conceptAnswers = [
-      //     // Hiv Status
-      //     {
-      //         "reactive": 1228,
-      //         "nonReactive": 1229,
-      //         "unknown": 1067
-      //     },
-      //     // PMTCT on ARVs
-      //     {
-      //         "yes": 1065,
-      //         "no": 1066
-      //     },
-      //     // Feeding option
-      //     {
-      //         "exclusiveBreastFeeding": 5526,
-      //         "noBreastFeeding": 1107,
-      //         "exclusiveFormulaFeeding": 5254
-      //     }
-      // ];
+          //Place of death
+          {
+              "home": 7445,
+              "currentFacility": 5937,
+              "onTheWay": 7398,
+              "other":5462
 
-      // var hivStatusAnswer;
-      // var pmtctOnArvsAnswer;
-      // var feedingOptionAnswer;
+          },
 
-      // switch(hivStatus.toUpperCase()) {
-      //     case 'REACTIVE':
-      //         hivStatusAnswer = conceptAnswers[0].reactive;
-      //         break;
-      //     case 'NON-REACTIVE':
-      //         hivStatusAnswer = conceptAnswers[0].nonReactive;
-      //         break;
-      //     case 'UNKNOWN':
-      //         hivStatusAnswer = conceptAnswers[0].unknown;
-      //         break;
-      // }
+          //Condition at death
+          {
+              "antenatal": 2232,
+              "postpartum": 1180,
+              "intrapartum": 1179
+          }
+      ];
 
-      // switch(pmtctOnArvs.toUpperCase()) {
-      //     case 'YES':
-      //         pmtctOnArvsAnswer = conceptAnswers[1].yes;
-      //         break;
-      //     case 'NO':
-      //         pmtctOnArvsAnswer = conceptAnswers[1].no;
-      //         break;
-      //     default:
-      //         break;
-      // }
+      var admissionAnswer;
+      var dischargedAnswer;
+      var procedureAnswer;
+      var placeOfDeathAnswer;
+      var conditionOfDeathAnswer;
 
-      // switch (feedingOption.toUpperCase()) {
-      //     case 'EXCLUSIVE BREAST FEEDING':
-      //         feedingOptionAnswer = conceptAnswers[2].exclusiveBreastFeeding;
-      //         break;
-      //     case 'NO BREAST FEEDING':
-      //         feedingOptionAnswer = conceptAnswers[2].noBreastFeeding;
-      //         break;
-      //     case 'EXCLUSIVE FORMULA FEEDING':
-      //         feedingOptionAnswer = conceptAnswers[2].exclusiveFormulaFeeding;
-      //         break;
-      //     default:
-      //         break;
-      // }
+      switch(admitSection.toUpperCase()) {
+          case 'DELIVERED IN THE WARD':
+              admissionAnswer = conceptAnswers[0].deliveredInWard;
+              break;
+          case 'DELIVERED BEFORE ARRIVAL':
+              admissionAnswer = conceptAnswers[0].deliveredBeforeArrival;
+              break;
+          case 'DELIVERED IN THEATRE':
+              admissionAnswer = conceptAnswers[0].deliveredInTheatre;
+              break;
+          case 'DELIVERED IN ANTENATAL WARD':
+             admissionAnswer = conceptAnswers[0].deliveredInAntenatalWard;
+          break;
+      }
 
-      // var obs = {
-      //     encounter_id: encounter["encounter_id"],
-      //     observations: [
-      //         { concept_id: 3753, value_coded: hivStatusAnswer } // hiv status
-      //     ]
-      // };
+      switch(dischargedWhere.toUpperCase()) {
+          case 'HOME- WAITING':
+              dischargedAnswer = conceptAnswers[1].homeWaiting;
+              break;
+          case 'ANOTHER HEALTH FACILITY':
+              dischargedAnswer = conceptAnswers[1].anotherHealthFacility;
+              break;
+          default:
+              break;
+      }
 
-      // if(pmtctTestDate !== '') {
-      //     var pmtctTestDay = pmtctTestDate.split('-')[0];
-      //     var pmtctTestMonth = pmtctTestDate.split('-')[1];
-      //     var pmtctTestYear = pmtctTestDate.split('-')[2];
+       switch (procedure.toUpperCase()) {
+          case 'NONE':
+              procedureAnswer = conceptAnswers[2].none;
+              break;
+              case 'HYSTERECTOMY':
+              procedureAnswer = conceptAnswers[2].hysterectomy;
+              break;
+              case 'MYOMECTOMY':
+              procedureAnswer = conceptAnswers[2].myomectomy;
+              break;
+              case 'BILATERAL TUBAL LIGATION':
+              procedureAnswer = conceptAnswers[2].bilateralTubal;
+              break;
+              case 'BIOPSY':
+              procedureAnswer = conceptAnswers[2].biopsy;
+              break;
+              case 'CECLAGE':
+              procedureAnswer = conceptAnswers[2].ceclage;
+              break;
+              case 'CYSTECTOMY':
+              procedureAnswer = conceptAnswers[2].cystectomy;
+              break;
+              case 'MARSUPILISATION':
+              procedureAnswer = conceptAnswers[2].marsupilisation;
+              break;
+              case 'EXCISION':
+              procedureAnswer = conceptAnswers[2].excision;
+              break;
+              case 'INCISION AND DRAINAGE':
+              procedureAnswer = conceptAnswers[2].incisionDrainage;
+              break;
+              case 'CAESAREAN SECTION':
+              procedureAnswer = conceptAnswers[2].caesareanSection;
+              break;
+              case 'EXAM UNDER ANAESTHESIA':
+              procedureAnswer = conceptAnswers[2].examAnaesthesia;
+              break;
+              case 'EAVACUATION/MANUAL VACUUM ASPIRATION':
+              procedureAnswer = conceptAnswers[2].evacuationVacuum;
+              break;
+              case 'DILATION AND CURETTAGE':
+              procedureAnswer = conceptAnswers[2].dilation;
+              break;
+              case 'EXPLATORY LAPARATOMY +/- ADNEXECTOMY':
+              procedureAnswer = conceptAnswers[2].laparatomy;
+              break;
+          default:
+              break;
+      }
+      switch(placeOfDeath.toUpperCase()) {
+          case 'HOME':
+              placeOfDeathAnswer = conceptAnswers[3].home;
+              break;
+          case 'CURRENT FACILITY':
+              placeOfDeathAnswer = conceptAnswers[3].currentFacility;
+              break;
+          case 'ON THE WAY':
+              placeOfDeathAnswer = conceptAnswers[3].onTheWay;
+              break;
+          case 'OTHER':
+              placeOfDeathAnswer = conceptAnswers[3].other;
+          break;
+          default:
+              break;
+      }
+      switch(conditionOfDeath.toUpperCase()) {
+          case 'ANTENATAL':
+              conditionOfDeathAnswer = conceptAnswers[4].antenatal;
+              break;
+          case 'POSTPARTUM':
+              conditionOfDeathAnswer = conceptAnswers[4].postpartum;
+              break;
+          case 'INTRAPARTUM':
+              conditionOfDeathAnswer = conceptAnswers[4].intrapartum;
+              break;
+          default:
+              break;
+      }
 
-      //     var pmtctTestDates = pmtctTestYear + "-" + pmtctTestMonth + "-" + pmtctTestDay;
 
-      //     obs.observations.push({ concept_id: 1837, value_datetime: pmtctTestDates }); // pmtct test date
-      // }
-      // if(pmtctOnArvs !== '') {
-      //     obs.observations.push({ concept_id: 1577, value_coded: pmtctOnArvsAnswer }); // pmtct on arvs
-      // }
-      // if(periodOnArvs !== '') {
-      //     var periodOnArvsDay = periodOnArvs.split('-')[0];
-      //     var periodOnArvsMonth = periodOnArvs.split('-')[1];
-      //     var periodOnArvsYear = periodOnArvs.split('-')[2];
+      var obs = {
+          encounter_id: encounter["encounter_id"],
+          observations: [
+              { concept_id: 6310, value_text: state } // hiv status
+          ]
+      };
 
-      //     var periodOnArvsDate = periodOnArvsYear + "-" + periodOnArvsMonth + "-" + periodOnArvsDay;
-
-      //     obs.observations.push({ concept_id: 7833, value_datetime: periodOnArvsDate }); // period on arvs
-      // }
-      // if(feedingOption !== '') {
-      //     obs.observations.push({ concept_id: 1151, value_coded: feedingOptionAnswer }); // feeding option
-      // }
-
-      // submitParameters(obs, "/observations", "nextPage")
+        if(admitSection !== '') {
+            obs.observations.push(  { concept_id: 7427, value_coded: admissionAnswer } ); //saving
+        }
+        if(dischargedWhere !== '') {
+            obs.observations.push(  { concept_id: 3626, value_coded: dischargedAnswer } ); //saving
+        }
+        if(healthFacility !== '') {
+            obs.observations.push(  { concept_id: 5937, value_text: healthFacility } ); 
+        }
+        if(dischargeDiagnosis !== '') {
+            obs.observations.push(  { concept_id: 7366, value_text: dischargeDiagnosis  } ); 
+        }
+        if(procedure !== '') {
+            obs.observations.push(  { concept_id: 7439, value_text: procedure } ); 
+        }
+        if(procedureDiagnosis !== '') {
+            obs.observations.push(  { concept_id: 3065, value_coded: procedureAnswer } ); 
+        }
+        if(dateOfDeath !== '') {
+            obs.observations.push(  { concept_id: 5928, value_datetime: dateOfDeath } ); 
+        }
+        if(timeOfDeath !== '') {
+            obs.observations.push(  { concept_id: 2120, value_text: timeOfDeath } ); 
+        }
+        if(placeOfDeath !== '') {
+            obs.observations.push(  { concept_id: 1640, value_coded: placeOfDeathAnswer } ); 
+        }
+        if(reasonOfDeath !== '') {
+            obs.observations.push(  { concept_id: 5002, value_text: reasonOfDeath } ); 
+        }
+        if(conditionOfDeath !== '') {
+            obs.observations.push(  { concept_id: 5241, value_coded: conditionOfDeathAnswer } ); 
+        }
+       submitParameters(obs, "/observations", "nextPage")
   }
 
   function nextPage(){
-      nextEncounter(sessionStorage.patientID, sessionStorage.programID);
+
+    // nextEncounter(sessionStorage.patientID, sessionStorage.programID);
   }
 </script>
