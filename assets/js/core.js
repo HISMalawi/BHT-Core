@@ -164,9 +164,9 @@ function createApplicationCard(applicationData, idx) {
     $("#moduleButton").attr('id', `moduleButton${idx}`)
 
     if (applicationData.url == "") {
-        $(`#moduleButton${idx}`).attr("href", window.location.href);
+        $(`#moduleButton${idx}`).attr("href",  window.location.href);
     } else {
-        $(`#moduleButton${idx}`).attr("href", applicationData.url);
+        $(`#moduleButton${idx}`).attr("href", "/" +applicationData.url);
     }
 
     $("#cardImage")

@@ -28,10 +28,10 @@
           var http = new XMLHttpRequest();
           var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/users';
           var params = JSON.stringify({
-            username: sessionStorage.getItem("username"),
+            username: sessionStorage.getItem("user_username"),
             password: confirm_password,
-            given_name: sessionStorage.getItem("given_name"),
-            family_name: sessionStorage.getItem("family_name"),
+            given_name: sessionStorage.getItem("user_given_name"),
+            family_name: sessionStorage.getItem("user_family_name"),
             roles: [sessionStorage.getItem("role")]
           });
           http.open('POST', url, true);
@@ -89,16 +89,16 @@
       </style>
       <form method="POST">
         <input type="text" name="given_name" id="given_name" field_type="alpha" tt_onUnload="getInput();" helpText="First name"
-          key="given_name" allowFreeText="true" tt_onUnLoad="getInput();" ajaxURL="/search/given_name?search_string=" />
+          key="user_given_name" allowFreeText="true" tt_onUnLoad="getInput();" ajaxURL="/search/given_name?search_string=" />
 
-        <input type="text" name="family_name" id="family_name" field_type="alpha" key="family_name" tt_onUnLoad="getInput();"
+        <input type="text" name="family_name" id="family_name" field_type="alpha" key="user_family_name" tt_onUnLoad="getInput();"
           ajaxURL="/search/family_name?search_string=" helpText="Last name" allowFreeText="true" />
 
         <select allowFreeText="false" helpText=" Role" id="userRole" name="user_role" tt_onLoad="setRoles('/roles?page_size=100'); $(keyboard).style.display = none;"
           key="role" tt_onUnLoad="saveSelection();getInput();"></select>
 
 
-        <input helpText="Username" key="username" textCase="lower" tt_onload="$(touchscreenInput5).value = ($(user_first_name).value.substring(0,3)+$(user_last_name).value.substring(0,3)).toLowerCase()"
+        <input helpText="Username" key="user_username" textCase="lower" tt_onload="$(touchscreenInput5).value = ($(user_first_name).value.substring(0,3)+$(user_last_name).value.substring(0,3)).toLowerCase()"
           validationRule="\w{6}\w*" validationMessage="Username must have at least SIX letters" type="text" tt_onUnLoad="getInput();"
           name="user[username]" id="user_username" />
 

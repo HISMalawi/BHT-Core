@@ -35,7 +35,7 @@
 </script>
 
 <style>
-    .modal-body {
+    /* .modal-body {
         overflow-y: auto;
     }
 
@@ -89,7 +89,7 @@
 
     #todaysDate, #selectedDate {
       font-size: 14px;
-    }
+    } */
 
 </style>
 
@@ -232,10 +232,10 @@
                     onclick="finish();">
                 <span>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Finish &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;</span>
             </button>
-<!--             <button class="btn btn-success buttons blue" style="margin-right: 5px;" data-toggle="modal"
+            <button class="btn btn-success buttons blue" style="margin-right: 5px;" data-toggle="modal"
                     data-target="#appModal">
                 <span>&nbsp;&nbsp; Applications &nbsp;&nbsp;<img src="/assets/images/launcher.png"></span>
-            </button> -->
+            </button>
             <button id="activities" class="btn btn-success buttons blue" style="margin-right: 5px;" data-toggle="modal"
                     data-target="#activitiesModal" onmousedown="showActivities(this);">
                 <span>&nbsp; Printouts/Other &nbsp;</span>
@@ -405,7 +405,7 @@
                         <div class="row" id="modal-div">
                             <template id="card_template">
                                 <!-- <div class="" > -->
-                                <a href="#" class="card-block clearfix" id="moduleButton"
+                                <a href="#" class="" id="moduleButton"
                                    onclick="$('#appModal').modal('hide');">
                                     <div class="app-btn" id="cardDiv" style="margin: 10px;">
                                         <img alt="Avatar" style="width:70px; height: 60px; margin-top: 10%;"
