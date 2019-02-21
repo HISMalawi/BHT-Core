@@ -806,11 +806,22 @@ function fetchStatesUrl () {
               break;
       }
 
+      if(state == 113){
+        stateAnswer = "Patient died";
+      }else if(state == 109){
+        stateAnswer = "Admitted";
+      }else if(state == 110){
+        stateAnswer = "Absconded";
+      }else if(state == 111){
+          stateAnswer = "Delivered";
+      }else if(state == 112){
+          stateAnswer = "Discharged";
+      }
 
       var obs = {
           encounter_id: encounter["encounter_id"],
           observations: [
-              { concept_id: 6310, value_text: state } // hiv status
+              { concept_id: 6310, value_text: stateAnswer } // hiv status
           ]
       };
 
@@ -851,7 +862,7 @@ function fetchStatesUrl () {
   }
 
   function nextPage(){
-
+    window.location.href = "/views/patient_dashboard.html?patient_id=" + patientID;
     // nextEncounter(sessionStorage.patientID, sessionStorage.programID);
   }
 </script>
