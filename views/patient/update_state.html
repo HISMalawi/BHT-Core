@@ -575,8 +575,6 @@ function fetchStatesUrl () {
   var patientID = sessionStorage.getItem("patientID");
   var tstCurrentDate = moment(tstCurrentDate).format("YYYY-MM-DD");
 
-//  var dischargeOutcome = document.getElementById('discharge_outcome').value;
-
 
   function changeNextAdmitBTN() {
       var nextButton =  document.getElementById('nextButton');
@@ -859,6 +857,10 @@ function fetchStatesUrl () {
             obs.observations.push(  { concept_id: 5241, value_coded: conditionOfDeathAnswer } ); 
         }
        submitParameters(obs, "/observations", "nextPage")
+
+       if(state == 111 || state == 112){
+        window.location.href = "../../apps/MATERNITY/views/encounters/baby_outcome.html?patient_id=" + patientID;
+       }
   }
 
   function nextPage(){
