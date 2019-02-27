@@ -859,6 +859,9 @@ function fetchStatesUrl () {
             obs.observations.push(  { concept_id: 5241, value_coded: conditionOfDeathAnswer } ); 
         }
        submitParameters(obs, "/observations", "nextPage")
+       if(state == 111 || state == 112){
+          window.location.href = "../../apps/MATERNITY/views/encounters/baby_demographics.html?patient_id=" + patientID;
+       }
   }
 
   function nextPage(){
