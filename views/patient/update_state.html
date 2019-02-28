@@ -574,8 +574,7 @@ function fetchStatesUrl () {
 <script>
   var patientID = sessionStorage.getItem("patientID");
   var tstCurrentDate = moment(tstCurrentDate).format("YYYY-MM-DD");
-
-//  var dischargeOutcome = document.getElementById('discharge_outcome').value;
+  var state
 
 
   function changeNextAdmitBTN() {
@@ -644,7 +643,7 @@ function fetchStatesUrl () {
       var placeOfDeath = document.getElementById('place_of_death').value;
       var reasonOfDeath = document.getElementById('reason_of_death').value;
       var conditionOfDeath = document.getElementById('condition_at_death').value;
-      var  state = document.getElementById('states').value;
+      state = document.getElementById('states').value;
       var conceptAnswers = 
        [
           // Admission section
@@ -859,13 +858,15 @@ function fetchStatesUrl () {
             obs.observations.push(  { concept_id: 5241, value_coded: conditionOfDeathAnswer } ); 
         }
        submitParameters(obs, "/observations", "nextPage")
-       if(state == 111 || state == 112){
-          window.location.href = "../../apps/MATERNITY/views/encounters/baby_demographics.html?patient_id=" + patientID;
-       }
+
   }
 
   function nextPage(){
+    if(state == 111 || state == 112){
+          window.location.href = "../../apps/MATERNITY/views/encounters/baby_demographics.html?patient_id=" + patientID;
+       } else{
     window.location.href = "/views/patient_dashboard.html?patient_id=" + patientID;
     // nextEncounter(sessionStorage.patientID, sessionStorage.programID);
+    }
   }
 </script>
