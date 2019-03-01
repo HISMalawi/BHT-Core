@@ -574,8 +574,7 @@ function fetchStatesUrl () {
 <script>
   var patientID = sessionStorage.getItem("patientID");
   var tstCurrentDate = moment(tstCurrentDate).format("YYYY-MM-DD");
-  var state
-
+  var  state;
 
   function changeNextAdmitBTN() {
       var nextButton =  document.getElementById('nextButton');
@@ -643,7 +642,7 @@ function fetchStatesUrl () {
       var placeOfDeath = document.getElementById('place_of_death').value;
       var reasonOfDeath = document.getElementById('reason_of_death').value;
       var conditionOfDeath = document.getElementById('condition_at_death').value;
-      state = document.getElementById('states').value;
+       state = document.getElementById('states').value;
       var conceptAnswers = 
        [
           // Admission section
@@ -820,7 +819,7 @@ function fetchStatesUrl () {
       var obs = {
           encounter_id: encounter["encounter_id"],
           observations: [
-              { concept_id: 6310, value_text: stateAnswer } // hiv status
+              { concept_id: 6310, value_text: stateAnswer } 
           ]
       };
 
@@ -857,16 +856,17 @@ function fetchStatesUrl () {
         if(conditionOfDeath !== '') {
             obs.observations.push(  { concept_id: 5241, value_coded: conditionOfDeathAnswer } ); 
         }
+        console.log(obs);
        submitParameters(obs, "/observations", "nextPage")
 
+      
   }
 
   function nextPage(){
     if(state == 111 || state == 112){
-          window.location.href = "../../apps/MATERNITY/views/encounters/baby_demographics.html?patient_id=" + patientID;
-       } else{
-    window.location.href = "/views/patient_dashboard.html?patient_id=" + patientID;
-    // nextEncounter(sessionStorage.patientID, sessionStorage.programID);
+        window.location.href = "../../apps/MATERNITY/views/encounters/baby_outcome.html?patient_id=" + patientID;
+       }else{
+       window.location.href = "/views/patient_dashboard.html?patient_id=" + patientID;
     }
   }
 </script>
