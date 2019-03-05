@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+
+    <script language="javascript" defer="true">
+      tstUsername = "";
+      tstUserKeyboardPref = "qwerty";
+
+      var d = new Date();
+      d.toDateString();
+      // var url = new URL(url);
+      // var id = url.searchParams.get("patient_id");
+
+      function getInput(){
+        key = $('touchscreenInput' + tstCurrentPage).getAttribute("key");
+         value = $('touchscreenInput' + tstCurrentPage).value;
+         value = value.charAt(0).toUpperCase() + value.slice(1);     
+         sessionStorage.setItem(key, value);
+         var d = new Date();
+         sessionStorage.setItem("date_created", d.toDateString());
+      }  
+    </script>
+
+    <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
+    <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/assets/js/core.js"></script>
+
+  </head>
+  <body id="mateme">
+    <div id="container">
+      <div id="content">
+        <style>
+.tt_controls_father_first_name #date, #star, #slash, #minus, #plus, #percent, #decimal, #comma { display: none; }
+
+.tt_controls_father_last_name #date, #star, #slash, #minus, #plus, #percent, #decimal, #comma { display: none; }
+
+</style>
+
+<script type="text/javascript">
+var tt_cancel_destination = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
+
+function validateName() {
+__$("nextButton").removeAttribute("onmousedown");
+__$("nextButton").onmousedown = function(){
+
+    validRegEx = /^(?=.{2,100}$)[a-z\!\A-Z]+(?:['_.\-\!\][a-z]+[a-z\!\A-Z])*$/
+    value = $('touchscreenInput' + tstCurrentPage).value;
+   if(value.match(validRegEx) == null) {
+     showMessage("Invalid name input");
+   }else if (value.match(validRegEx) != null) {
+    gotoNextPage();
+   }
+  }
+}
+
+</script>
+
+
+<form action="" method="POST" id="search_results">
+    <input type="text" name="given_name" id="given_name" field_type="alpha" tt_onLoad='validateName();' tt_onUnload="getInput();"
+     helpText="Father first name"  key="given_name" 
+    allowFreeText="true" ajaxURL="/search/given_name?search_string=" />
+
+    <input type="text" name="family_name" id="family_name" field_type="alpha"  tt_onLoad='validateName();' ajaxURL="/search/family_name?search_string=" helpText="Father last name" key="family_name" allowFreeText="true" tt_onUnload="getInput();"/>
+
+    <select allowFreeText="false" helpText="Gender" id="gender" tt_onUnLoad="getInput();" name="person[gender]" tt_onLoad="changeNextButton();" key="gender" ><option value=""></option>
+      <option value="M">Male</option></select>
+
+</form>
+        <div id="footer">
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script type="text/javascript">
+
+  function  submitSearchResults(){
+     var gender = __$('gender').value;
+     sessionStorage.setItem('gender', gender);
+     document.location = "/views/patient/father_demographics/search_results.html";
+  }
+
+  function changeNextButton(){
+    __$("nextButton").removeAttribute("onmousedown")
+    __$("nextButton").onmousedown = function(){
+
+  value = $('touchscreenInput' + tstCurrentPage).value;
+ if (value.length  > 0) {
+
+           submitSearchResults();
+ }else {
+   showMessage("You must enter a value to continue");
+ }
+
+    }
+  }
+
+  var patientID = ''
+  var backupPatientID = ''
+  jQuery(document).ready(function(){
+
+    var checkExist = setInterval(function() {
+      if (jQuery('#cancelButton').length) {
+        jQuery('#cancelButton').click(function () {
+          yesButton = jQuery("#messageBar button")[0];
+          yesButton.onmousedown = function(){
+            hideMessage();
+            if (patientID.length > 0){
+              window.top.location.href = "/views/patient/father_demographics/search_results.html";
+            } else {
+              window.top.location.href = "/views/patient_dashboard.html?patient_id=" +sessionStorage.patientID;
+            }
+            
+          }
+        });
+        clearInterval(checkExist);
+      }
+    }, 100); // check every 100ms
+  });
+
+</script>
+
+

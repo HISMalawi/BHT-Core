@@ -1,0 +1,458 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <script language="javascript" type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
+    <script language="javascript" type="text/javascript" src="/assets/js/jquery.min.js" defer="true"></script>
+    <script language="javascript" type="text/javascript" src="/assets/js/birthdate_functions.js" defer="true"></script>
+    <script language="javascript" type="text/javascript" src="/assets/js/generic_ajaxrequest.js" defer="true"></script>
+    <script language="javascript" type="text/javascript" src="/assets/js/moment.js" defer="true"></script>
+
+    <script type="text/javascript"> 
+      // var url = new URL(url);
+      // var id = url.searchParams.get("patient_id");
+      var tt_cancel_destination = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
+    </script>
+  </head>
+  
+  <body>
+     <div id="container">
+      <div id="content">
+        <div style="padding-left: 15px;font-size:1.2em;">
+        </div>
+        <style type="text/css">
+  #num{ display:none; }
+  #char{ display:none; }
+</style>
+<script type="text/javascript">
+  var people = [{}];
+  var remote_people;
+
+  var tt_cancel_destination = "/"
+
+  function changeNextButtonText(text, pos , person_id, selected_person){
+    __$('nextButton').innerHTML = "<span>" + text + "</span>";
+
+    if (text.match(/New Patient/)){
+      //clearFields
+      var fields = [
+        "identifier",
+        "gender",
+        "given_name",
+        "family_name",
+        "family_name2",
+        "address2",
+        "relation",
+        "birthdate",
+        "birthdate_estimated",
+        "state_province",
+        "city_village",
+        "county_district",
+        "occupation",
+        "cell_phone_number",
+        "national_id"
+      ]
+      for (k = 0; k < fields.length; k ++){
+        try{
+          __$(fields[k]).value = "";
+          __$(fields[k]).removeAttribute("name");
+        }catch(e){
+
+        }
+      }
+
+      createControlAndAssignValue("given_name", "person[names][given_name]", sessionStorage.getItem("given_name"));
+      createControlAndAssignValue("family_name", "person[names][family_name]", sessionStorage.getItem("family_name"));
+      createControlAndAssignValue("gender", "person[gender]", sessionStorage.getItem("gender"));
+    }
+
+    if(pos && (person_id == 0) && !text.match(/New Patient/)){
+      document.forms[0].action = "select";
+      __$('nextButton').onmousedown = function(){
+        document.forms[0].submit();
+      }
+
+      clearFields();
+
+      pos = parseInt(pos);
+      var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+      createControlAndAssignValue("remote", "remote", "true");
+
+      if (selected_person){
+        createControlAndAssignValue("gender", "person[gender]",selected_person[pos+1]["Gender"]);
+        createControlAndAssignValue("given_name", "person[names][given_name]",selected_person[pos+1]["Name"].split(' ')[0]);
+        createControlAndAssignValue("family_name", "person[names][family_name]",selected_person[pos+1]["Name"].split(' ')[1])
+        createControlAndAssignValue("address2", "person[addresses][city_village]",selected_person[pos+1]["Current Residence"])
+        //createControlAndAssignValue("person_birth_year", "person[birth_year]",selected_person[pos+1]["Year"])
+        try{
+          //createControlAndAssignValue("person_birth_month", "person[birth_month]",months.indexOf(selected_person[pos+1]["Month"]) + 1 );
+        }
+        catch(e){
+          //createControlAndAssignValue("person_birth_month", "person[birth_month]","");
+        }
+        //createControlAndAssignValue("person_birth_day", "person[birth_day]",selected_person[pos+1]["Day"])
+        //createControlAndAssignValue("birthdate_estimated", "person[birthdate_estimated]", selected_person[pos+1]["Birthdate Estimated"]);
+        createControlAndAssignValue("home_district", "person[addresses][address2]",selected_person[pos+1]["Home District"])
+        createControlAndAssignValue("county_district", "person[addresses][county_district]",selected_person[pos+1]["Ancestral Traditional Authority(T/A)"])
+        //createControlAndAssignValue("occupation", "person[occupation]",selected_person[pos+1]["Occupation"])
+        //createControlAndAssignValue("national_id", "person[patient][identifiers][National id]",selected_person[pos+1]["Patient National ID"]);
+      }
+
+      } else {
+      document.forms[0].action = "select";
+      clearFields();
+      __$('nextButton').onmousedown = function(){
+        search_redirect = $('touchscreenInput' + tstCurrentPage).value;
+        if (search_redirect.match(/Create a new/i)){
+          parameters = "?given_name=" + sessionStorage.getItem("given_name");
+          parameters += "&family_name=" + sessionStorage.getItem("family_name");
+          parameters += "&gender=" + sessionStorage.getItem("gender");
+
+          window.location.href = "/views/patient/father_demographics/new.html" + parameters;
+      }else if (search_redirect.length > 0){
+        sessionStorage.setItem("patientID", people[pos]["Person ID"]);
+        window.location.href = "/views/patient/father_demographics/confirm.html?person_id=" + people[pos]['Person ID'];
+        // nextEncounter(people[pos]['Person ID'] , 1, sessionStorage.programID);
+      }else{
+          showMessage("Select value to continue");
+      }
+    }
+
+      addFields();
+
+      try{
+        pos = parseInt(pos) + 1;
+        $('identifier').value = people[pos]['Patient National ID'];
+      }catch(e){
+        if(!pos && text.match(/New Patient/)){
+          $('identifier').value = "";
+        }else{
+          $('identifier').value = null;
+        }
+      }
+    }
+  }
+
+  function createControlAndAssignValue(control, name, value){
+    if(!__$(control)){
+      var hidden = document.createElement("input");
+      hidden.type = "hidden";
+      hidden.id = control;
+      hidden.value = "";
+
+      document.forms[0].appendChild(hidden);
+    }
+
+    __$(control).name = name;
+    __$(control).value = value;
+  }
+
+  function newSearch(){
+    if (window.location.href.match(/\?identifier/))
+      window.location.href = "/people/identifiers";
+    else
+      window.location.href = "/people/search";
+  }
+
+  function createNewSearchButton(){
+    $('clearButton').innerHTML = "<span>New Search</span>";
+    $('clearButton').setAttribute("onmousedown","newSearch();");
+  }
+
+  function newSearch() {
+    document.location = "/people/search?relation="
+  }
+
+  function setAttributes() {
+      var buttondiv = __$("buttons");
+      buttondiv = document.getElementById("buttons");
+      buttondiv.innerHTML += "<div id='tt_extraButtons'></div>"
+      buttondiv.innerHTML+= "<button class='button navButton' id='newSearch' onmousedown='newSearch();'><span>New search</span></button>"
+  }
+
+  function search_remote(){
+    // return
+    var url = "/people/dde_search?given_name=John" +
+      "&family_name=Does&gender=M";
+
+    ajaxGeneralRequest(url, "loadPatient()");
+
+  }
+
+
+
+function loadPatient(){
+    /*__$("summary").innerHTML = "";
+    remote_people = JSON.parse(ajaxGeneralRequestResult);
+     */
+    //people = [{}];
+    if (__$("touchscreenInput"+tstCurrentPage)) {
+      var targetElement = tstFormElements[__$("touchscreenInput"+tstCurrentPage).getAttribute("refersToTouchscreenInputID")];
+
+    var opts = __$("tt_currentUnorderedListOptions").getElementsByTagName("li");
+
+    var selOptions = targetElement.getElementsByTagName("option");
+
+    for(var i = opts.length-1; i > 0; i--){
+      if(opts[i].id > 0){
+        __$("tt_currentUnorderedListOptions").removeChild(opts[i]);
+      }
+    }
+
+    for(var j = selOptions.length-1; j > 1; j--){
+      targetElement.removeChild(selOptions[j]);
+    }
+
+    var pos = 1
+    i = -1;
+
+
+    for(var j = 0 ; j < found_clients.length; j++) {
+
+      i++
+
+      people.push({});
+      people[pos]["Name"] = found_clients[j].given_name + " " + found_clients[j].family_name;
+
+      people[pos]["Gender"] = found_clients[j].gender;
+
+      birthdate_estimated      = found_clients[j].birthdate_estimated; 
+      people[pos]["Birthdate"] = displayFormatedBirthdate(found_clients[j].birthdate, birthdate_estimated);
+      
+      people[pos]["Home District"] = found_clients[j].home_district;
+
+      people[pos]["Ancestral Traditional Authority(T/A)"] = found_clients[j].home_ta
+
+      people[pos]["Current Residence"] = found_clients[j].home_village;
+
+      people[pos]["Patient National ID"] = "";
+
+      people[pos]["DDE Document ID"] = "";
+
+      var person_id = parseInt(found_clients[j].person_id);
+
+      var li = document.createElement("li");
+      li.id = i + 1;
+      li.className = ((i + 1)/2 > 0 ? "odd" : "even");
+      li.setAttribute("tstvalue", person_id);
+      li.setAttribute("pos", i);
+      if(people[pos]["Home District"]){
+        li.innerHTML = people[pos]["Name"] + " (" + people[pos]["Gender"] + ") " +people[pos]["Birthdate"] + ", " + people[pos]["Home District"];
+      }else{
+        li.innerHTML = people[pos]["Name"] + " (" + people[pos]["Gender"] + ") " + people[pos]["Birthdate"];
+      }
+      li.setAttribute("tag", ((i + 1)/2 > 0 ? "odd" : "even"));
+      li.onmousedown = function(){
+        changeNextButtonText('Select Patient', this.getAttribute("pos"), person_id, people);
+        updateTouchscreenInputForSelect(this);
+        changeSummary(this.id);
+      }
+      li.onclick = function(){
+        changeNextButtonText('Select Patient', this.getAttribute("pos"), person_id,  people);
+        updateTouchscreenInputForSelect(this);
+        changeSummary(this.id);
+      }
+
+      __$("tt_currentUnorderedListOptions").appendChild(li);
+
+      var selOption = document.createElement("option");
+      selOption.innerHTML = li.innerHTML;
+      selOption.setAttribute("value", person_id);
+
+      targetElement.appendChild(selOption);
+
+      pos++;
+
+    }
+    
+    }  
+
+  }
+</script>
+
+<body onload = "setTimeout('setAttributes();findClients();', 500);">
+  <form action="" method="POST">
+        <label for="person">No father details were found:</label>
+    <select name="person[id]" id="person" dualView="true" dualViewOptions="people" tt_onUnload="" tt_onLoad = "setItems();">
+      <!--option onmousedown="search_remote()">Search from remote server for person with name John Does</option-->
+
+          <option class="test" value="0" onmousedown="changeNextButtonText('New Father')">&nbsp;</option>
+
+    </select>
+    <input type="hidden" id="identifier" name="identifier" value="" />
+    <input type="hidden" id="gender" name="gender" value="" />
+    <input type="hidden" id="given_name" name="given_name" value="" />
+    <input type="hidden" id="family_name" name="family_name" value="" />
+    <input type="hidden" id="family_name2" name="family_name2" value="" />
+    <input type="hidden" id="address2" name="address2" value="" />
+    <input type="hidden" id="relation" name="relation" value="" />
+  </form>
+  <script type="text/javascript" lang="javascript">
+    
+    var ctrls = ["identifier", "gender", "given_name", "family_name", "family_name2", "address2", "relation"];
+
+    function clearFields(){
+      for(var i = 0; i < ctrls.length; i++){
+        __$(ctrls[i]).removeAttribute("name");
+      }
+    }
+
+    function addFields(){
+      for(var i = 0; i < ctrls.length; i++){
+        __$(ctrls[i]).setAttribute("name", ctrls[i]);
+      }
+    }
+    
+    //-->
+  </script>
+</body>
+
+        <div id="footer">
+          <div id="buttons" class="buttonsDiv" style="position: absolute; width: 98.7%;">
+            <button id="finishButton" class="button navButton green" onclick="if (tt_cancel_destination) window.location = tt_cancel_destination;">
+              <span>Finish</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+</body>
+<script>
+  function setItems(){
+    //var inputField = document.getElementById("names");
+    //var personName = document.createTextNode(" " + sessionStorage.getItem("given_name") + " " + sessionStorage.getItem("family_name") );
+    //inputField.appendChild(personName);
+   string ="Create a new father with the names " + sessionStorage.getItem("given_name") + " " + sessionStorage.getItem("family_name");
+   document.getElementById("0").innerHTML = string;
+  }
+
+  function getResults(){
+     var f = document.getElementById('person');
+     var option = document.createElement('option');
+      option.setAttribute('value', sessionStorage.getItem('given_name'));
+      option.setAttribute('onmousedown', 'changeNextButton();');
+      option.setAttribute('id','given_name');
+      option.innerHTML = "Select " + sessionStorage.getItem('given_name') + sessionStorage.getItem('family_name');
+      f.appendChild(option);
+
+  }
+</script>
+</html>
+
+
+<!--
+...............
+
+
+-->
+<style>
+
+#popupBox {
+  z-index: 991;
+}
+ 
+#cover{
+ position: absolute;
+ background-color: black;
+ width: 100%;
+ height: 102%;
+ left: 0%;
+ top: 0%;
+ z-index: 990;
+ opacity: 0.65;
+ display: none;
+}
+
+</style>
+
+
+<div id="cover"></div>
+<script type="text/javascript" src="/assets/js/submitparameters.js"></script>
+
+<script>
+
+var found_clients = [];
+
+function findClients() {
+   var first_name = sessionStorage.getItem("given_name");
+   var last_name  = sessionStorage.getItem("family_name");
+   var gender     = sessionStorage.getItem("gender");
+
+   url = "/search/people?given_name=" + first_name + "&family_name=" + last_name +"&gender=" + gender;
+   functiontobecalled = 'searchResults'
+
+   document.getElementById('cover').style="display: inline;"; 
+   showStatus();
+   document.getElementById("cover").style.display = "none";
+   getParameters(url);
+}
+
+function searchResults(results){
+ document.getElementById('cover').style="display: none;"; 
+ document.getElementById('popupBox').style="display: none;"; 
+  
+  var data = JSON.parse(results);     
+  
+  for(var x in data){
+    if(data.hasOwnProperty(x)){
+      null_or_empty = function(value) {
+        return value ? value : ""; 
+      }
+
+      found_clients[x] = {
+        given_name:               null_or_empty(data[x].names[0].given_name),
+        middle_name:              null_or_empty(data[x].names[0].middle_name),
+        family_name:              null_or_empty(data[x].names[0].family_name),
+        gender:                   null_or_empty(data[x].gender),
+        birthdate:                null_or_empty(data[x].birthdate),
+        birthdate_estimated:      null_or_empty(data[x].birthdate_estimated),
+        home_district:            null_or_empty((data[x].addresses[0] || {}).address2),
+        home_ta:                  null_or_empty((data[x].addresses[0] || {}).county_district),
+        home_village:             null_or_empty((data[x].addresses[0] || {}).neighborhood_cell),
+        current_district:         null_or_empty((data[x].addresses[0] || {}).state_province),
+        current_ta:               null_or_empty((data[x].addresses[0] || {}).township_division),
+        current_village:          null_or_empty((data[x].addresses[0] || {}).city_village),
+
+        person_id:                data[x].person_id
+      }
+    }
+  } 
+
+  pos = 1
+  for(var i = 0 ; i < found_clients.length ; i++){
+    people.push({});
+    people.push({});
+    
+    people[pos]["Patient National ID"]  = 'XXX';
+    people[pos]["Name"]                 = found_clients[i].given_name + " " + found_clients[i].family_name;
+    people[pos]["Gender"]               = found_clients[i].gender;
+    birthdate_estimated                 = found_clients[i].birthdate_estimated; 
+    people[pos]["Birthdate"]            = displayFormatedBirthdate(found_clients[i].birthdate, birthdate_estimated);
+    people[pos]["Age"]                  = calculate_age(found_clients[i].birthdate);
+    people[pos]["Home District"]        = found_clients[i].home_district;
+
+
+    people[pos]["Ancestral Traditional Authority(T/A)"] = found_clients[i].home_ta;
+    people[pos]["Current Residence"] = found_clients[i].current_village;
+    people[pos]["Person ID"]            = found_clients[i].person_id;
+    pos++;
+  }
+
+  document.getElementById("innerPop").style.display = "none";  
+  loadPatient();
+}
+
+var interval = setInterval(function(){ 
+  // console.log("interval set");
+  var lists = document.getElementsByTagName("li");
+
+  loadPatient(); 
+  if (lists.length > 1){
+    clearInterval(interval);
+
+  }
+}, 600);
+</script>
