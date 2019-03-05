@@ -627,6 +627,7 @@
     }
 
     function validateHeight(height) {
+
         if (height.trim().length < 1)
             return true;
 
@@ -794,10 +795,10 @@
             showMessage("Weight can not be empty");
             return;
         }
-        if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.patientAge < 18) {
+        if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.patientAge < 18 && sessionStorage.programID != 11) {
             showMessage("Height can not be empty");
             return;
-        }if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.currentHeight == 0) {
+        }if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.currentHeight == 0 && sessionStorage.programID != 11) {
             showMessage("Height can not be empty");
             return;
         }
