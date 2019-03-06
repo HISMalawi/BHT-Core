@@ -96,9 +96,17 @@
         gender = sessionStorage.getItem("gender")
         var http = new XMLHttpRequest();
         var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/people/' + sessionStorage.patientID;
-        var params = JSON.stringify({
+        if(sessionStorage.dde_enabled === 'true'){
+          var params = {
             gender: sessionStorage.getItem("gender"),
-        });
+            program_id: sessionStorage.programID
+          };
+        }else{
+          var params = {
+            gender: sessionStorage.getItem("gender")
+          };
+        }
+        params = JSON.stringify(params);
         http.open('PUT', url, true);
         //Send the proper header information along with the request
         http.setRequestHeader('Content-type', 'application/json');

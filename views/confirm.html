@@ -303,7 +303,14 @@ function checkIfFilingNumberIsNotValid () {
   }
 
   function getClient(patient_id) {
-    var url =
+    var dde_status = "";
+    var url = "";
+    if (sessionStorage.dde_enabled === "true") {
+      url = apiProtocol + "://" + apiURL + ":" + apiPort;
+      url += "/api/v1/dde/patients/find_by_npid?npid=" + patient_id;
+      url += "&program_id=" + sessionStorage.programID;
+    }else {
+      url =
       apiProtocol +
       "://" +
       apiURL +
@@ -311,20 +318,34 @@ function checkIfFilingNumberIsNotValid () {
       apiPort +
       "/api/v1/search/patients/by_npid?npid=" +
       patient_id;
+    }
+
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
-        var obj = JSON.parse(this.responseText)[0];
-        var obj_2 = JSON.parse(this.responseText)[0];
-        if (JSON.parse(this.responseText).length > 1) {
-          location.href = "/views/duplicates.html?health_id=" + patient_id;
-        } else if (JSON.parse(this.responseText).length == 1) {
-          populatePatient(obj, obj_2);
-        } else {
-          noPatient();
-          // location.href = "/";
+        if (sessionStorage.dde_enabled === "true") {
+          var remotes = JSON.parse(this.responseText)["remotes"];
+          var locals = JSON.parse(this.responseText)["locals"];
+          if (remotes.length > 1 || locals.length > 1) {
+            location.href = "/views/npid_duplicates.html?health_id=" + patient_id;
+          } else if (locals.length == 1) {
+            populatePatient(locals[0], locals[0]);
+          } else {
+            noPatient();
+          }
+        }else {
+          var obj = JSON.parse(this.responseText)[0];
+          var obj_2 = JSON.parse(this.responseText)[0];
+          if (JSON.parse(this.responseText).length > 1) {
+            location.href = "/views/ duplicates.html?health_id=" + patient_id;
+          } else if (JSON.parse(this.responseText).length == 1) {
+            populatePatient(obj, obj_2);
+          } else {
+            noPatient();
+          }     
         }
+        
       } else if (this.status == 204) {
         window.location.href = "/";
       }
@@ -526,6 +547,10 @@ function checkIfFilingNumberIsNotValid () {
     var table = document.createElement("table");
     table.setAttribute("class", "info-tables");
 
+    var url = window.location.href;
+    url = new URL(url);
+    var scanned_id = url.searchParams.get("patient_id");
+
     for (identifier in identifiersHash) {
       var tr = document.createElement("tr");
       var td = document.createElement("td");
@@ -536,11 +561,20 @@ function checkIfFilingNumberIsNotValid () {
       td.innerHTML = identifiersHash[identifier];
       tr.appendChild(td);
       table.appendChild(tr);
-    }
 
+      if(sessionStorage.dde_enabled === 'true') {
+        if(identifier.toUpperCase() == 'NPID' && identifiersHash[identifier].length > 0) {
+          var returned_id = identifiersHash[identifier].toUpperCase().replace(/-/g, "");
+          if(scanned_id.toUpperCase() != returned_id && scanned_id.length != 6) {
+            document.location = '/views/print/npid.html?identifier=' + returned_id;
+          }
+        }
+      }
+    }  
     var container = document.getElementById("section-body-0");
     container.appendChild(table);
   }
+
   function buildStates(identifiers, patient_id) {
     var identifiersHash = {};
     var url =

@@ -14,14 +14,14 @@
     <script src="/assets/js/bootstrap/bootstrap.min.js"></script>
     <script src="/assets/js/moment.js"></script>
 
-    <! -- ...................... -->
+    <!-- ...................... -->
     <link rel="stylesheet" href="/assets/css/datatables/fixedHeader.dataTables.min.css" type="text/css">
     <link rel="stylesheet" href="/assets/css/datatables/jquery.dataTables.min.css" type="text/css">
 
     <script type="text/javascript" src="/assets/js/datatables/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="/assets/js/datatables/dataTables.fixedHeader.min.js"></script>
     <script src="/assets/js/medication.history.js"></script>
-    <! -- ...................... -->
+    <!-- ...................... -->
 
     <script src="/assets/js/lab.history.js"></script>
 
@@ -48,8 +48,8 @@
         width: 94%;
         margin-left: 10px;
         /*background-color: transparent !important;
-        color: white !important; */
-    }
+        color: white !important; 
+    }*/
 
     .badge {
         background-color: #007bff;
@@ -89,7 +89,7 @@
 
     #todaysDate, #selectedDate {
       font-size: 14px;
-    } */
+    } 
 
 </style>
 
@@ -157,10 +157,10 @@
     <div class="col-sm-10 col-lg-10 col-md-10 col-xs-10 cards"
          style="border: solid 2px;width: 80%; padding: 0; margin-left: 1%; height: 520px; margin-top: 1%;margin-right: 2%; width: 78%;"
          id="generic_tabs">
-        <div class="row" style="display: flex;"><h4 class="headers" style="margin-left: 40px; ">Set Date: <span
-                id="selectedDate"></span> | </h4>
+        <div class="row" style="display: flex;"><h4 class="headers" style="margin-left: 40px; ">Today&apos;s Date: <span
+                id="todaysDate"></span> | </h4>
             <h4 class="headers"> Next Task: <span id="nextEncounter"></span> | </h4>
-            <h4 class="headers todays-date"> Today&apos;s Date: <span id="todaysDate"></span></h4>
+            <h4 class="headers todays-date"> Set Date: <span id="selectedDate"></span></h4>
         </div>
         <div class="row">
             <div class="col-sm-6 col-lg-6 col-md-6 col-xs-6"
@@ -169,7 +169,7 @@
                      data-toggle="modal" data-target="#myModal" onclick="populateModal();">
                     <div class="card-header h4 btn-primary" style="margin: 3%; padding: 1%;" id="encounterHeader"></div>
 
-                    <div class="list-group" id="encounters">
+                    <div class="list-group" id="encounters" style="overflow-x: hidden;">
                     </div>
 
                     <!--table class="table" style="border: 0;">
@@ -261,9 +261,9 @@
                 <div class="modal-body"
                      style="height: calc(100vh - 200px); max-height: calc(100vh - 200px); overflow: hidden;">
                     <div class="col-lg-3 col-sm-3 col-md-3 col-xs-3 border" id="encounters2"
-                         style="border-right: solid 1px;"></div>
+                         style="height: 100%; border-right: solid 1px; overflow-y: auto;"></div>
 
-                    <div class="col-lg-9 col-sm-9 col-md-9 col-xs-9" style="height: 100%;overflow:scroll;">
+                    <div class="col-lg-9 col-sm-9 col-md-9 col-xs-9" style="height: 100%;overflow-y:auto;" >
                         <table class="table table-striped">
                             <thead>
                             <tr>
@@ -612,9 +612,13 @@
                     var phone_number = "";
                 }
                 try {
-                    identifier = results.patient_identifiers[0].identifier || "no value available";
+                    for (var index = 0; index < results.patient_identifiers.length; index++) {
+                        if(results.patient_identifiers[index]["identifier_type"] == 3) {
+                        identifier =  results.patient_identifiers[index]["identifier"];
+                        }
+                    }
                 } catch (e) {
-
+                    console.log(e); 
                 }
 
                 setValues(patient_name, gender, age, addressl1, addressl2, phone_number, identifier);
@@ -663,7 +667,7 @@
     }
 
     function getDates(patient_id, index, pageNumber) {
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/' + patient_id + '/visits';
+        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/' + patient_id + '/visits?program_id='+ sessionStorage.programID;
         var div = document.getElementById("dates");
         div.innerHTML = "";
         var req = new XMLHttpRequest();
@@ -694,12 +698,12 @@
 
                     }
                     div.innerHTML += '<button type="button" id="' + x + '" value="' + results[x] +
-                        '" class="app-btn btn btn-primary" style="width: 90%;  margin-left: 5%;margin-top: 6%; margin-bottom: 6%; border-radius: 0%; color:black;"  onclick="activateButton(this);changeDate(this);getValue(this.value,' + patient_id + ',&#034encounters&#034, &#034h4&#034, &#034table&#034); getMedication(' + patient_id + ',&#034table&#034, &#034medication&#034);">' +
+                        '" class="application-btn btn btn-primary" style="width: 90%;  margin-left: 5%;margin-top: 6%; margin-bottom: 6%; border-radius: 0%; color:black;"  onclick="activateButton(this);changeDate(this);getValue(this.value,' + patient_id + ',&#034encounters&#034, &#034h4&#034, &#034table&#034); getMedication(' + patient_id + ',&#034table&#034, &#034medication&#034);">' +
                         moment(results[x]).format("DD/MMM/YYYY");
                     +'</button>';
                     encDate = moment(results[0]).format("DD/MMM/YYYY");
                     getMedication(patient_id, "table", "medication");
-                    activateButton(document.getElementsByClassName("app-btn btn btn-primary")[0]);
+                    activateButton(document.getElementsByClassName("application-btn btn btn-primary")[0]);
                     // getMedication(patient_id ,"encounters", "h4"034, &#034table&#034);
                     if (counter == 4 || (results.length - (index + counter) == 1)) {
 
@@ -739,15 +743,13 @@
 
     function getValue(value, id, div, className, itemType) {
         var encounters = document.getElementById(div);
-        var selectedDate = document.getElementById("selectedDate");
-        selectedDate.innerHTML = moment(value).format("DD/MMM/YYYY");
         document.getElementById("encounterDate").innerHTML = moment(value).format("DD/MMM/YYYY");
         sessionStorage.setItem("value", value);
         if (encounters.innerHTML != null) {
             encounters.innerHTML = "";
         } else {
         }
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/encounters?patient_id=' + id + '&date=' + value;
+        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/encounters?paginate=false&patient_id=' + id + '&date=' + value;
         var req = new XMLHttpRequest();
         var counter = 0;
         req.onreadystatechange = function () {
@@ -809,7 +811,7 @@
     }
 
     function populateModal() {
-        getValue(sessionStorage.value, sessionStorage.patientID, "encounters2", "btn btn-primary btn-lg", "button");
+        getValue(sessionStorage.sessionDate, sessionStorage.patientID, "encounters2", "btn btn-primary btn-lg", "button");
     }
 
     function getMedication(id, itemType, div) {
@@ -818,7 +820,7 @@
             programs.innerHTML = "";
         } else {
         }
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/drug_orders?patient_id=' + id + "&paginate=false";
+        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/drug_orders?patient_id=' + id + "&program_id="+sessionStorage.programID+"&paginate=false";
         var req = new XMLHttpRequest();
 
         var listGroup = document.createElement("div");
@@ -1194,23 +1196,27 @@
     }
 
     function loadTodaysDate() {
-        var todays_date = moment(sessionStorage.sessionDate).format("DD/MMM/YYYY");
-        if (sessionStorage.session) {
-            jQuery("#todaysDate").html("<span style='color: red; font-weight: bold;'>" + todays_date + "</span>")
+        var selected_date = moment(sessionStorage.sessionDate).format("DD/MMM/YYYY");
+        console.log(selected_date)
+        if (selected_date != moment().format('DD/MMM/YYYY')) {
+            jQuery("#selectedDate").html("<span style='color: red; font-weight: bold;'>" + selected_date + "</span>")
         } else {
-            jQuery("#todaysDate").html("<span style='color: green; font-weight: bold;'>" + todays_date + "</span>")
+            jQuery("#selectedDate").html("<span style='color: green; font-weight: bold;'>" + selected_date + "</span>")
         }
+        var todays_date = moment().format('DD/MMM/YYYY');
+        jQuery("#todaysDate").html("<span style='color: green; font-weight: bold;'>" + todays_date + "</span>")
     }
 
     loadTodaysDate();
 
     function activateButton(button) {
-        var buttons = document.getElementsByClassName("app-btn btn btn-primary");
+        var buttons = document.getElementsByClassName("application-btn btn btn-primary");
 
         for (let index = 0; index < buttons.length; index++) {
             buttons[index].style.backgroundColor = "white";
+            buttons[index].style.color = "black";
         }
-
+        button.style.color = "white";
         button.style.backgroundColor = "#204d74";
     }
 

@@ -160,7 +160,7 @@ function initiateDataTable() {
 function fetchMedicationOrders() {
   var url = apiProtocol + "://" + apiURL + ":" + apiPort;
   url +="/api/v1/drug_orders?patient_id=" + sessionStorage.patientID;
-  url += "&page_size=100000";
+  url += "&program_id="+sessionStorage.programID+"&page_size=100000";
   //url += "&date=" + sessionStorage.sessionDate;
 
   var xhttp = new XMLHttpRequest();

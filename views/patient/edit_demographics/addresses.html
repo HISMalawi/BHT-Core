@@ -454,15 +454,22 @@
         current_village = sessionStorage.getItem("current_village");
         var http = new XMLHttpRequest();
         var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/people/' + sessionStorage.patientID;
-        var params = JSON.stringify({
+        var new_address = {
             home_district: sessionStorage.getItem("home_district"),
             home_traditional_authority: sessionStorage.getItem("home_ta"),
             home_village: sessionStorage.getItem("home_village"),
             current_region: sessionStorage.getItem("current_region"),
             current_district: sessionStorage.getItem("current_district"),
             current_traditional_authority: sessionStorage.getItem("current_ta"),
-            current_village: sessionStorage.getItem("current_village"),
-        });
+            current_village: sessionStorage.getItem("current_village")
+        };
+
+        if(sessionStorage.dde_enabled === 'true') {
+          new_address.program_id = sessionStorage.programID;
+        }
+
+        var params = JSON.stringify(new_address);
+
         http.open('PUT', url, true);
         //Send the proper header information along with the request
         http.setRequestHeader('Content-type', 'application/json');

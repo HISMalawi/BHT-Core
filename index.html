@@ -189,6 +189,7 @@
         var apiProtocol = sessionStorage.apiProtocol;
         var apiURL = sessionStorage.apiURL;
         var apiPort = sessionStorage.apiPort;
+        getDDEStatus();
        function getLocationID() {
             var url =apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/global_properties?property=current_health_center_id";
 
@@ -275,7 +276,6 @@
       document.getElementById('findByButton').style = 'display: none;';
     }
   }
-
   disableNoneART();
 </script>
 

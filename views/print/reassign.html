@@ -33,6 +33,7 @@
     if (useFilingNumbers) {
       document.location = FILING_NUMBERS_ROUTE + '?patient_id=' + PERSON_ID;
     } else {
+      window.location.href = '/views/confirm.html?person_id='+PERSON_ID;
       nextEncounter(PERSON_ID, PROGRAM_ID, true);
     }
   }

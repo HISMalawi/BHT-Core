@@ -1,0 +1,207 @@
+<script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js"
+        defer="true"></script>
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+
+<script type="text/javascript" src="/assets/js/post_parameters.js"></script>
+<script type="text/javascript" src="/assets/js/generic_ajaxrequest.js"></script>
+<script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
+<script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
+
+<link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
+
+<script src="/assets/js/moment.js"></script>
+<link rel="stylesheet" href="/assets/css/lab.min.css" type="text/css">
+
+<style>
+    #nextButton {
+        display: none;
+    }
+
+    #arv-number-duplicate-patients {
+        width: 100%;
+    }
+
+    #arv-number-duplicate-patients th {
+        background-color: teal;
+        color: white;
+        text-align: center;
+        line-height: 2em;
+    }
+
+    #arv-number-duplicate-patients tbody {
+        text-align: center;
+        line-height: 2em;
+        letter-spacing: 1;
+    }
+
+    .loader {
+        position: absolute;
+        display: none;
+        top: 30%;
+        left: 40%;
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+        z-index: 9999999999999;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .arv-btn{
+        border: none;
+        color: white;
+        padding: 8px 30px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius:0.12em;
+        float: right;
+        cursor: pointer;
+    }
+
+    .select-btn{
+        background-color: orange;
+    }
+
+    .reassign-btn{
+        background-color: firebrick;
+    }
+</style>
+
+<script type="text/javascript">
+    var patient_id = sessionStorage.patientID;
+    var tt_cancel_destination = "/views/patient/find_by_menu.html";
+
+    function showDuplicatePatients() {
+
+        jQuery(".loader").show();
+
+        var arv_number = getUrlVars()["arv_number"];
+        var arv_number_type_id = 4;
+        var arv_number_url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/search/patients/by_identifier?type_id=" + arv_number_type_id + "&identifier=" + arv_number;
+
+        jQuery("#helpText" + tstCurrentPage).html("Duplicate patients with identifier " + arv_number);
+
+        var html = "<table>";
+        html += "</html>";
+        jQuery("#keyboard").hide();
+        jQuery("#clearButton").hide();
+        jQuery("#cancelButton").hide();
+
+        jQuery(".inputFrameClass").css("width", "96%");
+        jQuery(".inputFrameClass").css("height", "80%");
+
+        var finishButtonHtml = '<button class="button navButton green"  onmousedown="gotoFindByMenu();"><span>Finish</span></button>'
+        jQuery("#buttons").append(finishButtonHtml);
+
+
+        var xhttp1 = new XMLHttpRequest();
+        xhttp1.onreadystatechange = function () {
+            if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+                jQuery(".loader").hide();
+                var people = JSON.parse(this.responseText);
+                var html = "<table id='arv-number-duplicate-patients'>";
+                html += "<thead>";
+                html += "<th>&nbsp;</th>";
+                html += "<th>First Name</th>";
+                html += "<th>Family Name</th>";
+                html += "<th>Gender</th>";
+                html += "<th>Birthdate</th>";
+                html += "<th>Current village</th>";
+                html += "<th colspan='2'>&nbsp;</th>";
+                html += "</thead>";
+                html += "<tbody>";
+                var count = 1;
+                for (var key in people) {
+                    var patient_identifiers = people[key]["patient_identifiers"];
+
+                    for (var i=0; i<=patient_identifiers.length - 1; i++){
+                        var identifier_type = patient_identifiers[i].type;
+                        if (identifier_type.name.match(/ARV/i)){
+                            var patient_identifier_id = patient_identifiers[i]["patient_identifier_id"]
+                        }
+                    }
+
+                    var person_address = people[key]["person"]["addresses"][0];
+                    var person_name = people[key]["person"]["names"][0];
+                    //date_created = moment(date_created).format('DD/MMM/YYYY');
+                    //var date_voided = past_filling_numbers[key]["date_voided"];
+                    //date_voided = moment(date_voided).format('DD/MMM/YYYY');
+
+                    var person_id = people[key]["person"]["person_id"]
+
+                    html += "<tr>";
+                    html += "<td>" + count + "</td>";
+                    html += "<td>" + person_name["given_name"] + "</td>";
+                    html += "<td>" + person_name["given_name"] + "</td>";
+                    html += "<td>" + people[key]["person"]["gender"] + "</td>";
+                    html += "<td>" + people[key]["person"]["birthdate"] + "</td>";
+                    html += "<td>" + person_address["city_village"] + "</td>";
+                    html += "<td><span class='arv-btn select-btn' onclick='selectPatient(" + person_id + ")'>Select patient</span></td>";
+                    html += "<td> <span class='arv-btn reassign-btn' onclick='reassignARVNumber(" + person_id + ", " + patient_identifier_id + ")'>Reassign identifier</span></td>";
+                    html += "</tr>";
+                    count = count + 1;
+                }
+
+                html += "</tbody>";
+                html += "<table>";
+                jQuery(".inputFrameClass").append(html)
+            }
+        };
+
+        xhttp1.open("GET", arv_number_url, true);
+        xhttp1.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+        xhttp1.setRequestHeader('Content-type', "application/json");
+        xhttp1.send();
+    }
+
+    function getUrlVars() {
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,
+            function (m, key, value) {
+                vars[key] = value;
+            });
+        return vars;
+    }
+
+    function gotoFindByMenu() {
+        window.location = "/views/patient/find_by_menu.html";
+    }
+
+    function selectPatient(personID){
+        window.location = "/views/confirm.html?person_id=" + personID;
+    }
+
+    function reassignARVNumber(personID, patient_identifier_id){
+        var arv_number = getUrlVars()["arv_number"];
+        window.location = "/views/patient/reassign_arv_number.html?patient_identifier_id=" + patient_identifier_id + "&arv_number=" + arv_number + "&patient_id=" + personID;
+    }
+
+</script>
+
+<body id="mateme">
+<div id="container">
+    <div id="content">
+        <form>
+            <input type="text" name="summary"
+                   tt_onLoad="showDuplicatePatients();"
+                   tt_pageStyleClass="NoControls" helpText="" optional="true"/>
+
+        </form>
+
+        <div class="loader"></div>
+    </div>
+</div>
+</body>
+

@@ -1,0 +1,196 @@
+<script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js"
+        defer="true"></script>
+<!-- <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/standard.js" defer="true"></script> -->
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+
+<script type="text/javascript" src="/assets/js/yes_no_ctrls.js"></script>
+<link rel="stylesheet" href="/assets/css/yes_no_ctrls.css" type="text/css">
+<script type="text/javascript" src="/assets/js/post_parameters.js"></script>
+<script type="text/javascript" src="/assets/js/generic_ajaxrequest.js"></script>
+<script type="text/javascript" src="/assets/js/moment.js"></script>
+<script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
+<script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
+
+<link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
+
+<style>
+    .loader {
+        position: absolute;
+        display: none;
+        top: 30%;
+        left: 40%;
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+        z-index: 9999999999999;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<script type="text/javascript">
+
+    var programID = sessionStorage.getItem("programID");
+    var arv_number = getUrlVars()["arv_number"];
+    var tt_cancel_destination = "/views/patient/arv_number_duplicates.html?arv_number=" + arv_number;
+
+    var site_prefix = "";
+    var suggested_arv_number = "";
+
+    function getUrlVars() {
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,
+            function (m, key, value) {
+                vars[key] = value;
+            });
+        return vars;
+    }
+
+    function initializeVariables() {
+        jQuery(".loader").show();
+        jQuery('#keyboard').hide();
+        jQuery("#buttons").hide();
+        jQuery("#inputFrame" + tstCurrentPage).hide();
+
+        var property_name = "site_prefix";
+        var site_prefix_url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/global_properties?property=" + property_name;
+
+        var xhttp1 = new XMLHttpRequest();
+        xhttp1.onreadystatechange = function () {
+            if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+                site_prefix = JSON.parse(this.responseText)["site_prefix"];
+                var suggested_arv_number_url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/programs/1/next_available_arv_number";
+                var xhttp2 = new XMLHttpRequest();
+                xhttp2.onreadystatechange = function () {
+                    if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+                        suggested_arv_number = JSON.parse(this.responseText)["arv_number"];
+                        suggested_arv_number = suggested_arv_number.replace(/^\D+/g, '');
+                        gotoNextPage();
+                    }
+                };
+
+                xhttp2.open("GET", suggested_arv_number_url, true);
+                xhttp2.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+                xhttp2.setRequestHeader('Content-type', "application/json");
+                xhttp2.send();
+
+            }
+        };
+
+        xhttp1.open("GET", site_prefix_url, true);
+        xhttp1.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+        xhttp1.setRequestHeader('Content-type', "application/json");
+        xhttp1.send();
+    }
+
+    function updateARVNumberInput() {
+        var inputElement = $('tt_page_art_number').getElementsByTagName("input")[0]
+        var prefix = document.createElement("span");
+        var style = document.createAttribute("style");
+        style.value = "position: absolute; z-index: 100; left: 47px; font-size: 44px;";
+        prefix.setAttributeNode(style)
+        inputElement.setAttribute("style", "text-align:right; width:924px;");
+        prefix.innerHTML = site_prefix;
+        inputElement.parentNode.insertBefore(prefix, inputElement);
+        style.value += 'left:35px;'
+        prefix.setAttributeNode(style);
+        inputElement.value = suggested_arv_number
+    }
+
+    function changeNextButtonToValidateARVNumber() {
+        __$('nextButton').onmousedown = function () {
+            var value = __$('touchscreenInput' + tstCurrentPage).value;
+            var arv_number = site_prefix + "-ARV-" + value;
+            var lookup_arv_number_url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/programs/1/lookup_arv_number/" + arv_number;
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+                    var exists = JSON.parse(this.responseText)["exists"];
+                    if (exists) {
+                        showMessage("ARV number already exists")
+                    } else {
+                        postARVNumber();
+
+                    }
+                }
+            };
+
+            xhttp.open("GET", lookup_arv_number_url, true);
+            xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+            xhttp.setRequestHeader('Content-type', "application/json");
+            xhttp.send();
+        }
+    }
+
+
+    function postARVNumber() {
+
+        var patient_identifier_id = getUrlVars()["patient_identifier_id"];
+        var patient_id = getUrlVars()["patient_id"];
+
+        var value = __$('touchscreenInput' + tstCurrentPage).value;
+        var arv_number = site_prefix + "-ARV-" + value;
+
+        var identifier_data = {
+            identifier: arv_number,
+        };
+
+        var update_patient_identifier_url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/patient_identifiers/" + patient_identifier_id;
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+                window.location = "/views/confirm.html?person_id=" + patient_id;
+            }
+        };
+
+        xhttp.open("PUT", update_patient_identifier_url, true);
+        xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+        xhttp.setRequestHeader('Content-type', "application/json");
+        xhttp.send(JSON.stringify(identifier_data));
+    }
+
+    function nextPage() {
+        var patient_id = getUrlVars()["patient_id"];
+        window.location = "/views/confirm.html?person_id=" + patient_id;
+    }
+
+    function resetPage() {
+        jQuery('#keyboard').show();
+        jQuery("#buttons").show();
+        jQuery("#innerPop").show()
+        jQuery("#inputFrame" + tstCurrentPage).show();
+        jQuery(".loader").hide();
+    }
+
+</script>
+
+<body id="mateme">
+<div id="container">
+    <div id="content">
+
+        <form>
+            <input type="text" name="regimens"
+                   tt_onLoad="initializeVariables();"
+                   tt_onUnLoad="resetPage();"
+                   tt_pageStyleClass="NoControls" optional="true"/>
+
+            <input allowFreeText="true" field_type="alpha"
+                   helpText="ART number" id="art_number" name="arv_number"
+                   tt_onLoad="press('num'); updateARVNumberInput(); changeNextButtonToValidateARVNumber();"
+                   tt_pageStyleClass="Numeric NumbersOnly" type="text"/>
+        </form>
+
+        <div class="loader"></div>
+    </div>
+</div>
+</body>
