@@ -307,10 +307,21 @@
         person_age_estimate = sessionStorage.getItem("person_age_estimate");
         var http = new XMLHttpRequest();
         var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/people/' + sessionStorage.patientID;
-        var params = JSON.stringify({
-            birthdate: birth_date,
-            birthdate_estimated: estimated
-        });
+        if(sessionStorage.dde_enabled === 'true'){
+          var params = {
+              birthdate: birth_date,
+              birthdate_estimated: estimated,
+              program_id: sessionStorage.programID
+          };
+        }else{
+          var params = {
+              birthdate: birth_date,
+              birthdate_estimated: estimated
+          };
+        }
+        var params = JSON.stringify(params);
+
+
         http.open('PUT', url, true);
         http.setRequestHeader('Content-type', 'application/json');
         http.onreadystatechange = function () { //Call a function when the state changes.

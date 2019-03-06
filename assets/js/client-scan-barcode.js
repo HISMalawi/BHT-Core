@@ -66,6 +66,12 @@ function returnToFunction(search_string) {
 }
 
 function postID(identifier) {
+  if(sessionStorage.programID == undefined)
+    return;
+
+  if(sessionStorage.programID.length < 1)
+    return;
+
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {

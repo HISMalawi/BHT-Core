@@ -44,6 +44,16 @@
 <script type="text/javascript">
 var tt_cancel_destination = "/";
 
+var url = window.location.href;
+url = new URL(url);
+var merge = url.searchParams.get("merge");
+if(merge == null)
+  merge = '';
+
+if(merge.length > 0) {
+  tt_cancel_destination = '/views/data_management/merge_clients.html'
+}
+
 function validateName() {
 __$("nextButton").removeAttribute("onmousedown");
 __$("nextButton").onmousedown = function(){
@@ -83,9 +93,19 @@ __$("nextButton").onmousedown = function(){
 <script type="text/javascript">
 
   function  submitSearchResults(){
+    if(merge.length > 0) {
+      var gender = __$('gender').value;
+      var url = '/views/data_management/merge_clients.html'
+      url += "?gender=" + gender;
+      url += "&first_name=" + document.getElementById('given_name').value;
+      url += "&last_name=" + document.getElementById('family_name').value;
+      url += "&side=" + merge;
+      document.location = url;
+    }else{
      var gender = __$('gender').value;
      sessionStorage.setItem('gender', gender);
      document.location = "search_results.html"; 
+    }
   }
 
   function changeNextButton(){
@@ -94,8 +114,7 @@ __$("nextButton").onmousedown = function(){
 
   value = $('touchscreenInput' + tstCurrentPage).value;
  if (value.length  > 0) {
-
-           submitSearchResults();
+   submitSearchResults();
  }else {
    showMessage("You must enter a value to continue");
  }

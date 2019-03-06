@@ -114,8 +114,12 @@
 
           window.location.href = "/views/patient/new.html" + parameters;
       }else if (search_redirect.length > 0){
-        sessionStorage.setItem("patientID", people[pos]["Person ID"]);
-        window.location.href = "/views/confirm.html?person_id=" + people[pos]['Person ID'];
+        if(people[pos]["person_type"] === "local" || people[pos]["person_type"] == undefined) {
+          window.location.href = "/views/confirm.html?person_id=" + people[pos]['Person ID'];
+          sessionStorage.setItem("patientID", people[pos]["Person ID"]);
+        }else {
+          window.location.href = "/views/confirm.html?patient_id=" + people[pos]['Person ID'];
+        }
         // nextEncounter(people[pos]['Person ID'] , 1, sessionStorage.programID);
       }else{
           showMessage("Select value to continue");
@@ -173,17 +177,6 @@
       document.getElementById("buttons").innerHTML += newSearchHTML;
   }
 
-  function search_remote(){
-    // return
-    var url = "/people/dde_search?given_name=John" +
-      "&family_name=Does&gender=M";
-
-    ajaxGeneralRequest(url, "loadPatient()");
-
-  }
-
-
-
 function loadPatient(){
     /*__$("summary").innerHTML = "";
     remote_people = JSON.parse(ajaxGeneralRequestResult);
@@ -218,6 +211,7 @@ function loadPatient(){
       people[pos]["Name"] = found_clients[j].given_name + " " + found_clients[j].family_name;
 
       people[pos]["Gender"] = found_clients[j].gender;
+      people[pos]["person_type"] = found_clients[j].person_type;
 
       birthdate_estimated      = found_clients[j].birthdate_estimated; 
       people[pos]["Birthdate"] = displayFormatedBirthdate(found_clients[j].birthdate, birthdate_estimated);
@@ -301,7 +295,6 @@ function loadPatient(){
   <form action="" method="POST">
         <label for="person" id="patient-results">No patients were found:</label>
     <select name="person[id]" id="person" dualView="true" dualViewOptions="people" tt_onUnload="" tt_onLoad = "addBtns();setItems();">
-      <!--option onmousedown="search_remote()">Search from remote server for person with name John Does</option-->
 
           <option class="test" value="0" onmousedown="changeNextButtonText('New Patient')">&nbsp;</option>
 
@@ -399,7 +392,15 @@ function findClients() {
    var last_name  = sessionStorage.getItem("family_name");
    var gender     = sessionStorage.getItem("gender");
 
-   url = "/search/people?given_name=" + first_name + "&family_name=" + last_name +"&gender=" + gender;
+   if(sessionStorage.dde_enabled === "true") {
+    url = "/dde/patients/find_by_name_and_gender?given_name=";
+    url += first_name + "&family_name=" + last_name;
+    url += "&gender="+ gender + "&program_id=";
+    url += sessionStorage.programID;
+   }else {
+    url = "/search/people?given_name=" + first_name + "&family_name=" + last_name +"&gender=" + gender;
+   }
+
    functiontobecalled = 'searchResults'
 
    document.getElementById('cover').style="display: inline;"; 
@@ -407,36 +408,79 @@ function findClients() {
    document.getElementById("cover").style.display = "none";
    getParameters(url);
 }
-
+function nationalID(identifiers) {
+  var identifier = null;
+  for (var index = 0; index < identifiers.length; index++) {
+    if(identifiers[index]["identifier_type"] == 3) {
+      identifier =  identifiers[index]["identifier"];
+    }
+  }
+    return identifier;
+}
 function searchResults(results){
  document.getElementById('cover').style="display: none;"; 
  document.getElementById('popupBox').style="display: none;"; 
   
   var data = JSON.parse(results);     
-  var patientsNumber = data.length;
+  if(sessionStorage.dde_enabled === "true") {
+    var obj3 =[];
+    for (var index = 0; index < data["locals"].length; index++) {
+      obj3.push(data["locals"][index]);
+      obj3[index]["pateint_type"] = "local";
+    }
+    for (var index = 0; index < data["remotes"].length; index++) {
+      obj3.push(data["remotes"][index]);
+    }
+    data = obj3;
+  }
   
+  var patientsNumber = data.length;
   for(var x in data){
+    
+      
     if(data.hasOwnProperty(x)){
+
       null_or_empty = function(value) {
         return value ? value : ""; 
       }
+      if(sessionStorage.dde_enabled === "true") {
+        found_clients[x] = {
+          given_name: 							null_or_empty(data[x].person.names[0].given_name),
+          middle_name: 							null_or_empty(data[x].person.names[0].middle_name),
+          family_name: 							null_or_empty(data[x].person.names[0].family_name),
+          gender: 									null_or_empty(data[x].person.gender),
+          birthdate: 								null_or_empty(data[x].person.birthdate),
+          birthdate_estimated: 			null_or_empty(data[x].person.birthdate_estimated),
+          home_district:						null_or_empty((data[x].person.addresses[0] || {}).address2),
+          home_ta:									null_or_empty((data[x].person.addresses[0] || {}).county_district),
+          home_village:							null_or_empty((data[x].person.addresses[0] || {}).neighborhood_cell),
+          current_district:					null_or_empty((data[x].person.addresses[0] || {}).state_province),
+          current_ta:								null_or_empty((data[x].person.addresses[0] || {}).township_division),
+          current_village:					null_or_empty((data[x].person.addresses[0] || {}).city_village),
 
-			found_clients[x] = {
-				given_name: 							null_or_empty(data[x].names[0].given_name),
-				middle_name: 							null_or_empty(data[x].names[0].middle_name),
-				family_name: 							null_or_empty(data[x].names[0].family_name),
-				gender: 									null_or_empty(data[x].gender),
-				birthdate: 								null_or_empty(data[x].birthdate),
-				birthdate_estimated: 			null_or_empty(data[x].birthdate_estimated),
-				home_district:						null_or_empty((data[x].addresses[0] || {}).address2),
-				home_ta:									null_or_empty((data[x].addresses[0] || {}).county_district),
-				home_village:							null_or_empty((data[x].addresses[0] || {}).neighborhood_cell),
-				current_district:					null_or_empty((data[x].addresses[0] || {}).state_province),
-				current_ta:								null_or_empty((data[x].addresses[0] || {}).township_division),
-				current_village:					null_or_empty((data[x].addresses[0] || {}).city_village),
+          person_type:							data[x].person.person_id != null? "local" : "remote",  
+          person_id:								data[x].person.person_id != null? data[x].person.person_id : nationalID(data[x].patient_identifiers)
+  			}
+      }else {
+        found_clients[x] = {
+          given_name: 							null_or_empty(data[x].names[0].given_name),
+          middle_name: 							null_or_empty(data[x].names[0].middle_name),
+          family_name: 							null_or_empty(data[x].names[0].family_name),
+          gender: 									null_or_empty(data[x].gender),
+          birthdate: 								null_or_empty(data[x].birthdate),
+          birthdate_estimated: 			null_or_empty(data[x].birthdate_estimated),
+          home_district:						null_or_empty((data[x].addresses[0] || {}).address2),
+          home_ta:									null_or_empty((data[x].addresses[0] || {}).county_district),
+          home_village:							null_or_empty((data[x].addresses[0] || {}).neighborhood_cell),
+          current_district:					null_or_empty((data[x].addresses[0] || {}).state_province),
+          current_ta:								null_or_empty((data[x].addresses[0] || {}).township_division),
+          current_village:					null_or_empty((data[x].addresses[0] || {}).city_village),
 
-				person_id:								data[x].person_id
-			}
+          person_id:								data[x].person_id
+      // li.setAttribute("tag", ((i + 1)/2 > 0 ? "odd" : "even"));
+        }
+
+      }
     }
   } 
 
@@ -466,7 +510,6 @@ function searchResults(results){
 }
 
 var interval = setInterval(function(){ 
-  // console.log("interval set");
   var lists = document.getElementsByTagName("li");
 
   loadPatient(); 

@@ -164,9 +164,9 @@ function createApplicationCard(applicationData, idx) {
     $("#moduleButton").attr('id', `moduleButton${idx}`)
 
     if (applicationData.url == "") {
-        $(`#moduleButton${idx}`).attr("href", window.location.href);
+        $(`#moduleButton${idx}`).attr("href",  window.location.href);
     } else {
-        $(`#moduleButton${idx}`).attr("href", applicationData.url);
+        $(`#moduleButton${idx}`).attr("href", "/" +applicationData.url);
     }
 
     $("#cardImage")
@@ -529,6 +529,10 @@ function showBarcodeDiv() {
 }
 
 function redirect(id) {
+    var dvTable = document.getElementById("generic_tabs");
+    dvTable.innerHTML = null;
+    dvTable.style = "width: 97% !important;";
+    
     if (id === "create-user") {
         window.location.href = './views/users/new.html';
     }
@@ -541,16 +545,12 @@ function redirect(id) {
         window.location.href = '/views/print_location.html';
     }
     if (id === "view-sys-settings") {
+      var obj = document.createElement("object");
+      obj.setAttribute("data", "/apps/" + sessionStorage.applicationFolder + "/views/system_settings.html");
+      obj.setAttribute("type", "text/html");
+      obj.setAttribute("style", "width: 97%; height: 430px; text-align: left;");
+      dvTable.appendChild(obj);
     }
-    var dvTable = document.getElementById("generic_tabs");
-    dvTable.innerHTML = null;
-    dvTable.style = "width: 97% !important;";
-
-    var obj = document.createElement("object");
-    obj.setAttribute("data", "/apps/ART/views/system_settings.html");
-    obj.setAttribute("type", "text/html");
-    obj.setAttribute("style", "width: 97%; height: 430px; text-align: left;");
-    dvTable.appendChild(obj);
     if (id === "report-1") {
     }
 }
@@ -816,3 +816,34 @@ function print_and_redirect(url_forward, url_back) {
 function finishRedirect(url) {
     document.location = url;
 }
+
+function getDDEStatus(){
+    var property_name = "dde_enabled";
+    var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/global_properties?property=" + property_name;
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 ) {
+            if(this.status == 201 || this.status == 200) {
+                try{
+                    site_prefix = JSON.parse(this.responseText)["dde_enabled"];
+                    if (site_prefix === "true") {
+                        sessionStorage.dde_enabled = true;
+                    }else {
+                        sessionStorage.dde_enabled = false;
+                    } 
+                } catch(e){
+                        sessionStorage.dde_enabled = false;
+                }
+            }else if(this.status == 404) {
+                sessionStorage.dde_enabled = false;
+            } 
+            
+        }
+    };
+
+    xhttp.open("GET", url, true);
+    xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    xhttp.setRequestHeader('Content-type', "application/json");
+    xhttp.send();
+}
+  

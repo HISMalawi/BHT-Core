@@ -1,0 +1,389 @@
+
+<script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
+<!-- <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/standard.js" defer="true"></script> -->
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+
+<script type="text/javascript" src="/assets/js/post_parameters.js"></script>
+<script type="text/javascript" src="/assets/js/generic_ajaxrequest.js"></script>
+<script type="text/javascript" src="/assets/js/moment.js"></script>
+<script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
+<script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
+
+<link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
+
+<style>
+#clearButton, #nextButton {
+  display: none;
+}
+
+.main-container {
+  display: table;
+  width: 100%;
+}
+
+.container-row {
+  display: table-row;
+}
+
+.container-cell {
+  display: table-cell;
+  width: 48.5%;
+  height: 575px;
+  overflow-x: hidden;
+}
+
+#container-cell-left {
+  float: left;
+}
+#container-cell-right {
+  float: right;
+  border-style: solid;
+  border-width: 0px 0px 0px 1px;
+}
+
+.fetch-buttons {
+  vertical-align: middle;
+  top: 35%;
+  position: absolute;
+}
+
+#fetch-button-left {
+  left: 22%;
+}
+
+#fetch-button-right {
+  right: 22%;
+}
+
+.result-container {
+  display: table;
+  width: 100%;
+}
+
+.result-container-row {
+  display: table-row;
+}
+
+.result-container-cell {
+  display: table-cell;
+  border-style: solid;
+  border-width: 0px 0px 1px 0px;
+}
+
+.result-table {
+  width: 100%;
+}
+
+.result-table th {
+  text-align: left;
+}
+
+.reset-buttons {
+  width: 95%;
+}
+
+</style>
+
+
+<script>
+
+function buildMergePage() {
+
+  var frame = document.getElementById('inputFrame' + tstCurrentPage);
+  frame.style = 'width: 96%;height:90%;';
+
+  var div = document.createElement('div');
+  div.setAttribute('class','main-container');
+  frame.appendChild(div);
+
+  var divR = document.createElement('div');
+  divR.setAttribute('class','container-row');
+  div.appendChild(divR);
+
+  var cells = ['left','right'];
+  for(var i = 0 ; i < cells.length ; i++){
+    var divC = document.createElement('div');
+    divC.setAttribute('class','container-cell');
+    divC.setAttribute('id','container-cell-' + cells[i]);
+    divR.appendChild(divC);
+
+    var button = document.createElement('button');
+    button.innerHTML = '<span>Add client</span>';
+    button.setAttribute('class','button blue navButton fetch-buttons');
+    button.setAttribute('onmousedown','addClient("' + cells[i] + '")');
+    button.setAttribute('id','fetch-button-' + cells[i]);
+    divC.appendChild(button);
+  }
+
+  initSearch();
+}
+
+function addClient(side) {
+  document.location = '/views/patient/search.html?merge=' + side;
+}
+
+function isHashEmpty(obj) {
+  for(var key in obj) {
+    if(obj.hasOwnProperty(key))
+      return false;
+    }
+  return true;
+}
+
+function initSearch() {
+  var url = window.location.href;
+  url = new URL(url);
+  var gender = url.searchParams.get("gender");
+  var given_name = url.searchParams.get("first_name");
+  var family_name = url.searchParams.get("last_name");
+  var side = url.searchParams.get("side");
+  
+  if(side == undefined || side == null)
+    return 
+
+  var mergeClientParameters = {};
+  if(side == 'right'){
+    sessionStorage.mergeClientParametersRight = "?given_name=" + given_name;
+    sessionStorage.mergeClientParametersRight += "&family_name=" + family_name;
+    sessionStorage.mergeClientParametersRight += "&gender=" + gender;
+    sessionStorage.mergeClientParametersRight += "&side=right";
+  }else{
+    sessionStorage.mergeClientParametersLeft = "?given_name=" + given_name;
+    sessionStorage.mergeClientParametersLeft += "&family_name=" + family_name;
+    sessionStorage.mergeClientParametersLeft += "&gender=" + gender;
+    sessionStorage.mergeClientParametersLeft += "&side=left";
+  }
+
+  var searchParameters = [];
+  if(sessionStorage.mergeClientParametersRight != undefined && sessionStorage.mergeClientParametersRight != '')
+    searchParameters.push(sessionStorage.mergeClientParametersRight);
+
+  if(sessionStorage.mergeClientParametersLeft != undefined && sessionStorage.mergeClientParametersLeft != '')
+    searchParameters.push(sessionStorage.mergeClientParametersLeft);
+
+  for(var i = 0 ; i < searchParameters.length ; i++) {
+    var ulink = new URL("search:3000/aaaa.html" + searchParameters[i]);
+    gender = ulink.searchParams.get("gender");
+    given_name = ulink.searchParams.get("given_name");
+    family_name = ulink.searchParams.get("family_name");
+    var vside = ulink.searchParams.get("side");
+    
+    mergeClientParameters[vside] = {
+      given_name: given_name,
+      family_name: family_name,
+      gender: gender
+    };
+    
+  }
+
+  //console.log(mergeClientParameters[side])
+
+  for(var s in mergeClientParameters) {
+    var given_name = mergeClientParameters[s].given_name;
+    var family_name = mergeClientParameters[s].family_name;
+    var gender = mergeClientParameters[s].gender;
+    searchClient(given_name, family_name, gender, s); 
+  }
+}
+
+function searchClient(first_name, last_name, gender, side) {
+  var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1";
+  if(sessionStorage.dde_enabled === "true") {
+    url += "/dde/patients/find_by_name_and_gender?given_name=" + first_name +"&family_name=" + last_name +"&gender="+ gender;
+  }else {
+    url += "/search/people?given_name=" + first_name + "&family_name=" + last_name +"&gender=" + gender;
+  }
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+      var obj = JSON.parse(this.responseText);
+      processResults(obj, side);
+    }
+  };
+  xhttp.open("GET", url, true);
+  xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+  xhttp.setRequestHeader('Content-type', "application/json");
+  xhttp.send();
+}
+
+function processResults(results, side) {
+  var container = document.getElementById('container-cell-' + side);
+  container.innerHTML = null;
+
+  var result_container = document.createElement('div');
+  result_container.setAttribute('class','result-container');
+  container.appendChild(result_container);
+
+  for(var i = 0 ; i < results.length; i++){
+    var container_row = document.createElement('div');
+    container_row.setAttribute('class','result-container-row');
+    result_container.appendChild(container_row);
+
+    var container_cell = document.createElement('div');
+    container_cell.setAttribute('class','result-container-cell ' + side + "-cells");
+    container_cell.setAttribute('side', side);
+    container_cell.setAttribute('selected', 'false');
+    container_cell.setAttribute('patient_id', '');
+    container_cell.setAttribute('dde_doc_id', '');
+    container_cell.setAttribute('onmousedown','selectRow(this);');
+    container_row.appendChild(container_cell);
+
+    addResult(results[i], container_cell);
+  }
+
+  var button = document.createElement('button');
+  button.setAttribute('id','reset-button-' + side);
+  button.setAttribute('class','reset-buttons');
+  button.innerHTML = '<span>New search</span>';
+  button.setAttribute('onmousedown', 'addClient("' + side + '")');
+  container.appendChild(button);
+
+}
+
+function addResult(result, cell) {
+  var table = document.createElement('table');
+  table.setAttribute('class','result-table');
+  cell.appendChild(table);
+
+  var tr = document.createElement('tr');
+  table.appendChild(tr);
+
+  var th = document.createElement('th');
+  th.innerHTML = 'NPID';
+  tr.appendChild(th);
+
+  var td = document.createElement('td');
+  tr.appendChild(td);
+  /* ............................. */
+
+  var tr = document.createElement('tr');
+  table.appendChild(tr);
+
+  var th = document.createElement('th');
+  th.innerHTML = 'Name';
+  tr.appendChild(th);
+
+  var td = document.createElement('td');
+  td.innerHTML = result['names'][0]['given_name'];
+  td.innerHTML += " " + result['names'][0]['family_name'];
+  tr.appendChild(td);
+
+  var tr = document.createElement('tr');
+  table.appendChild(tr);
+
+  var th = document.createElement('th');
+  th.innerHTML = 'Birthdate';
+  tr.appendChild(th);
+
+  var td = document.createElement('td');
+  td.innerHTML = result['birthdate'];
+  td.innerHTML += " (" + result['gender'] + ")"
+  tr.appendChild(td);
+  /* ............................. */
+
+  var tr = document.createElement('tr');
+  table.appendChild(tr);
+
+  var th = document.createElement('th');
+  th.innerHTML = 'Ancestry address';
+  tr.appendChild(th);
+
+  var td = document.createElement('td');
+  td.innerHTML = result['addresses'][0]['address2'];
+  td.innerHTML += " " + result['addresses'][0]['county_district'];
+  td.innerHTML += " " + result['addresses'][0]['neighborhood_cell'];
+  tr.appendChild(td);
+  /* ............................. */
+
+  var tr = document.createElement('tr');
+  table.appendChild(tr);
+
+  var th = document.createElement('th');
+  th.innerHTML = 'Current address';
+  tr.appendChild(th);
+
+  var td = document.createElement('td');
+  td.innerHTML = result['addresses'][0]['state_province'];
+  td.innerHTML += " " + result['addresses'][0]['township_division'];
+  td.innerHTML += " " + result['addresses'][0]['city_village'];
+  tr.appendChild(td);
+  /* ............................. */
+
+  if(result['person_id'] != null)
+    cell.setAttribute('patient_id', result['person_id'])
+
+  if(result['doc_id'] != null)
+    cell.setAttribute('dde_doc_id', result['dde_doc_id'])
+
+
+}
+
+var selectedRecords = {}
+
+function selectRow(e) {
+  var cells = document.getElementsByClassName(e.getAttribute('side') + '-cells');
+  for(var i = 0 ; i < cells.length ; i++){
+    cells[i].style = 'background-color: "";';
+  }
+ 
+  selectedRecords[e.getAttribute('side')] = {
+    patient_id: null, dde_doc_id: null
+  }
+   
+  if(e.getAttribute('selected') == 'false') {
+    var patient_id = e.getAttribute('patient_id');
+    var dde_doc_id = e.getAttribute('dde_doc_id');
+
+    if(patient_id.length > 0)
+      selectedRecords[e.getAttribute('side')].patient_id = patient_id;
+    
+    if(dde_doc_id.length > 0)
+      selectedRecords[e.getAttribute('side')].dde_doc_id = dde_doc_id;
+    
+    e.style = 'background-color: lightblue;';
+    e.setAttribute('selected','true');
+  }else{
+    e.style = 'background-color: "";';
+    e.setAttribute('selected','false');
+  }
+
+  var button = document.getElementById('nextButton');
+ 
+  try { 
+    if(selectedRecords['left'].patient_id.length > 0 || selectedRecords['left'].dde_doc_id.length > 0) {
+      if(selectedRecords['right'].patient_id.length > 0 || selectedRecords['right'].dde_doc_id.length > 0) {
+        button.innerHTML = '<span>Merge</span>';
+        button.setAttribute('onmousedown', 'mergeClients();');
+        button.style = 'display: inline';
+      }else{
+        button.style = 'display: none';
+      }
+    }else{
+        button.style = 'display: none';
+    }
+  }catch(i) {
+    button.style = 'display: none';
+  }
+}
+
+</script>
+
+
+
+
+<body id="mateme">
+  <div id="container">
+    <div id="content">
+
+      <form>
+        <input type="text" name="merge"
+          tt_onLoad="__$('keyboard').style.display = 'none';buildMergePage()"
+          tt_pageStyleClass= "NoControls" helpText="Merge clients" optional = "true"/>
+
+      </form>
+
+   </div>
+ </div>
+</body>
+

@@ -106,10 +106,18 @@
         family_name = sessionStorage.getItem("family_name");
         var http = new XMLHttpRequest();
         var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/people/' + sessionStorage.patientID;
-        var params = JSON.stringify({
-            given_name: sessionStorage.getItem("given_name"),
-            family_name: sessionStorage.getItem("family_name"),
-        });
+        if(sessionStorage.dde_enabled === 'true') {
+          var params = JSON.stringify({
+              given_name: sessionStorage.getItem("given_name"),
+              family_name: sessionStorage.getItem("family_name"),
+              program_id: sessionStorage.programID
+          });
+        }else{
+          var params = JSON.stringify({
+              given_name: sessionStorage.getItem("given_name"),
+              family_name: sessionStorage.getItem("family_name")
+          });
+        }
         http.open('PUT', url, true);
         //Send the proper header information along with the request
         http.setRequestHeader('Content-type', 'application/json');

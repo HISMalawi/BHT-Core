@@ -68,7 +68,14 @@
   document.location = url;
 
   function red() {
-    finishRedirect('/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID);
+    var url = window.location.href;
+    url = new URL(url);
+    var identifier = url.searchParams.get("identifier");
+    if(identifier == null) {
+      finishRedirect('/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID);
+    }else{
+      finishRedirect('/views/confirm.html?patient_id=' + identifier);
+    }
   }
     
   setTimeout('red()', 3000);
