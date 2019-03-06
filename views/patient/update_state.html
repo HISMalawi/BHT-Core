@@ -334,13 +334,13 @@ function fetchStatesUrl () {
         <input type="text" name="states" id="states" 
           field_type="alpha" xhelpText="State" 
           setvalue="" tt_pageStyleClass="NoKeyboard"
-          ajaxURL="/programs/1/workflows" 
+          ajaxURL="" 
           tt_onLoad="setProgramStates(); changeAbscounded();" objectType="states" />  
 
 
         <!-- Admitted -->
         <select id="admission_section" name="admission_section" 
-        helpText="Select Admission section" condition ="$('touchscreenInput0').value == 'Admitted'">
+        helpText="Select Admission section" condition ="$('touchscreenInput0').value == 'Admitted'" tt_onLoad = "changeNextAdmitBTN();">
             <option></option>
             <option>Delivered in the ward</option>
             <option>Delivered before arrival</option>
@@ -372,7 +372,7 @@ function fetchStatesUrl () {
 
         <!-- Procedures -->
         <select id="procedure_done" name="procedure_done"
-        helpText="1<sup>st</sup> Procedure done"  condition ="$('states').value == '112' || $('states').value == '111'" tt_onLoad=""  >
+        helpText="1<sup>st</sup> Procedure done"  condition ="$('states').value == '112' || $('states').value == '111'" tt_onLoad="changeNextButton()"  >
             <option></option>
             <option>None</option>
             <option>Hysterectomy</option>
@@ -396,14 +396,14 @@ function fetchStatesUrl () {
         id="date_of_death" field_type="date" 
         helpText="Date of Death" 
         tt_pageStyleClass="date" 
-        condition = "$('touchscreenInput0').value == 'Patient died'" /> 
+        condition = "$('states').value == '113'" /> 
 
         <input type="text" name="time_of_death" 
         id="time_of_death" field_type="advancedTime" 
         helpText="Time of Death" 
         condition = "$('states').value == '113'" /> 
 
-        <select id="place_of_death" name="place_of_death" tt_onLoad="changeNextBTN();"
+        <select id="place_of_death" name="place_of_death" tt_onLoad=""
         helpText="Place of Death" condition = "$('states').value == '113'"> 
             <option></option>
             <option>Home</option>
@@ -418,8 +418,8 @@ function fetchStatesUrl () {
         tt_pageStyleClass="date" 
         condition = "$('states').value == '113'" /> 
 
-        <select id="condition_at_death" name="condition_at_death" tt_onLoad="changeNextButton();"
-        helpText="Condition at Death" condition = "$('states').value == '113'"> 
+        <select id="condition_at_death" name="condition_at_death" 
+        helpText="Condition at Death" condition = "$('states').value == '113'" tt_onLoad="changeNextAdmitBTN();"> 
             <option></option>
             <option>Antenatal</option>
             <option>Postpartum</option>
@@ -432,7 +432,7 @@ function fetchStatesUrl () {
         <!-- End martenity -->
         <select objectType="location" ajaxURL="/locations?name=" 
           allowFreeText="true" 
-          condition="$('touchscreenInput0').value == 'Patient transferred out'" 
+          condition="$('states').value == '2'" 
           field_type="alpha" 
           helpText="Please select facility name" 
           id="facility_name" 
@@ -472,7 +472,7 @@ function fetchStatesUrl () {
         </select>
 
         <input type="text" name="outcome_day" id="outcome_day" field_type="number" helpText="Outcome Day" condition="($('outcome_year').value != 'Unknown') && ($('outcome_month').value != 'Unknown')"
-          tt_onLoad="getDayOfMonthPicker($('outcome_year').value, $('outcome_month').value);setUpPageForDateValidation(); changeNextAdmitBTN();"
+          tt_onLoad="getDayOfMonthPicker($('outcome_year').value, $('outcome_month').value);setUpPageForDateValidation(); "
           tt_onUnLoad="" />
 
       </form>
@@ -539,7 +539,6 @@ function fetchStatesUrl () {
 
 
   function postUpdateOutcomeObs(encounter) {
-
       var admitSection = document.getElementById('admission_section').value;
       var dischargedWhere = document.getElementById('discharged_to_where').value;
       var healthFacility = document.getElementById('health_facility').value;
@@ -552,13 +551,7 @@ function fetchStatesUrl () {
       var placeOfDeath = document.getElementById('place_of_death').value;
       var reasonOfDeath = document.getElementById('reason_of_death').value;
       var conditionOfDeath = document.getElementById('condition_at_death').value;
-       states = document.getElementById('states').value;
-      var outcome_date = "2019-03-01"; 
-       state = {
-        state: document.getElementById('states').value,
-        date: outcome_date
-      }
-      postState(state);
+      states = document.getElementById('states').value;
       var conceptAnswers = 
        [
           // Admission section
@@ -594,10 +587,10 @@ function fetchStatesUrl () {
 
           //Place of death
           {
-              "home": 7445,
-              "currentFacility": 5937,
+              "home": 8850,
+              "currentFacility": 8847,
               "onTheWay": 7398,
-              "other":5462
+              "other":6408
 
           },
 
@@ -722,13 +715,13 @@ function fetchStatesUrl () {
 
       if(states == 113){
         stateAnswer = "Patient died";
-      }else if(state == 109){
+      }else if(states == 109){
         stateAnswer = "Admitted";
-      }else if(state == 110){
+      }else if(states == 110){
         stateAnswer = "Absconded";
-      }else if(state == 111){
+      }else if(states == 111){
           stateAnswer = "Delivered";
-      }else if(state == 112){
+      }else if(states == 112){
           stateAnswer = "Discharged";
       }
 
@@ -758,31 +751,49 @@ function fetchStatesUrl () {
             obs.observations.push(  { concept_id: 3065, value_coded: procedureAnswer } ); 
         }
         if(dateOfDeath !== '') {
-            obs.observations.push(  { concept_id: 5928, value_datetime: dateOfDeath } ); 
+           var dayOfDeath = dateOfDeath.split('-')[0];
+           var monthOfDeath = dateOfDeath.split('-')[1];
+           var yearOfDeath = dateOfDeath.split('-')[2];
+
+           var deathValue = yearOfDeath + '-' + monthOfDeath + '-' + dayOfDeath;
+            obs.observations.push(  { concept_id: 1815, value_datetime: deathValue } ); 
         }
         if(timeOfDeath !== '') {
-            obs.observations.push(  { concept_id: 2120, value_text: timeOfDeath } ); 
+            obs.observations.push(  { concept_id: 9161, value_text: timeOfDeath } ); 
         }
         if(placeOfDeath !== '') {
-            obs.observations.push(  { concept_id: 1640, value_coded: placeOfDeathAnswer } ); 
+            obs.observations.push(  { concept_id: 8429, value_coded: placeOfDeathAnswer } ); 
         }
         if(reasonOfDeath !== '') {
             obs.observations.push(  { concept_id: 5002, value_text: reasonOfDeath } ); 
         }
         if(conditionOfDeath !== '') {
-            obs.observations.push(  { concept_id: 5241, value_coded: conditionOfDeathAnswer } ); 
+            obs.observations.push(  { concept_id: 9162, value_coded: conditionOfDeathAnswer } ); 
         }
-        console.log(obs);
-       submitParameters(obs, "/observations", "nextPage")
-
-      
+       submitParameters(obs, "/observations", "submitState")
+ 
   }
 
-  function nextPage(){
-    if(state == 111 || state == 112){
+  function submitState(){
+    var outcome_date = new Date().toISOString().slice(0,10);
+       state = {
+        state: document.getElementById('states').value,
+        date: outcome_date
+      }
+      if(states == 111 || states == 112){
+        postState(state);
         window.location.href = "../../apps/MATERNITY/views/encounters/baby_outcome.html?patient_id=" + patientID;
        }else{
-       window.location.href = "/views/patient_dashboard.html?patient_id=" + patientID;
-    }
+        postState(state);
+       }
+      }
+
+  function nextPage(){
+      if(states == 111 || states == 112){
+        postState(state);
+        window.location.href = "../../apps/MATERNITY/views/encounters/baby_outcome.html?patient_id=" + patientID;
+       }else{
+        //window.location.href = "/views/patient_dashboard.html?patient_id=" + patientID;
+       }
   }
 </script>
