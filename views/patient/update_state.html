@@ -782,11 +782,9 @@ function fetchStatesUrl () {
         state: document.getElementById('states').value,
         date: outcome_date
       }
+      postState(state);
       if(states == 111 || states == 112){
-         postState(state);
-         window.location.href = "../../apps/MATERNITY/views/encounters/baby_outcome.html?patient_id=" + patientID;
-       }else{
-        postState(state);
-       }
+        window.location.href = "../../apps/MATERNITY/views/encounters/baby_demographics.html?patient_id=" + patientID;
+      }
    }
 </script>
