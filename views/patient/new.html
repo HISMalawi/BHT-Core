@@ -859,24 +859,24 @@
                    key="given_name" helpText="First name"
                    ajaxURL="/search/given_name?search_string="
                    key=given_name" allowFreeText="true"
-                   condition="$(&quot;given_name&quot;).value == &quot;&quot;"/>
+                   condition="$(&quot;given_name&quot;).value == &quot;&quot;" />
 
             <input type="text" name="person[names][family_name]"
                    id="family_name" value="Testing" field_type="alpha"
                    helpText="Last name"
                    ajaxURL="/search/family_name?search_string="
                    allowFreeText="true"
-                   condition="$(&quot;family_name&quot;).value == &quot;&quot;"/>
+                   condition="$(&quot;family_name&quot;).value == &quot;&quot;" />
 
             <input type="text" name="person[birth_year]" id="person_birth_year" helpText="Year of Birth"
                    field_type="number"
                    absoluteMin="1900" min="1900" tt_onLoad="setAbsoluteMaxBirthYear()"
-                   tt_pageStyleClass="Numeric NumbersOnly"/>
+                   tt_pageStyleClass="Numeric NumbersOnly" />
 
             <select name="person[birth_month]" id="person_birth_month" helpText="Month of Birth"
                     condition="$('person_birth_year').value.toLowerCase() != 'unknown'"
                     validationMessage="Please enter a valid date" tt_onUnLoad="resetFinishBtn();"
-                    tt_onLoad=" validateMonth();__$(keyboard).style.display = none;">
+                    tt_onLoad=" validateMonth();__$(keyboard).style.display = none;" >
                 <option value=""></option>
                 <option value="1">Jan</option>
                 <option value="2">Feb</option>
@@ -896,14 +896,14 @@
             <input type="text" name="person[age_estimate]" id="person_age_estimate" helpText="Age Estimate"
                    absoluteMin="1" absoluteMax="120" field_type="number"
                    condition="$('person_birth_year').value == 'Unknown'"
-                   tt_onLoad="$(nextButton).style.display = block;" tt_pageStyleClass="Numeric NumbersOnly"/>
+                   tt_onLoad="$(nextButton).style.display = block;" tt_pageStyleClass="Numeric NumbersOnly" />
 
             <input type="text" name="person[birth_day]"
                    id="person_birth_day"
                    field_type="number" helpText="Birth Day"
                    condition="($('person_birth_year').value != 'Unknown') && ($('person_birth_month').value != 'Unknown')"
                    tt_onLoad="getDayOfMonthPicker($('person_birth_year').value, $('person_birth_month').value);setUpPageForDateValidation();"
-                   tt_onUnLoad="resetFinishBtn();"/>
+                   tt_onUnLoad="resetFinishBtn();" />
 
 
             <!-- Home Address ............................................. -->
@@ -918,7 +918,7 @@
                    tt_onUnload="jQuery('#nextButton').show(); "
                    tt_requireNextClick='false'
                    tt_pageStyleClass="NoKeyboard"
-                   objectType="region"/>
+                   objectType="region" />
 
             <input type="text" name="home_district"
                    id="home_district"
@@ -930,7 +930,7 @@
                    tt_requireNextClick='false'
                    tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);"
                    tt_onUnload="jQuery('#nextButton').show();homeDistrict = getNames(__$('home_district').value, 'District', '/districts?paginate=false&district_id=' + document.getElementById('home_district').value);"
-                   objectType="districts"/>
+                   objectType="districts" />
 
             <input type="text" name="home_ta"
                    id="home_ta" field_type="alpha"
@@ -939,7 +939,7 @@
                    tt_requireNextClick='false'
                    tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('home_district').value);"
                    tt_onUnLoad="jQuery('#nextButton').show();homeTA = getNames(__$('home_ta').value, 'TA', '/traditional_authorities?paginate=false&region_id=' + document.getElementById('home_ta').value);"
-                   objectType="traditional_authority"/>
+                   objectType="traditional_authority" />
                  
             <input type="text" name="home_village"
                    id="home_village" field_type="alpha"
@@ -948,7 +948,7 @@
                    tt_requireNextClick='false'
                    tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('home_ta').value);"
                    tt_onUnload="jQuery('#nextButton').show();homeVillage = getNames(__$('home_village').value, 'Village', '/villages?paginate=false&traditional_authority_id=' + document.getElementById('home_ta').value);"
-                   objectType="village"/>
+                   objectType="village" />
 
             <!-- Home Address ............................................. -->
 
@@ -964,7 +964,7 @@
                    tt_pageStyleClass="NoKeyboard"
                    tt_onLoad="clearInput(); jQuery('#nextButton').hide();"
                    tt_onUnload="jQuery('#nextButton').show();"
-                   objectType="region"/>
+                   objectType="region" />
 
             <input type="text" name="current_district"
                    id="current_district"
@@ -976,7 +976,7 @@
                    tt_requireNextClick='false'
                    tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('current_region').value);"
                    tt_onUnload="jQuery('#nextButton').show();"
-                   objectType="districts"/>
+                   objectType="districts" />
 
             <input type="text" name="current_ta"
                    id="current_ta" field_type="alpha"
@@ -985,7 +985,7 @@
                    tt_requireNextClick='false'
                    tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('current_district').value);"
                    tt_onUnload="jQuery('#nextButton').show();"
-                   objectType="traditional_authority"/>
+                   objectType="traditional_authority" />
 
             <input type="text" name="current_village"
                    id="current_village" field_type="alpha"
@@ -995,7 +995,7 @@
                    tt_requireNextClick='false'
                    tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('current_ta').value);"
                    tt_onUnload="jQuery('#nextButton').show();searchForPotentialDuplicates();"
-                   objectType="village"/>
+                   objectType="village" />
 
             <!-- ................... Current Address ends ........................... -->
 

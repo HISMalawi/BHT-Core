@@ -539,12 +539,15 @@ function fetchStatesUrl () {
 
 
   function postUpdateOutcomeObs(encounter) {
+    console.log('Heeeeeeeeeeeee');
       var admitSection = document.getElementById('admission_section').value;
       var dischargedWhere = document.getElementById('discharged_to_where').value;
       var healthFacility = document.getElementById('health_facility').value;
       var dischargeDiagnosis = document.getElementById('diagnosis').value;
       var procedure = document.getElementById('procedure_done').value;
       var procedureDiagnosis = document.getElementById('procedureDiagnosis');
+
+
       var dischargedWhere = document.getElementById('discharged_to_where').value;
       var dateOfDeath = document.getElementById('date_of_death').value;
       var timeOfDeath = document.getElementById('time_of_death').value;
@@ -557,46 +560,46 @@ function fetchStatesUrl () {
           // Admission section
           {
               "deliveredInWard": 7428,
-              "deliveredBeforeArrival": 7429,
-              "deliveredInTheatre": 7428,
-              "deliveredInAntenatalWard": 7429
+              "deliveredBeforeArrival": 7162,
+              "deliveredInTheatre": 9730,
+              "deliveredInAntenatalWard": 9731
           },
           // Discharged to where
           {
               "homeWaiting": 7445,
-              "anotherHealthFacility": 1275
+              "anotherHealthFacility": 7446
           },
           // procedure done
           {
               "none": 1107,
               "hysterectomy": 5276,
-              "myomectomy": 7478,
-              "bilateralTubal":1719,
-              "biopsy": 3593,
-              "ceclage": 7470,
-              "cystectomy": 3742,
+              "myomectomy": 9095,
+              "bilateralTubal":9096,
+              "biopsy": 9092,
+              "ceclage": 9097,
+              "cystectomy": 9094,
               "marsupilisation": 7472,
-              "excision": 218,
-              "incisionDrainage": 7476,
-              "caesareanSection": 1171,
-              "examAnaesthesia": 7441,
-              "evacuationVacuum": 7139,
-              "dilation": 7475,
-              "laparatomy": 7470
+              "excision": 9091,
+              "incisionDrainage": 9090,
+              "caesareanSection": 9089,
+              "examAnaesthesia": 9088,
+              "evacuationVacuum": 9087,
+              "dilation": 9086,
+              "laparatomy": 9085
           },
 
           //Place of death
           {
               "home": 8850,
               "currentFacility": 8847,
-              "onTheWay": 7398,
+              "onTheWay": 9732,
               "other":6408
 
           },
 
           //Condition at death
           {
-              "antenatal": 2232,
+              "antenatal": 9733,
               "postpartum": 1180,
               "intrapartum": 1179
           }
@@ -739,7 +742,7 @@ function fetchStatesUrl () {
             obs.observations.push(  { concept_id: 3626, value_coded: dischargedAnswer } ); //saving
         }
         if(healthFacility !== '') {
-            obs.observations.push(  { concept_id: 5937, value_text: healthFacility } ); 
+            obs.observations.push(  { concept_id: 8341, value_text: healthFacility } ); 
         }
         if(dischargeDiagnosis !== '') {
             obs.observations.push(  { concept_id: 7366, value_text: dischargeDiagnosis  } ); 
@@ -748,7 +751,7 @@ function fetchStatesUrl () {
             obs.observations.push(  { concept_id: 7439, value_text: procedure } ); 
         }
         if(procedureDiagnosis !== '') {
-            obs.observations.push(  { concept_id: 3065, value_coded: procedureAnswer } ); 
+            obs.observations.push(  { concept_id: 7448, value_coded: procedureAnswer } ); 
         }
         if(dateOfDeath !== '') {
            var dayOfDeath = dateOfDeath.split('-')[0];
@@ -773,7 +776,6 @@ function fetchStatesUrl () {
        submitParameters(obs, "/observations", "submitState")
  
   }
-
   function submitState(){
     var outcome_date = new Date().toISOString().slice(0,10);
        state = {
@@ -781,19 +783,10 @@ function fetchStatesUrl () {
         date: outcome_date
       }
       if(states == 111 || states == 112){
-        postState(state);
-        window.location.href = "../../apps/MATERNITY/views/encounters/baby_outcome.html?patient_id=" + patientID;
+         postState(state);
+         window.location.href = "../../apps/MATERNITY/views/encounters/baby_outcome.html?patient_id=" + patientID;
        }else{
         postState(state);
        }
-      }
-
-  function nextPage(){
-      if(states == 111 || states == 112){
-        postState(state);
-        window.location.href = "../../apps/MATERNITY/views/encounters/baby_outcome.html?patient_id=" + patientID;
-       }else{
-        //window.location.href = "/views/patient_dashboard.html?patient_id=" + patientID;
-       }
-  }
+   }
 </script>
