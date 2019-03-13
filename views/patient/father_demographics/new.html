@@ -1,208 +1,209 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-  <head>
+<head>
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 
     <script language="javascript">
-      tstUsername = "";
-      tstUserKeyboardPref = "qwerty";
+        tstUsername = "";
+        tstUserKeyboardPref = "qwerty";
 
-      var d = new Date();
-      d.toDateString();
+        var d = new Date();
+        d.toDateString();
 
-      function getInput(){
-         key = $('touchscreenInput' + tstCurrentPage).getAttribute("key");
-         value = $('touchscreenInput' + tstCurrentPage).value
-         sessionStorage.setItem(key, value);
-         var d = new Date();
-         sessionStorage.setItem("date_created", d.toDateString());
-      }
-
-      function changeFinishBtn() {
-        var finishButton =  __$("nextButton");
-        finishButton.setAttribute('onmousedown',"createClient();");
-        finishButton.setAttribute('onclick',"");
-      }
-
-      function resetFinishBtn() {
-        var finishButton =  __$("nextButton");
-        finishButton.setAttribute('onmousedown',"gotoNextPage();");
-        finishButton.setAttribute('onclick',"");
-      }
-
-      function createClient() {
-        
-        var summary_table = document.getElementsByClassName('summary-table')[0];
-        var rows  = summary_table.getElementsByTagName('tr');
-  
-        var parametersPassed = {
-          given_name: null, family_name: null,
-          gender: null, birthdate: null, birthdate_estimated: null,
-          home_district: null, home_traditional_authority: null, home_village: null,
-          current_district: null, current_traditional_authority: null, current_village: null,
-                    landmark: null, cell_phone_number: null
+        function getInput(){
+            key = $('touchscreenInput' + tstCurrentPage).getAttribute("key");
+            value = $('touchscreenInput' + tstCurrentPage).value
+            sessionStorage.setItem(key, value);
+            var d = new Date();
+            sessionStorage.setItem("date_created", d.toDateString());
         }
-          
-        
-        for(var i = 0 ; i < rows.length ; i++){
-          
-          var title = rows[i].getElementsByTagName('th')[0].innerHTML.trim();
-          var data  = rows[i].getElementsByTagName('td')[0].innerHTML.trim();
-          
-                    if(title.match(/Given name/i)){
-                        parametersPassed.given_name = data; 
-                    }else if(title.match(/Family name/i)){
-                        parametersPassed.family_name = data; 
-                    }else if(title.match(/Gender/i)){
-                        parametersPassed.gender = data[0]; 
-                    }else if(title.match(/Birthdate Estimated/i)){
-                        parametersPassed.birthdate_estimated = data; 
-                    }else if(title.match(/Birthdate/i)){
-                        parametersPassed.birthdate = data; 
-                    }else if(title.match(/Home District/i)){
-                        parametersPassed.home_district = data; 
-                    }else if(title.match(/Home TA/i)){
-                        parametersPassed.home_traditional_authority = (data || 'Unknown'); 
-                    }else if(title.match(/Home Village/i)){
-                        parametersPassed.home_village = (data || 'Unknown'); 
-                    }else if(title.match(/Current District/i)){
-                        parametersPassed.current_district = (data || 'Unknown'); 
-                    }else if(title.match(/Current TA/i)){
-                        parametersPassed.current_traditional_authority = data; 
-                    }else if(title.match(/Current Village/i)){
-                        parametersPassed.current_village = (data || 'Unknown'); 
-                    }else if(title.match(/Landmark/i)){
-                        parametersPassed.landmark = data; 
-                    }else if(title.match(/Cell phone/i)){
-                        parametersPassed.cell_phone_number = data; 
-                    }
+
+        function changeFinishBtn() {
+            var finishButton =  __$("nextButton");
+            finishButton.setAttribute('onmousedown',"createClient();");
+            finishButton.setAttribute('onclick',"");
         }
-       
-        postClientParamaters(parametersPassed);
-      }
 
-      function changeNextButton(){
-         __$("nextButton").removeAttribute("onmousedown")
-         __$("nextButton").onmousedown = function(){
-            confirm_password = $('touchscreenInput' + tstCurrentPage).value;
-            if (sessionStorage.getItem("password") === confirm_password){
-              window.location.href = "show.html";
-               }
-               else{
-                //  alert("passwords do not match");
-                 
-               }
-         }
-      }
+        function resetFinishBtn() {
+            var finishButton =  __$("nextButton");
+            finishButton.setAttribute('onmousedown',"gotoNextPage();");
+            finishButton.setAttribute('onclick',"");
+        }
 
-      function calBirthdateFromEstimetedYear(age){
-        var currYear = new Date().getFullYear();
-        estYear = (currYear - parseInt(age));
-        return (estYear + "-07-01");
-      }
+        function createClient() {
 
-      function summary() {
-      var date_estimated = 0;
-      if(__$('person_birth_year').value !== "Unknown") {
-        birth_date = new Date(__$('person_birth_year').value + "/" + __$('person_birth_month').value + "/" + __$('person_birth_day').value);
-        birth_date = moment(birth_date).format("DD/MMM/YYYY");
-      }else if (__$('person_birth_year').value === "Unknown") {
-        date_estimated = 1;
-        birth_date = moment().subtract(parseInt(__$('person_age_estimate').value), "years").format("YYYY");
-        birth_date = birth_date + "-07-01";
-      }if (__$('person_birth_year').value !== "Unknown" && __$('person_birth_month').value === "Unknown") {
-        date_estimated = 1;
-        birth_date = __$('person_birth_year').value + "-07-01";
-      }if(__$('person_birth_year').value !== "Unknown" && __$('person_birth_month').value !== "Unknown" && __$('person_birth_day').value === "Unknown") {
-        date_estimated = 1;
-        birth_date = __$('person_birth_year').value + "-" + __$('person_birth_month').value + "-15";
-      }
-        parameter = {
-              given_name:                     sessionStorage.given_name,
-              family_name:                    sessionStorage.family_name,
-              gender:                         sessionStorage.gender,
-              birthdate:                      birth_date ,
-              birthdate_estimated:            __$('person_birth_year').value != 'Unknown'  ? 0 : 1,
+            var summary_table = document.getElementsByClassName('summary-table')[0];
+            var rows  = summary_table.getElementsByTagName('tr');
 
-              current_district:                __$('current_district').value, 
-              current_traditional_authority:   __$('current_ta').value,
-              current_village:                 __$('current_village').value,
-
-              home_district:                   __$('home_district').value,
-              home_traditional_authority:      __$('home_ta').value,
-              home_village:                    __$('home_village').value,
-
-              landmark:                        __$('landmark').value,
-              cell_phone_number:               __$('cellphone').value,
+            var parametersPassed = {
+                given_name: null, family_name: null,
+                gender: null, birthdate: null, birthdate_estimated: null,
+                home_district: null, home_traditional_authority: null, home_village: null,
+                current_district: null, current_traditional_authority: null, current_village: null,
+                landmark: null, cell_phone_number: null
             }
 
-        var table = document.createElement('table');
-        table.setAttribute('class','summary-table');
 
-        var attributes = [
-          ["Given name", parameter.given_name],
-          ["Family name", parameter.family_name],
-          ["Gender", parameter.gender],
-          ["Birthdate", parameter.birthdate],
-          ["Birthdate Estimated", parameter.birthdate_estimated],
-          ["Home District", parameter.home_district],
-          ["Home TA", parameter.home_traditional_authority],
-          ["Home Village", parameter.home_village],
-          ["Current District", parameter.current_district],
-          ["Current TA", parameter.current_traditional_authority],
-          ["Current Village", parameter.current_village],
-          ["Landmark", parameter.landmark],
-          ["Cell phone", parameter.cell_phone_number]
-        ];
+            for(var i = 0 ; i < rows.length ; i++){
 
-        for(var i = 0 ; i < attributes.length; i++){
+                var title = rows[i].getElementsByTagName('th')[0].innerHTML.trim();
+                var data  = rows[i].getElementsByTagName('td')[0].innerHTML.trim();
 
-          var row = document.createElement('tr');
-          row.setAttribute('class','summary-table-row');
-          table.appendChild(row);
-      
-          var th = document.createElement('th');
-          th.innerHTML = attributes[i][0];
-          row.appendChild(th);
+                if(title.match(/Given name/i)){
+                    parametersPassed.given_name = data;
+                }else if(title.match(/Family name/i)){
+                    parametersPassed.family_name = data;
+                }else if(title.match(/Gender/i)){
+                    parametersPassed.gender = data[0];
+                }else if(title.match(/Birthdate Estimated/i)){
+                    parametersPassed.birthdate_estimated = data;
+                }else if(title.match(/Birthdate/i)){
+                    parametersPassed.birthdate = data;
+                }else if(title.match(/Home District/i)){
+                    parametersPassed.home_district = data;
+                }else if(title.match(/Home TA/i)){
+                    parametersPassed.home_traditional_authority = (data || 'Unknown');
+                }else if(title.match(/Home Village/i)){
+                    parametersPassed.home_village = (data || 'Unknown');
+                }else if(title.match(/Current District/i)){
+                    parametersPassed.current_district = (data || 'Unknown');
+                }else if(title.match(/Current TA/i)){
+                    parametersPassed.current_traditional_authority = data;
+                }else if(title.match(/Current Village/i)){
+                    parametersPassed.current_village = (data || 'Unknown');
+                }else if(title.match(/Landmark/i)){
+                    parametersPassed.landmark = data;
+                }else if(title.match(/Cell phone/i)){
+                    parametersPassed.cell_phone_number = data;
+                }
+            }
 
-          var td = document.createElement('td');
-          td.innerHTML = attributes[i][1];
-
-          if(attributes[i][0].match(/Current District/i)){
-            getObjects(td, attributes[i][1], "District", "/districts?region_id=" + document.getElementById('current_region').value);
-          }else if(attributes[i][0].match(/Current TA/i)){
-            getObjects(td, attributes[i][1], "TA", "/traditional_authorities?district_id=" + document.getElementById('current_district').value);
-          }else if(attributes[i][0].match(/Current Village/i)){
-            getObjects(td, attributes[i][1], "Village", "/villages?traditional_authority_id=" + document.getElementById('current_ta').value);
-          }    
-          
-          if(attributes[i][0].match(/Home District/i)){
-            getObjects(td, attributes[i][1], "District", "/districts?region_id=" + document.getElementById('home_region').value);
-          }else if(attributes[i][0].match(/Home TA/i)){
-            getObjects(td, attributes[i][1], "TA", "/traditional_authorities?district_id=" + document.getElementById('home_district').value);
-          }else if(attributes[i][0].match(/Home Village/i)){
-            getObjects(td, attributes[i][1], "Village", "/villages?traditional_authority_id=" + document.getElementById('home_ta').value);
-          }  
-          if (attributes[i][0].match(/Birthdate Estimated/i)) {
-              if(parameter.birthdate_estimated == 1) {
-                  td.innerHTML = "Yes";
-              }else {
-                  td.innerHTML = "No";
-              }
-          }  
-          
-
-          row.appendChild(td);
-
-          
+            postClientParamaters(parametersPassed);
         }
 
-        var f = document.getElementById('inputFrame' + tstCurrentPage);
-        f.appendChild(table);
-      }
+        function changeNextButton(){
+            __$("nextButton").removeAttribute("onmousedown")
+            __$("nextButton").onmousedown = function(){
+                confirm_password = $('touchscreenInput' + tstCurrentPage).value;
+                if (sessionStorage.getItem("password") === confirm_password){
+                    window.location.href = "show.html";
+                }
+                else{
+                    //  alert("passwords do not match");
 
-    </script>    
+                }
+            }
+        }
+
+        function calBirthdateFromEstimetedYear(age){
+            var currYear = new Date().getFullYear();
+            estYear = (currYear - parseInt(age));
+            return (estYear + "-07-01");
+        }
+
+        function summary() {
+            var date_estimated = 0;
+            if(__$('person_birth_year').value !== "Unknown") {
+                birth_date = new Date(__$('person_birth_year').value + "/" + __$('person_birth_month').value + "/" + __$('person_birth_day').value);
+                birth_date = moment(birth_date).format("DD/MMM/YYYY");
+            }else if (__$('person_birth_year').value === "Unknown") {
+                date_estimated = 1;
+                birth_date = moment().subtract(parseInt(__$('person_age_estimate').value), "years").format("YYYY");
+                birth_date = birth_date + "-07-01";
+            }if (__$('person_birth_year').value !== "Unknown" && __$('person_birth_month').value === "Unknown") {
+                date_estimated = 1;
+                birth_date = __$('person_birth_year').value + "-07-01";
+            }if(__$('person_birth_year').value !== "Unknown" && __$('person_birth_month').value !== "Unknown" && __$('person_birth_day').value === "Unknown") {
+                date_estimated = 1;
+                birth_date = __$('person_birth_year').value + "-" + __$('person_birth_month').value + "-15";
+            }
+            parameter = {
+                given_name:                     sessionStorage.given_name,
+                family_name:                    sessionStorage.family_name,
+                gender:                         sessionStorage.gender,
+                birthdate:                      birth_date ,
+                birthdate_estimated:            __$('person_birth_year').value != 'Unknown'  ? 0 : 1,
+
+                current_district:                __$('current_district').value,
+                current_traditional_authority:   __$('current_ta').value,
+                current_village:                 __$('current_village').value,
+
+                home_district:                   __$('home_district').value,
+                home_traditional_authority:      __$('home_ta').value,
+                home_village:                    __$('home_village').value,
+
+                landmark:                        __$('landmark').value,
+                cell_phone_number:               __$('cellphone').value,
+            }
+
+            var table = document.createElement('table');
+            table.setAttribute('class','summary-table');
+
+            var attributes = [
+                ["Given name", parameter.given_name],
+                ["Family name", parameter.family_name],
+                ["Gender", parameter.gender],
+                ["Birthdate", parameter.birthdate],
+                ["Birthdate Estimated", parameter.birthdate_estimated],
+                ["Home District", parameter.home_district],
+                ["Home TA", parameter.home_traditional_authority],
+                ["Home Village", parameter.home_village],
+                ["Current District", parameter.current_district],
+                ["Current TA", parameter.current_traditional_authority],
+                ["Current Village", parameter.current_village],
+                ["Landmark", parameter.landmark],
+                ["Cell phone", parameter.cell_phone_number],
+                ["Relationship", 'Spouse/Partner']
+            ];
+
+            for(var i = 0 ; i < attributes.length; i++){
+
+                var row = document.createElement('tr');
+                row.setAttribute('class','summary-table-row');
+                table.appendChild(row);
+
+                var th = document.createElement('th');
+                th.innerHTML = attributes[i][0];
+                row.appendChild(th);
+
+                var td = document.createElement('td');
+                td.innerHTML = attributes[i][1];
+
+                if(attributes[i][0].match(/Current District/i)){
+                    getObjects(td, attributes[i][1], "District", "/districts?region_id=" + document.getElementById('current_region').value);
+                }else if(attributes[i][0].match(/Current TA/i)){
+                    getObjects(td, attributes[i][1], "TA", "/traditional_authorities?district_id=" + document.getElementById('current_district').value);
+                }else if(attributes[i][0].match(/Current Village/i)){
+                    getObjects(td, attributes[i][1], "Village", "/villages?traditional_authority_id=" + document.getElementById('current_ta').value);
+                }
+
+                if(attributes[i][0].match(/Home District/i)){
+                    getObjects(td, attributes[i][1], "District", "/districts?region_id=" + document.getElementById('home_region').value);
+                }else if(attributes[i][0].match(/Home TA/i)){
+                    getObjects(td, attributes[i][1], "TA", "/traditional_authorities?district_id=" + document.getElementById('home_district').value);
+                }else if(attributes[i][0].match(/Home Village/i)){
+                    getObjects(td, attributes[i][1], "Village", "/villages?traditional_authority_id=" + document.getElementById('home_ta').value);
+                }
+                if (attributes[i][0].match(/Birthdate Estimated/i)) {
+                    if(parameter.birthdate_estimated == 1) {
+                        td.innerHTML = "Yes";
+                    }else {
+                        td.innerHTML = "No";
+                    }
+                }
+
+
+                row.appendChild(td);
+
+
+            }
+
+            var f = document.getElementById('inputFrame' + tstCurrentPage);
+            f.appendChild(table);
+        }
+
+    </script>
 
     <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
     <!-- <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/standard.js" defer="true"></script> -->
@@ -212,734 +213,765 @@
     <script type="text/javascript" src="/assets/js/moment.js"></script>
     <script type="text/javascript" src="/assets/js/demographics.js"></script>
 
-  </head>
-  <body id="mateme">
-    <div id="container">
-      <div id="content">
+</head>
+<body id="mateme">
+<div id="container">
+    <div id="content">
         <style>
 
-  .tt_controls_year_of_birth #qwerty { display:none; }
-  .tt_controls_age_estimate #qwerty { display:none; }
-  .tt_controls_cell_phone_number #qwerty { display:none; }
-  .tt_controls_ground_phone_number #qwerty { display:none; }
-  .tt_controls_office_phone_number #qwerty { display:none; }
+            .tt_controls_year_of_birth #qwerty { display:none; }
+            .tt_controls_age_estimate #qwerty { display:none; }
+            .tt_controls_cell_phone_number #qwerty { display:none; }
+            .tt_controls_ground_phone_number #qwerty { display:none; }
+            .tt_controls_office_phone_number #qwerty { display:none; }
 
-  .tt_controls_year_of_birth #Unknown { display:block; }
-  .tt_controls_age_estimate #Unknown { display:none; }
+            .tt_controls_year_of_birth #Unknown { display:block; }
+            .tt_controls_age_estimate #Unknown { display:none; }
 
-  .tt_controls_ground_phone_number #Unknown { display:block; }
+            .tt_controls_ground_phone_number #Unknown { display:block; }
 
-  .tt_controls_region_of_origin .keyboard{display:none;}
-  .tt_controls_current_region .keyboard{display:none;}
+            .tt_controls_region_of_origin .keyboard{display:none;}
+            .tt_controls_current_region .keyboard{display:none;}
 
-  .tt_controls_month_of_birth .keyboard{display:none;}
-  #tt_page_month_of_birth .options{height:570px;}
-  #tt_page_month_of_birth .options li{font-size:30px;}
+            .tt_controls_month_of_birth .keyboard{display:none;}
+            #tt_page_month_of_birth .options{height:570px;}
+            #tt_page_month_of_birth .options li{font-size:30px;}
 
-  .tt_controls_home_village #space , #apostrophe { display:inline; }
+            .tt_controls_home_village #space , #apostrophe { display:inline; }
 
-  .tt_controls_current_traditional_authority_ta #space { display:inline; }
+            .tt_controls_current_traditional_authority_ta #space { display:inline; }
 
-  .tt_controls_current_village_residence #space { display:inline; }
+            .tt_controls_current_village_residence #space { display:inline; }
 
-  .tt_controls_cell_phone_number #num , #plus, #apostrophe, #star, #char, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+            .tt_controls_cell_phone_number #num , #plus, #apostrophe, #star, #char, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
 
-  .tt_controls_father_cell_phone_number #num , #plus, #apostrophe, #star, #char, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+            .tt_controls_father_cell_phone_number #num , #plus, #apostrophe, #star, #char, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
 
-  .tt_controls_home_phone_number #num , #plus, #apostrophe, #star, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+            .tt_controls_home_phone_number #num , #plus, #apostrophe, #star, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
 
-  .tt_controls_office_phone_number #num , #plus, #apostrophe, #star, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+            .tt_controls_office_phone_number #num , #plus, #apostrophe, #star, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
 
-  .tt_controls_occupation .keyboard{display:none;}
-  #tt_page_occupation .options{height:500px;}
-  #tt_page_occupation .options li{font-size:30px;}
-  #space {display:inline;}
+            .tt_controls_occupation .keyboard{display:none;}
+            #tt_page_occupation .options{height:500px;}
+            #tt_page_occupation .options li{font-size:30px;}
+            #space {display:inline;}
 
-  .nota #na {
-    display: block;
-  }
+            .nota #na {
+                display: block;
+            }
 
-  #num{ display:block; }
-  #char{ display:none; }
-  #apostrophe { display:inline; }
-
-  .tt_controls_current_district #num{ display:none; }
-
-  .tt_controls_current_city_place_or_area_of_residence #num{ display:block; }
-  .tt_controls_current_city_place_or_area_of_residence #char{ display:block; }
-
-  .tt_controls_closest_landmark_or_plot_number #num{ display:block; }
-  .tt_controls_closest_landmark_or_plot_number #char{ display:block; }
-
-  .azButton .numericKeyboard #char {
-    display: block;
-  }
-
-  .tt_controls_home_district #viewport { display:inline; }
-  .tt_controls_home_district #num { display:none; }
-
-  #tt_page_home_district #viewport { display: inline !important; }
-  #tt_page_home_ta #viewport { display: inline !important; }
-  #tt_page_home_village #viewport { display: inline !important; }
-
-  #tt_page_current_district #viewport { display: inline !important; }
-  
-  #tt_page_current_ta #viewport { 
-    display: inline !important; 
-    height: 55%;
-  }
-
-
-  #tt_page_home_ta .inputFrameClass {
-    height: 50%;
-    overflow: auto;
-  }
-
-  #tt_page_home_village .inputFrameClass {
-    height: 50%;
-    overflow: auto;
-  }
-
-  #tt_page_current_ta .inputFrameClass {
-    height: 50%;
-    overflow: auto;
-  }
-
-  #tt_page_current_village .inputFrameClass {
-    height: 50%;
-    overflow: auto;
-  }
-
- .summary-table {
-   width: 100%;
-   border-collapse: collapse;
- }
-
- .summary-table th {
-   border-style: solid;
-   border-width: 0px 0px 1px 0px;
-   text-align: left;
-   padding-left: 5px 0px 10px 0px;
-   width: 20%;
-   height: 30px;
- }
-
- .summary-table td {
-   border-style: solid;
-   border-width: 0px 0px 1px 0px;
-   text-align: left;
-   padding-left: 5px 0px 10px 0px;
-   height: 30px;
- }
-
- .tt_controls_month_of_birth .keyboard {
-   display: none !important;
- }
-
- .tt_controls_birth_day #qwerty {
-   display: none;
- }
-
-</style>
-
-<script type="text/javascript">
-  var date_diff = "2008-08-31"
-  var url = new URL(url);
-  var backupPatientID = "";
-  var id = url.searchParams.get("patient_id");
-  sessionStorage.setItem("backupPatientID", id);
-  var tt_cancel_destination = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
-
-  function validateDate() {
-    selectYear = parseInt(document.getElementsByName('person[birth_year]')[0].value);
-    selectDay = parseInt(document.getElementsByName('person[birth_day]')[0].value);
-    date = new Date
-    currYear = date.getFullYear();
-    currDay = date.getDate();
-    availableMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-    if (selectYear == currYear){
-      currentMonth = [];
-      numOfloops = ((new Date).getMonth() + 1);
-      for(var i = 0; i < numOfloops; i++){
-        currentMonth.push(availableMonths[i]);
-      }
-      rule = currentMonth.join("|");
-      rule = rule + "|Unknown";
-      return $('touchscreenInput'+tstCurrentPage).setAttribute('validationRule',rule);
-    }
-    if (selectYear != currYear) {
-      rule = availableMonths.join("|");
-      rule = rule + "|Unknown";
-      return $('touchscreenInput'+tstCurrentPage).setAttribute('validationRule',rule);
-    }
-  }
-
-  function setAbsoluteMaxBirthYear(){
-    var element = document.getElementById('touchscreenInput' + tstCurrentPage);
-    element.setAttribute("absoluteMax", (new Date().getFullYear()));
-    element.setAttribute("min", (new Date().getFullYear() - 100)); 
-    element.setAttribute("absoluteMin", (new Date().getFullYear() - 120)); 
-  }
-
-  function validateYear() {
-    selectYear = parseInt(document.getElementsByName('person[birth_year]')[0].value);
-    selectDay = parseInt(document.getElementsByName('person[birth_day]')[0].value);
-    date = new Date
-    currYear = date.getFullYear();
-    currDay = date.getDate();
-
-    abMax = parseInt(date_diff.split("-")[0]) - 10;
-
-    jQuery('#touchscreenInput'+ tstCurrentPage).attr("absoluteMax", date_diff.split("-")[0]);
-
-  }
-  function updateMonthAbsMax(){
-    var month = jQuery('#person_birth_month').val();
-    var year = jQuery('#person_birth_year').val();
-    
-    if ((parseInt(year) == parseInt(date_diff.split("-")[0])) && (parseInt(month) > parseInt(date_diff.split("-")[1]))) {
-      var message = "Month selected is greater than Current Month";
-      setTimeout(function () {
-        gotoPage(tstCurrentPage - 1, false, true);
-        showMessage(message,null,30000);
-      }, 10);
-    }
-  }
-
-  function updateDayAbsMax(){
-    var month = jQuery('#person_birth_month').val();
-    var year = jQuery('#person_birth_year').val();
-    if ((parseInt(year) == parseInt(date_diff.split("-")[0])) && (parseInt(month) == parseInt(date_diff.split("-")[1]))){
-      jQuery('#touchscreenInput'+ tstCurrentPage).attr("absoluteMax", date_diff.split("-")[2]);
-    }
-  }
-
-  function validateMonth() {
-    var nextBtn =  __$("nextButton");
-    nextBtn.setAttribute('onmousedown',"validateBirthYearMonth();");
-    nextBtn.setAttribute('onclick',"");
-  }
-
-  function validateBirthYearMonth() {
-    setYear = parseInt(document.getElementById('person_birth_year').value);
-    if(setYear == (new Date().getFullYear())){
-      var element = document.getElementById('touchscreenInput' + tstCurrentPage);
-      var selectedMonth = parseInt(element.getAttribute('tstValue'));
-      var currMonth     = parseInt(new Date().getMonth() + 1);
-      if(selectedMonth > currMonth){
-        showMessage("Selected month is greater than current month");
-        return;
-      }
-    }
-
-    gotoNextPage();
-  }
-
-  function validateDay(){
-    date = new Date
-    currYear = date.getFullYear();
-    currDay = date.getDate();
-    currMonth = date.getMonth() + 1;
-    selected_month = parseInt(document.getElementsByName('person[birth_month]')[0].value)
-    selectYear = parseInt(document.getElementsByName('person[birth_year]')[0].value);
-    if (selectYear == currYear) {
-      if (selected_month == currMonth){
-        return $('touchscreenInput'+tstCurrentPage).setAttribute('absoluteMax',currDay);
-      }
-    }
-  }
-
-  function buildSetDate(date_str){
-    
-    date_arr = date_str.split('-');
-    intyear = parseInt(date_arr[0]);
-    intmonth = parseInt(date_arr[1]);
-    intday = parseInt(date_arr[2]);
-
-
-    return new Date(intyear,intmonth, (intday + 1));
-  }
-
-  function set_ajaxURL_for_suggestions(url, filter_value) {
-    $('touchscreenInput'+tstCurrentPage).setAttribute('ajaxURL', url + filter_value + "&page_size=1000&name=");
-    listSuggestions(tstCurrentPage);
-  }
-
-  var dob_year = null ; var dob_month = null ; dob_day = null;
-  var set_dob = null;
-  
-  function setUpPageForDateValidation() {
-    var nextBtn =  __$("nextButton");
-    nextBtn.setAttribute('onmousedown',"validateDOB();");
-    nextBtn.setAttribute('onclick',"");
-  }
-
-  function validateDOB() {
-    setDOB();
-    var valid_date = validateEnteredDate(set_dob);
-
-    if(!valid_date){
-      showMessage("Invalid Date");
-      return;
-    }
-
-    currDate  = new Date();
-    currDate  = new Date(currDate.getFullYear() + "-" + (currDate.getMonth() + 1) + "-" + currDate.getDate());
-    setDate   = new Date(set_dob);
-    
-    if(setDate > currDate){
-      showMessage("Birthdate more than the current date");
-      return;
-    }
-    
-    gotoNextPage();
-  }
-  
-  function setDOB() {
-    try {
-      dob_year = document.getElementById('person_birth_year').value; //getElementsByTagName("input")[0].value
-    }catch(e){ dob_year = dob_year }
-    try {
-      dob_month = document.getElementById('person_birth_month').value; //getElementsByTagName("input")[0].getAttribute('tstvalue')
-      if (dob_month.length == 1)
-        dob_month = 0 + dob_month
-    }catch(e){ dob_month = dob_month }
-    try {
-      dob_day = document.getElementById('person_birth_day').value; //getElementsByTagName("input")[0].value
-      if(dob_day.length < 1)
-        dob_day = document.getElementById('touchscreenInput' + tstCurrentPage).value; //getElementsByTagName("input")[0].value
-
-      if (dob_day.length == 1)
-        dob_day = 0 + dob_day
-    }catch(e){ dob_day = dob_day }
-
-    set_dob = (dob_year + '-' + dob_month + '-' + dob_day)
-  }
-
-    function setOverFow() {
-        var element = document.getElementById("inputFrame" + tstCurrentPage);
-        element.style="overflow: auto;";
-    }
-</script>
-
-<form action="" method="POST">
-
-  <input type="text" name="given_name" 
-    id="given_name" field_type="alpha" 
-    key="given_name" helpText="First name"  
-    ajaxURL="/search/given_name?search_string=" 
-    key=given_name" allowFreeText="true" 
-      condition="$('given_name').value == ''" /> 
-
-  <input type="text" name="person[names][family_name]" 
-    id="family_name" value="Testing" field_type="alpha" 
-    helpText="Last name" 
-    ajaxURL="/search/family_name?search_string=" 
-    allowFreeText="true" 
-      condition="$('family_name').value == ''" /> 
-
-  <input type="text" name="person[birth_year]" id="person_birth_year" helpText="Year of Birth" field_type="number" 
-    absoluteMin="1900" min="1900" tt_onLoad="setAbsoluteMaxBirthYear()" 
-    tt_pageStyleClass="Numeric NumbersOnly" />
-
-  <select name="person[birth_month]" id="person_birth_month" helpText="Month of Birth" 
-    condition="$('person_birth_year').value.toLowerCase() != 'unknown'" 
-    validationMessage="Please enter a valid date" tt_onUnLoad="resetFinishBtn();" 
-    tt_onLoad=" validateMonth();__$(keyboard).style.display = none;">
-      <option value=""></option>
-      <option value="1">Jan</option>
-      <option value="2">Feb</option>
-      <option value="3">Mar</option>
-      <option value="4">Apr</option>
-      <option value="5">May</option>
-      <option value="6">Jun</option>
-      <option value="7">Jul</option>
-      <option value="8">Aug</option>
-      <option value="9">Sep</option>
-      <option value="10">Oct</option>
-      <option value="11">Nov</option>
-      <option value="12">Dec</option>
-      <option value="Unknown">Unknown</option>
-    </select>
-
-  <input type="text" name="person[age_estimate]" id="person_age_estimate" helpText="Age Estimate" absoluteMin="1" absoluteMax="120" field_type="number" condition="$('person_birth_year').value == 'Unknown'" tt_onLoad="$(nextButton).style.display = block;" tt_pageStyleClass="Numeric NumbersOnly" />
-
-  <input type="text" name="person[birth_day]" 
-    id="person_birth_day" 
-    field_type="number" helpText="Birth Day" 
-    condition="($('person_birth_year').value != 'Unknown') && ($('person_birth_month').value != 'Unknown')" 
-    tt_onLoad="setUpPageForDateValidation();" 
-    tt_onUnLoad="resetFinishBtn();" />
-
-
-  <!-- Home Address ............................................. -->
-  <input type="text" name="region[region_name]" 
-    id="home_region" 
-    field_type="alpha"
-    xhelpText="Region"
-    helpText="Region of origin"
-    ajaxURL = "/regions"
-    setvalue = ""
-    tt_onLoad="clearInput(); jQuery('#nextButton').hide();"
-    tt_onUnload ="jQuery('#nextButton').show(); "
-    tt_requireNextClick = 'false'
-    tt_pageStyleClass = "NoKeyboard"
-    objectType="region" />
-  
-  <input type="text" name="home_district" 
-    id="home_district" 
-    field_type="alpha" 
-    xhelpText="District"
-    helpText="Home District"
-    setvalue = "" 
-    tt_pageStyleClass = "NoKeyboard"
-    tt_requireNextClick = 'false'
-    tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);"
-    tt_onUnload =" jQuery('#nextButton').show();"
-    objectType="districts" />
-
-  <input type="text" name="home_ta" 
-    id="home_ta" field_type="alpha" 
-    helpText="Home TA" 
-    ajaxURL=""
-    condition="$('home_region').value != '4'"
-    tt_requireNextClick = 'false'
-    tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('home_district').value);"
-    tt_onUnLoad =" jQuery('#nextButton').show();"
-    objectType="traditional_authority" />
-
-  <input type="text" name="home_village" 
-    id="home_village" field_type="alpha" 
-    helpText="Home Village" 
-    ajaxURL="" 
-    condition="$('home_region').value != '4'"
-    tt_requireNextClick = 'false'
-    tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('home_ta').value);"
-    tt_onUnload ="jQuery('#nextButton').show();"
-    objectType="village" />
-
-  <!-- Home Address ............................................. -->
-
-    <!-- ................... Current Address ........................... -->
-  <input type="text" name="region[region_name]" 
-    id="current_region" 
-    field_type="alpha" 
-    xhelpText="Region"
-    helpText="Current Region"
-    ajaxURL = "/regions"
-    setvalue = ""
-    tt_requireNextClick = 'false'
-    tt_pageStyleClass = "NoKeyboard"
-    tt_onLoad="clearInput(); jQuery('#nextButton').hide();"
-    tt_onUnload ="jQuery('#nextButton').show();"
-    objectType="region" />
-  
-  <input type="text" name="current_district" 
-    id="current_district" 
-    field_type="alpha" 
-    xhelpText="District"
-    helpText="Current District"
-    setvalue = "" 
-    tt_pageStyleClass = "NoKeyboard"
-    tt_requireNextClick = 'false'
-    tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('current_region').value);"
-    tt_onUnload ="jQuery('#nextButton').show();"
-    objectType="districts" />
-
-  <input type="text" name="current_ta" 
-    id="current_ta" field_type="alpha" 
-    helpText="Current TA" 
-    ajaxURL="" 
-    condition="$('current_region').value != '4'"
-    tt_requireNextClick = 'false'
-    tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('current_district').value);"
-    tt_onUnload ="jQuery('#nextButton').show();"
-    objectType="traditional_authority" />
-
-  <input type="text" name="current_village" 
-    id="current_village" field_type="alpha" 
-    helpText="Current Village" 
-    ajaxURL="" 
-    condition="$('current_region').value != '4'"
-    tt_requireNextClick = 'false'
-    tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('current_ta').value);"
-    tt_onUnload ="jQuery('#nextButton').show();"
-    objectType="village" />
-
-    <!-- ................... Current Address ends ........................... -->
-
-
-
-  <!-- <input type="text" name="p[addresses][city_village_a]" id="p_addresses_city_village_a" tt_onUnLoad="$(&quot;person_addresses_city_village&quot;).value = $(&quot;p_addresses_city_village_a&quot;).value" condition="$(&quot;filter_t_a&quot;).value == &quot;Other&quot;" ajaxURL="/person_addresses/village?search_string=" allowFreeText="true" field_type="alpha" helpText="Specify Location/Village" tt_pageStyleClass="azButton" tt_requireNextClick="true" tt_onLoad="$(&#39;nextButton&#39;).style.display = &#39;block&#39;;" /> -->
-
-  <select type="text" name="person[addresses][address1]" id="landmark" 
-    helpText="Closest Landmark or Plot Number<br /><span style='font-size:0.7em;font-style:italic'>(Please do not include these words: Next to, close, in front of, behind)</span>" allowFreeText="true" 
-    tt_pageStyleClass = "NoKeyboard"
-    validationRule = "^(?=.{2,100}$)[a-z\!\A-Z]+(?:['_.\-\!\s\][a-z]+[a-z\!\A-Z\0-9])*$|Unknown|Not Available"
-    tt_onLoad="$(nextButton).style.display = block;"> 
-      <option value="Catholic Church">Catholic Church</option>
-      <option value="CCAP">CCAP</option>
-      <option value="Seventh Day">Seventh Day</option>
-      <option value="Mosque">Mosque</option>
-      <option value="Primary School">Primary School</option>
-      <option value="Borehole">Borehole</option>
-      <option value="Secondary School">Secondary School</option>
-      <option value="College">College</option>
-      <option value="Market">Market</option>
-      <option value="Football Ground">Football Ground</option>
-      <option value="Other">Other</option>
-  </select>
-
-  <input type="text" name="person[addresses][address1]" id="landmark-other" 
-  condition="__$('landmark').value === 'Other';"
-    helpText="Closest Landmark or Plot Number<br /><span style='font-size:0.7em;font-style:italic'>(Please do not include these words: Next to, close, in front of, behind)</span>" allowFreeText="true" 
-    tt_pageStyleClass="azButton" 
-    validationRule = "^(?=.{2,100}$)[a-z\!\A-Z]+(?:['_.\-\!\s\][a-z]+[a-z\!\A-Z\0-9])*$|Unknown|Not Available"
-    tt_onLoad="$(nextButton).style.display = block;"
-    ajaxURL="/search/landmarks?search_string=" />
-
-  <input type="text" name="cellphone" id="cellphone" 
-    helpText="Father cell phone number"
-    tt_pageStyleClass="NumbersOnlyWithUnknown" 
-    field_type="number"
-    validationRule="^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|Unknown|Not Available"
-    validationMessage="Not a valid phone number" 
-    tt_onLoad="$(nextButton).style.display = block;" />
-  
-  <!-- Make sure patient is created
-
-  <! <input id="person_patient" name="person[patient]" type="hidden" value="" />
-
-  <input id="relation" name="relation" type="hidden" value="" />
-
-  <input id="identifier" name="identifier" type="hidden" value="" />
-
-  <input name="commit" type="submit" value="Create person" /> -->
-  
-  <input type="text" name="summary" id="summary"
-    tt_onLoad = "summary();__$('keyboard').style.display = 'none';changeFinishBtn();"
-    tt_onUnLoad ="resetFinishBtn();" optional = "true" tt_pageStyleClass = "NoControls" /> 
-
-
-  <!-- <input type="text" name="person[guardian_cell_phone_number]" id="guardian_cellphone" field_type="number" helpText="Next of Kin Cell Phone Number" tt_onUnload="getInput();" validationRule="^0\d{7}$|Unknown|Not Available|N/A|^0\d{9}$" validationMessage="Not a valid phone number" tt_pageStyleClass="nota NumbersOnlyWithUnknown" /> -->
-
-  <input type="hidden" name="person[gender]" id="gender" value="" />
-  <input type="hidden" name="person[patient]" id="person_patient" value="" />
-
-  <input type="hidden" name="relation" id="relation" value="" />
-
-  <input type="hidden" name="identifier" id="identifier" value="" />
-
-</form>
+            #num{ display:block; }
+            #char{ display:none; }
+            #apostrophe { display:inline; }
+
+            .tt_controls_current_district #num{ display:none; }
+
+            .tt_controls_current_city_place_or_area_of_residence #num{ display:block; }
+            .tt_controls_current_city_place_or_area_of_residence #char{ display:block; }
+
+            .tt_controls_closest_landmark_or_plot_number #num{ display:block; }
+            .tt_controls_closest_landmark_or_plot_number #char{ display:block; }
+
+            .azButton .numericKeyboard #char {
+                display: block;
+            }
+
+            .tt_controls_home_district #viewport { display:inline; }
+            .tt_controls_home_district #num { display:none; }
+
+            #tt_page_home_district #viewport { display: inline !important; }
+            #tt_page_home_ta #viewport { display: inline !important; }
+            #tt_page_home_village #viewport { display: inline !important; }
+
+            #tt_page_current_district #viewport { display: inline !important; }
+
+            #tt_page_current_ta #viewport {
+                display: inline !important;
+                height: 55%;
+            }
+
+
+            #tt_page_home_ta .inputFrameClass {
+                height: 50%;
+                overflow: auto;
+            }
+
+            #tt_page_home_village .inputFrameClass {
+                height: 50%;
+                overflow: auto;
+            }
+
+            #tt_page_current_ta .inputFrameClass {
+                height: 50%;
+                overflow: auto;
+            }
+
+            #tt_page_current_village .inputFrameClass {
+                height: 50%;
+                overflow: auto;
+            }
+
+            .summary-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .summary-table th {
+                border-style: solid;
+                border-width: 0px 0px 1px 0px;
+                text-align: left;
+                padding-left: 5px 0px 10px 0px;
+                width: 20%;
+                height: 30px;
+            }
+
+            .summary-table td {
+                border-style: solid;
+                border-width: 0px 0px 1px 0px;
+                text-align: left;
+                padding-left: 5px 0px 10px 0px;
+                height: 30px;
+            }
+
+            .tt_controls_month_of_birth .keyboard {
+                display: none !important;
+            }
+
+            .tt_controls_birth_day #qwerty {
+                display: none;
+            }
+
+        </style>
+
+        <script type="text/javascript">
+            var date_diff = "2008-08-31"
+            var url = new URL(url);
+            var backupPatientID = "";
+            var id = url.searchParams.get("patient_id");
+            sessionStorage.setItem("backupPatientID", id);
+            var tt_cancel_destination = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
+
+            function validateDate() {
+                selectYear = parseInt(document.getElementsByName('person[birth_year]')[0].value);
+                selectDay = parseInt(document.getElementsByName('person[birth_day]')[0].value);
+                date = new Date
+                currYear = date.getFullYear();
+                currDay = date.getDate();
+                availableMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+                if (selectYear == currYear){
+                    currentMonth = [];
+                    numOfloops = ((new Date).getMonth() + 1);
+                    for(var i = 0; i < numOfloops; i++){
+                        currentMonth.push(availableMonths[i]);
+                    }
+                    rule = currentMonth.join("|");
+                    rule = rule + "|Unknown";
+                    return $('touchscreenInput'+tstCurrentPage).setAttribute('validationRule',rule);
+                }
+                if (selectYear != currYear) {
+                    rule = availableMonths.join("|");
+                    rule = rule + "|Unknown";
+                    return $('touchscreenInput'+tstCurrentPage).setAttribute('validationRule',rule);
+                }
+            }
+
+            function setAbsoluteMaxBirthYear(){
+                var element = document.getElementById('touchscreenInput' + tstCurrentPage);
+                element.setAttribute("absoluteMax", (new Date().getFullYear()));
+                element.setAttribute("min", (new Date().getFullYear() - 100));
+                element.setAttribute("absoluteMin", (new Date().getFullYear() - 120));
+            }
+
+            function validateYear() {
+                selectYear = parseInt(document.getElementsByName('person[birth_year]')[0].value);
+                selectDay = parseInt(document.getElementsByName('person[birth_day]')[0].value);
+                date = new Date
+                currYear = date.getFullYear();
+                currDay = date.getDate();
+
+                abMax = parseInt(date_diff.split("-")[0]) - 10;
+
+                jQuery('#touchscreenInput'+ tstCurrentPage).attr("absoluteMax", date_diff.split("-")[0]);
+
+            }
+            function updateMonthAbsMax(){
+                var month = jQuery('#person_birth_month').val();
+                var year = jQuery('#person_birth_year').val();
+
+                if ((parseInt(year) == parseInt(date_diff.split("-")[0])) && (parseInt(month) > parseInt(date_diff.split("-")[1]))) {
+                    var message = "Month selected is greater than Current Month";
+                    setTimeout(function () {
+                        gotoPage(tstCurrentPage - 1, false, true);
+                        showMessage(message,null,30000);
+                    }, 10);
+                }
+            }
+
+            function updateDayAbsMax(){
+                var month = jQuery('#person_birth_month').val();
+                var year = jQuery('#person_birth_year').val();
+                if ((parseInt(year) == parseInt(date_diff.split("-")[0])) && (parseInt(month) == parseInt(date_diff.split("-")[1]))){
+                    jQuery('#touchscreenInput'+ tstCurrentPage).attr("absoluteMax", date_diff.split("-")[2]);
+                }
+            }
+
+            function validateMonth() {
+                var nextBtn =  __$("nextButton");
+                nextBtn.setAttribute('onmousedown',"validateBirthYearMonth();");
+                nextBtn.setAttribute('onclick',"");
+            }
+
+            function validateBirthYearMonth() {
+                setYear = parseInt(document.getElementById('person_birth_year').value);
+                if(setYear == (new Date().getFullYear())){
+                    var element = document.getElementById('touchscreenInput' + tstCurrentPage);
+                    var selectedMonth = parseInt(element.getAttribute('tstValue'));
+                    var currMonth     = parseInt(new Date().getMonth() + 1);
+                    if(selectedMonth > currMonth){
+                        showMessage("Selected month is greater than current month");
+                        return;
+                    }
+                }
+
+                gotoNextPage();
+            }
+
+            function validateDay(){
+                date = new Date
+                currYear = date.getFullYear();
+                currDay = date.getDate();
+                currMonth = date.getMonth() + 1;
+                selected_month = parseInt(document.getElementsByName('person[birth_month]')[0].value)
+                selectYear = parseInt(document.getElementsByName('person[birth_year]')[0].value);
+                if (selectYear == currYear) {
+                    if (selected_month == currMonth){
+                        return $('touchscreenInput'+tstCurrentPage).setAttribute('absoluteMax',currDay);
+                    }
+                }
+            }
+
+            function buildSetDate(date_str){
+
+                date_arr = date_str.split('-');
+                intyear = parseInt(date_arr[0]);
+                intmonth = parseInt(date_arr[1]);
+                intday = parseInt(date_arr[2]);
+
+
+                return new Date(intyear,intmonth, (intday + 1));
+            }
+
+            function set_ajaxURL_for_suggestions(url, filter_value) {
+                $('touchscreenInput'+tstCurrentPage).setAttribute('ajaxURL', url + filter_value + "&page_size=1000&name=");
+                listSuggestions(tstCurrentPage);
+            }
+
+            var dob_year = null ; var dob_month = null ; dob_day = null;
+            var set_dob = null;
+
+            function setUpPageForDateValidation() {
+                var nextBtn =  __$("nextButton");
+                nextBtn.setAttribute('onmousedown',"validateDOB();");
+                nextBtn.setAttribute('onclick',"");
+            }
+
+            function validateDOB() {
+                setDOB();
+                var valid_date = validateEnteredDate(set_dob);
+
+                if(!valid_date){
+                    showMessage("Invalid Date");
+                    return;
+                }
+
+                currDate  = new Date();
+                currDate  = new Date(currDate.getFullYear() + "-" + (currDate.getMonth() + 1) + "-" + currDate.getDate());
+                setDate   = new Date(set_dob);
+
+                if(setDate > currDate){
+                    showMessage("Birthdate more than the current date");
+                    return;
+                }
+
+                gotoNextPage();
+            }
+
+            function setDOB() {
+                try {
+                    dob_year = document.getElementById('person_birth_year').value; //getElementsByTagName("input")[0].value
+                }catch(e){ dob_year = dob_year }
+                try {
+                    dob_month = document.getElementById('person_birth_month').value; //getElementsByTagName("input")[0].getAttribute('tstvalue')
+                    if (dob_month.length == 1)
+                        dob_month = 0 + dob_month
+                }catch(e){ dob_month = dob_month }
+                try {
+                    dob_day = document.getElementById('person_birth_day').value; //getElementsByTagName("input")[0].value
+                    if(dob_day.length < 1)
+                        dob_day = document.getElementById('touchscreenInput' + tstCurrentPage).value; //getElementsByTagName("input")[0].value
+
+                    if (dob_day.length == 1)
+                        dob_day = 0 + dob_day
+                }catch(e){ dob_day = dob_day }
+
+                set_dob = (dob_year + '-' + dob_month + '-' + dob_day)
+            }
+
+            function setOverFow() {
+                var element = document.getElementById("inputFrame" + tstCurrentPage);
+                element.style="overflow: auto;";
+            }
+        </script>
+
+        <form action="" method="POST">
+
+            <input type="text" name="given_name"
+                   id="given_name" field_type="alpha"
+                   key="given_name" helpText="First name"
+                   ajaxURL="/search/given_name?search_string="
+                   key=given_name" allowFreeText="true"
+                   condition="$('given_name').value == ''" />
+
+            <input type="text" name="person[names][family_name]"
+                   id="family_name" value="Testing" field_type="alpha"
+                   helpText="Last name"
+                   ajaxURL="/search/family_name?search_string="
+                   allowFreeText="true"
+                   condition="$('family_name').value == ''" />
+
+            <input type="text" name="person[birth_year]" id="person_birth_year" helpText="Year of Birth" field_type="number"
+                   absoluteMin="1900" min="1900" tt_onLoad="setAbsoluteMaxBirthYear()"
+                   tt_pageStyleClass="Numeric NumbersOnly" />
+
+            <select name="person[birth_month]" id="person_birth_month" helpText="Month of Birth"
+                    condition="$('person_birth_year').value.toLowerCase() != 'unknown'"
+                    validationMessage="Please enter a valid date" tt_onUnLoad="resetFinishBtn();"
+                    tt_onLoad=" validateMonth();__$(keyboard).style.display = none;">
+                <option value=""></option>
+                <option value="1">Jan</option>
+                <option value="2">Feb</option>
+                <option value="3">Mar</option>
+                <option value="4">Apr</option>
+                <option value="5">May</option>
+                <option value="6">Jun</option>
+                <option value="7">Jul</option>
+                <option value="8">Aug</option>
+                <option value="9">Sep</option>
+                <option value="10">Oct</option>
+                <option value="11">Nov</option>
+                <option value="12">Dec</option>
+                <option value="Unknown">Unknown</option>
+            </select>
+
+            <input type="text" name="person[age_estimate]" id="person_age_estimate" helpText="Age Estimate" absoluteMin="1" absoluteMax="120" field_type="number" condition="$('person_birth_year').value == 'Unknown'" tt_onLoad="$(nextButton).style.display = block;" tt_pageStyleClass="Numeric NumbersOnly" />
+
+            <input type="text" name="person[birth_day]"
+                   id="person_birth_day"
+                   field_type="number" helpText="Birth Day"
+                   condition="($('person_birth_year').value != 'Unknown') && ($('person_birth_month').value != 'Unknown')"
+                   tt_onLoad="setUpPageForDateValidation();"
+                   tt_onUnLoad="resetFinishBtn();" />
+
+
+            <!-- Home Address ............................................. -->
+            <input type="text" name="region[region_name]"
+                   id="home_region"
+                   field_type="alpha"
+                   xhelpText="Region"
+                   helpText="Region of origin"
+                   ajaxURL = "/regions"
+                   setvalue = ""
+                   tt_onLoad="clearInput(); jQuery('#nextButton').hide();"
+                   tt_onUnload ="jQuery('#nextButton').show(); "
+                   tt_requireNextClick = 'false'
+                   tt_pageStyleClass = "NoKeyboard"
+                   objectType="region" />
+
+            <input type="text" name="home_district"
+                   id="home_district"
+                   field_type="alpha"
+                   xhelpText="District"
+                   helpText="Home District"
+                   setvalue = ""
+                   tt_pageStyleClass = "NoKeyboard"
+                   tt_requireNextClick = 'false'
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);"
+                   tt_onUnload =" jQuery('#nextButton').show();"
+                   objectType="districts" />
+
+            <input type="text" name="home_ta"
+                   id="home_ta" field_type="alpha"
+                   helpText="Home TA"
+                   ajaxURL=""
+                   condition="$('home_region').value != '4'"
+                   tt_requireNextClick = 'false'
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('home_district').value);"
+                   tt_onUnLoad =" jQuery('#nextButton').show();"
+                   objectType="traditional_authority" />
+
+            <input type="text" name="home_village"
+                   id="home_village" field_type="alpha"
+                   helpText="Home Village"
+                   ajaxURL=""
+                   condition="$('home_region').value != '4'"
+                   tt_requireNextClick = 'false'
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('home_ta').value);"
+                   tt_onUnload ="jQuery('#nextButton').show();"
+                   objectType="village" />
+
+            <!-- Home Address ............................................. -->
+
+            <!-- ................... Current Address ........................... -->
+            <input type="text" name="region[region_name]"
+                   id="current_region"
+                   field_type="alpha"
+                   xhelpText="Region"
+                   helpText="Current Region"
+                   ajaxURL = "/regions"
+                   setvalue = ""
+                   tt_requireNextClick = 'false'
+                   tt_pageStyleClass = "NoKeyboard"
+                   tt_onLoad="clearInput(); jQuery('#nextButton').hide();"
+                   tt_onUnload ="jQuery('#nextButton').show();"
+                   objectType="region" />
+
+            <input type="text" name="current_district"
+                   id="current_district"
+                   field_type="alpha"
+                   xhelpText="District"
+                   helpText="Current District"
+                   setvalue = ""
+                   tt_pageStyleClass = "NoKeyboard"
+                   tt_requireNextClick = 'false'
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('current_region').value);"
+                   tt_onUnload ="jQuery('#nextButton').show();"
+                   objectType="districts" />
+
+            <input type="text" name="current_ta"
+                   id="current_ta" field_type="alpha"
+                   helpText="Current TA"
+                   ajaxURL=""
+                   condition="$('current_region').value != '4'"
+                   tt_requireNextClick = 'false'
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('current_district').value);"
+                   tt_onUnload ="jQuery('#nextButton').show();"
+                   objectType="traditional_authority" />
+
+            <input type="text" name="current_village"
+                   id="current_village" field_type="alpha"
+                   helpText="Current Village"
+                   ajaxURL=""
+                   condition="$('current_region').value != '4'"
+                   tt_requireNextClick = 'false'
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('current_ta').value);"
+                   tt_onUnload ="jQuery('#nextButton').show();"
+                   objectType="village" />
+
+            <!-- ................... Current Address ends ........................... -->
+
+
+
+            <!-- <input type="text" name="p[addresses][city_village_a]" id="p_addresses_city_village_a" tt_onUnLoad="$(&quot;person_addresses_city_village&quot;).value = $(&quot;p_addresses_city_village_a&quot;).value" condition="$(&quot;filter_t_a&quot;).value == &quot;Other&quot;" ajaxURL="/person_addresses/village?search_string=" allowFreeText="true" field_type="alpha" helpText="Specify Location/Village" tt_pageStyleClass="azButton" tt_requireNextClick="true" tt_onLoad="$(&#39;nextButton&#39;).style.display = &#39;block&#39;;" /> -->
+
+            <select type="text" name="person[addresses][address1]" id="landmark"
+                    helpText="Closest Landmark or Plot Number<br /><span style='font-size:0.7em;font-style:italic'>(Please do not include these words: Next to, close, in front of, behind)</span>" allowFreeText="true"
+                    tt_pageStyleClass = "NoKeyboard"
+                    validationRule = "^(?=.{2,100}$)[a-z\!\A-Z]+(?:['_.\-\!\s\][a-z]+[a-z\!\A-Z\0-9])*$|Unknown|Not Available"
+                    tt_onLoad="$(nextButton).style.display = block;">
+                <option value="Catholic Church">Catholic Church</option>
+                <option value="CCAP">CCAP</option>
+                <option value="Seventh Day">Seventh Day</option>
+                <option value="Mosque">Mosque</option>
+                <option value="Primary School">Primary School</option>
+                <option value="Borehole">Borehole</option>
+                <option value="Secondary School">Secondary School</option>
+                <option value="College">College</option>
+                <option value="Market">Market</option>
+                <option value="Football Ground">Football Ground</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <input type="text" name="person[addresses][address1]" id="landmark-other"
+                   condition="__$('landmark').value === 'Other';"
+                   helpText="Closest Landmark or Plot Number<br /><span style='font-size:0.7em;font-style:italic'>(Please do not include these words: Next to, close, in front of, behind)</span>" allowFreeText="true"
+                   tt_pageStyleClass="azButton"
+                   validationRule = "^(?=.{2,100}$)[a-z\!\A-Z]+(?:['_.\-\!\s\][a-z]+[a-z\!\A-Z\0-9])*$|Unknown|Not Available"
+                   tt_onLoad="$(nextButton).style.display = block;"
+                   ajaxURL="/search/landmarks?search_string=" />
+
+            <input type="text" name="cellphone" id="cellphone"
+                   helpText="Father cell phone number"
+                   tt_pageStyleClass="NumbersOnlyWithUnknown"
+                   field_type="number"
+                   validationRule="^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|Unknown|Not Available"
+                   validationMessage="Not a valid phone number"
+                   tt_onLoad="$(nextButton).style.display = block;" />
+
+            <!-- Make sure patient is created
+
+            <! <input id="person_patient" name="person[patient]" type="hidden" value="" />
+
+            <input id="relation" name="relation" type="hidden" value="" />
+
+            <input id="identifier" name="identifier" type="hidden" value="" />
+
+            <input name="commit" type="submit" value="Create person" /> -->
+
+            <input type="text" name="summary" id="summary"
+                   tt_onLoad = "summary();__$('keyboard').style.display = 'none';changeFinishBtn();"
+                   tt_onUnLoad ="resetFinishBtn();" optional = "true" tt_pageStyleClass = "NoControls" />
+
+
+            <!-- <input type="text" name="person[guardian_cell_phone_number]" id="guardian_cellphone" field_type="number" helpText="Next of Kin Cell Phone Number" tt_onUnload="getInput();" validationRule="^0\d{7}$|Unknown|Not Available|N/A|^0\d{9}$" validationMessage="Not a valid phone number" tt_pageStyleClass="nota NumbersOnlyWithUnknown" /> -->
+
+            <input type="hidden" name="person[gender]" id="gender" value="" />
+            <input type="hidden" name="person[patient]" id="person_patient" value="" />
+
+            <input type="hidden" name="relation" id="relation" value="" />
+
+            <input type="hidden" name="identifier" id="identifier" value="" />
+
+        </form>
 
         <div id="footer">
         </div>
-      </div>
     </div>
-  </body>
+</div>
+</body>
 </html>
 
 <script type="text/javascript">
-var patientID = sessionStorage.getItem("patientID");
+    var patientID = sessionStorage.getItem("patientID");
 
-function getObjects(td, attribute, element_name, aUrl) {
-  var url = apiProtocol+'://'+apiURL+':'+apiPort+'/api/v1' + aUrl;
+    function getObjects(td, attribute, element_name, aUrl) {
+        var url = apiProtocol+'://'+apiURL+':'+apiPort+'/api/v1' + aUrl;
 
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      var obj = JSON.parse(this.responseText);
-      if(element_name.match(/District/i)){
-        districts = obj;
-        for(var x = 0 ; x < districts.length; x++){
-          if(districts[x].district_id == attribute){
-            td.innerHTML = districts[x].name;
-            break;
-          }
-        }
-      }else if(element_name.match(/TA/i)){
-        traditional_authorities = obj;
-        for(var x = 0 ; x < traditional_authorities.length; x++){
-          if(traditional_authorities[x].traditional_authority_id == attribute){
-            td.innerHTML = traditional_authorities[x].name;
-            break;
-          }
-        }
-      }else if(element_name.match(/Village/i)){
-        villages = obj;
-        for(var x = 0 ; x < villages.length; x++){
-          if(villages[x].village_id == attribute){
-            td.innerHTML = villages[x].name;
-            break;
-          }
-        }
-      }
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var obj = JSON.parse(this.responseText);
+                if(element_name.match(/District/i)){
+                    districts = obj;
+                    for(var x = 0 ; x < districts.length; x++){
+                        if(districts[x].district_id == attribute){
+                            td.innerHTML = districts[x].name;
+                            break;
+                        }
+                    }
+                }else if(element_name.match(/TA/i)){
+                    traditional_authorities = obj;
+                    for(var x = 0 ; x < traditional_authorities.length; x++){
+                        if(traditional_authorities[x].traditional_authority_id == attribute){
+                            td.innerHTML = traditional_authorities[x].name;
+                            break;
+                        }
+                    }
+                }else if(element_name.match(/Village/i)){
+                    villages = obj;
+                    for(var x = 0 ; x < villages.length; x++){
+                        if(villages[x].village_id == attribute){
+                            td.innerHTML = villages[x].name;
+                            break;
+                        }
+                    }
+                }
+            }
+        };
+        xhttp.open("GET", url, true);
+        xhttp.setRequestHeader('Authorization',sessionStorage.getItem("authorization"));
+        xhttp.send();
     }
-  };
-  xhttp.open("GET", url, true);
-  xhttp.setRequestHeader('Authorization',sessionStorage.getItem("authorization"));
-  xhttp.send();
-}
 
-function setUrl(e, name) {
-  __$(e).setAttribute('ajaxURL', "/districts?region_id=2");
-}
-
-function QueryString(URL) {
-    // This function is anonymous, is executed immediately and 
-    // the return value is assigned to QueryString!
-    var query_string = {};
-    var usefulParam = URL.split("?")[1] || "";
-    var query = usefulParam || "";
-    var vars = query.split("&");
-
-    for (var i = 0; i < vars.length; i++) {
-        var pair = vars[i].split("=");
-        
-        // If first entry with this name
-        if (typeof query_string[pair[0]] === "undefined") {
-            query_string[pair[0]] = decodeURIComponent(pair[1]);
-            // If second entry with this name
-        } else if (typeof query_string[pair[0]] === "string") {
-            var arr = [query_string[pair[0]], decodeURIComponent(pair[1])];
-            query_string[pair[0]] = arr;
-            // If third or later entry with this name
-        } else {
-            query_string[pair[0]].push(decodeURIComponent(pair[1]));
-        }
+    function setUrl(e, name) {
+        __$(e).setAttribute('ajaxURL', "/districts?region_id=2");
     }
+
+    function QueryString(URL) {
+        // This function is anonymous, is executed immediately and
+        // the return value is assigned to QueryString!
+        var query_string = {};
+        var usefulParam = URL.split("?")[1] || "";
+        var query = usefulParam || "";
+        var vars = query.split("&");
+
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split("=");
+
+            // If first entry with this name
+            if (typeof query_string[pair[0]] === "undefined") {
+                query_string[pair[0]] = decodeURIComponent(pair[1]);
+                // If second entry with this name
+            } else if (typeof query_string[pair[0]] === "string") {
+                var arr = [query_string[pair[0]], decodeURIComponent(pair[1])];
+                query_string[pair[0]] = arr;
+                // If third or later entry with this name
+            } else {
+                query_string[pair[0]].push(decodeURIComponent(pair[1]));
+            }
+        }
 
         document.getElementById('given_name').value = query_string.given_name;
         document.getElementById('family_name').value = query_string.family_name;
         document.getElementById('gender').value = query_string.gender;
-    return query_string;
-}
-
-QueryString(window.location.href);
-
-function validateEnteredDate(inputText){
-  // Match the date format through regular expression
-  if(inputText.match(/-/i)) {
-
-    //Test which seperator is used '/' or '-'
-    var pdate = inputText.split('-');
-
-    var dd = parseInt(pdate[2]);
-    var mm  = parseInt(pdate[1]);
-    var yy = parseInt(pdate[0]);
-
-    if(dd == 0){
-      return false;
+        return query_string;
     }
 
-    // Create list of days of a month [assume there is no leap year by default]
-    var ListofDays = [31,28,31,30,31,30,31,31,30,31,30,31];
-    if (mm==1 || mm>2){
-      if (dd>ListofDays[mm-1]) {
-        //alert('Invalid date format!');
-        return false;
-      }
+    QueryString(window.location.href);
+
+    function validateEnteredDate(inputText){
+        // Match the date format through regular expression
+        if(inputText.match(/-/i)) {
+
+            //Test which seperator is used '/' or '-'
+            var pdate = inputText.split('-');
+
+            var dd = parseInt(pdate[2]);
+            var mm  = parseInt(pdate[1]);
+            var yy = parseInt(pdate[0]);
+
+            if(dd == 0){
+                return false;
+            }
+
+            // Create list of days of a month [assume there is no leap year by default]
+            var ListofDays = [31,28,31,30,31,30,31,31,30,31,30,31];
+            if (mm==1 || mm>2){
+                if (dd>ListofDays[mm-1]) {
+                    //alert('Invalid date format!');
+                    return false;
+                }
+            }
+
+            if (mm==2) {
+                var lyear = false;
+                if ( (!(yy % 4) && yy % 100) || !(yy % 400)){
+                    lyear = true;
+                }
+
+                if ((lyear==false) && (dd>=29)) {
+                    //alert('Invalid date format!');
+                    return false;
+                }
+
+                if ((lyear==true) && (dd>29)){
+                    //alert('Invalid date format!');
+                    return false;
+                }
+            }
+        }else{
+            //alert("Invalid date format!");
+            //document.form1.text1.focus();
+            return false;
+        }
+
+        return true;
     }
-  
-    if (mm==2) {
-      var lyear = false;
-      if ( (!(yy % 4) && yy % 100) || !(yy % 400)){
-        lyear = true;
-      }
-  
-      if ((lyear==false) && (dd>=29)) {
-        //alert('Invalid date format!');
-        return false;
-      }
-  
-      if ((lyear==true) && (dd>29)){
-        //alert('Invalid date format!');
-        return false;
-      }
+
+    function postClientParamaters(parametersPassed) {
+        var url = apiProtocol+'://'+apiURL+':'+apiPort+'/api/v1/people';
+        if (parametersPassed.birthdate_estimated === "Yes") {
+            parametersPassed.birthdate_estimated = 1;
+        }else {
+            parametersPassed.birthdate_estimated = 0;
+        }
+        var parametersPassed = JSON.stringify(parametersPassed);
+        console.log('verifying the data before sending to server' + console.table(parametersPassed));
+        showStatus();
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 201) {
+                var obj = JSON.parse(this.responseText);
+                console.log('examin the id for the person' + obj['person_id'] );
+                createPatient(obj['person_id']);
+            }
+        };
+        xhttp.open("POST", url, true);
+        xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+        xhttp.setRequestHeader('Content-type', "application/json");
+        xhttp.send(parametersPassed);
     }
-  }else{
-    //alert("Invalid date format!");
-    //document.form1.text1.focus();
-    return false;
-  }
 
-  return true;
-}
+    function createPatient(person_id) {
+        var url = apiProtocol+'://'+apiURL+':'+apiPort+'/api/v1/patients';
+        var parametersPassed = JSON.stringify({person_id: person_id});
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 201) {
+                var obj = JSON.parse(this.responseText);
 
-function postClientParamaters(parametersPassed) {
-  var url = apiProtocol+'://'+apiURL+':'+apiPort+'/api/v1/people';
-  if (parametersPassed.birthdate_estimated === "Yes") {
-    parametersPassed.birthdate_estimated = 1;
-  }else {
-    parametersPassed.birthdate_estimated = 0;
-  }
-  var parametersPassed = JSON.stringify(parametersPassed);
-  console.log('verifying the data before sending to server' + console.table(parametersPassed));
-    showStatus();
-
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 201) {
-      var obj = JSON.parse(this.responseText);
-      console.log('examin the id for the person' + obj['person_id'] );
-            createPatient(obj['person_id']);
+                if (sessionStorage.programID == 11) {
+                    assignRelationShip(12,person_id);
+                } else {
+                    enrollPatient(person_id);
+                }
+            }
+        };
+        xhttp.open("POST", url, true);
+        xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+        xhttp.setRequestHeader('Content-type', "application/json");
+        xhttp.send(parametersPassed);
     }
-  };
-  xhttp.open("POST", url, true);
-  xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
-  xhttp.setRequestHeader('Content-type', "application/json");
-  xhttp.send(parametersPassed);
-}
 
-function createPatient(person_id) {
-  var url = apiProtocol+'://'+apiURL+':'+apiPort+'/api/v1/patients';
-  var parametersPassed = JSON.stringify({person_id: person_id});
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 201) {
-      var obj = JSON.parse(this.responseText);
+    // TODO make this code Better
+    // ---- For Maternity
+    function assignRelationShip(relationship_type_id,child_id) {
+        var http = new XMLHttpRequest();
+        var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/people/' + patientID+ '/relationships/';
+        var params = JSON.stringify({
+            relationship_type_id: relationship_type_id,
+            relation_id: child_id
+        });
+        http.open('POST', url, true);
+        http.setRequestHeader('Content-type', 'application/json');
+        http.onreadystatechange = function () {
+            if (http.readyState == 4) {
+                if (http.status == 201) {
+                    var v = JSON.parse(http.responseText);
+                    window.location.href = "/views/patient_dashboard.html?patient_id=" + patientID;
+                } else if (http.status == 409) {
 
-        enrollPatient(person_id);
+                } else {
+                }
+            }
+        }
+        http.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
+        http.send(params);
     }
-  };
-  xhttp.open("POST", url, true);
-  xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
-  xhttp.setRequestHeader('Content-type', "application/json");
-  xhttp.send(parametersPassed);
-}
+    //----- End for Maternity
 
-function enrollPatient(person_id) {
-  sessionStorage.patientID = person_id;
-  var http = new XMLHttpRequest();
-  var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/'+person_id +"/programs/";
-  var params = JSON.stringify({
-  program_id: 1,
-  });
-  http.open('POST', url, true);
-  //Send the proper header information along with the request
-  http.setRequestHeader('Content-type', 'application/json');
-  http.onreadystatechange = function () { //Call a function when the state changes.
-  if (http.readyState == 4) {
-  if (http.status == 201) {
-  var v = JSON.parse(http.responseText);
-  redirect();
-  getDemographics(person_id);
-  // nextEncounter(person_id, 1);
-  } else if (http.status == 409) {
-  alert('Username already exists');
-  } else {
-  alert('error' + http.status);
-  }
-  }
-  }
-  http.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
-  http.send(params);
-}
+    function enrollPatient(person_id) {
+        sessionStorage.patientID = person_id;
+        var http = new XMLHttpRequest();
+        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/'+person_id +"/programs/";
+        var params = JSON.stringify({
+            program_id: 1,
+        });
+        http.open('POST', url, true);
+        //Send the proper header information along with the request
+        http.setRequestHeader('Content-type', 'application/json');
+        http.onreadystatechange = function () { //Call a function when the state changes.
+            if (http.readyState == 4) {
+                if (http.status == 201) {
+                    var v = JSON.parse(http.responseText);
+                    redirect();
+                    getDemographics(person_id);
+                    // nextEncounter(person_id, 1);
+                } else if (http.status == 409) {
+                    alert('Username already exists');
+                } else {
+                    alert('error' + http.status);
+                }
+            }
+        }
+        http.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
+        http.send(params);
+    }
 
-  function redirect(){
-    window.location.href = "/views/patient_dashboard.html?patient_id=" + patientID;
-  }
+    function redirect(){
+        window.location.href = "/views/patient_dashboard.html?patient_id=" + patientID;
+    }
 
 
 
