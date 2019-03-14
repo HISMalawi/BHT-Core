@@ -334,13 +334,13 @@ function fetchStatesUrl () {
         <input type="text" name="states" id="states" 
           field_type="alpha" xhelpText="State" 
           setvalue="" tt_pageStyleClass="NoKeyboard"
-          ajaxURL="/programs/11/workflows" 
+          ajaxURL="" 
           tt_onLoad="setProgramStates(); changeAbscounded();" objectType="states" />  
 
 
         <!-- Admitted -->
-        <select id="admission_section" name="admission_section" tt_onLoad="changeNextAdmitBTN();" 
-        helpText="Select Admission section" condition ="$('touchscreenInput0').value == 'Admitted'">
+        <select id="admission_section" name="admission_section" 
+        helpText="Select Admission section" condition ="$('touchscreenInput0').value == 'Admitted'" tt_onLoad = "changeNextAdmitBTN();">
             <option></option>
             <option>Delivered in the ward</option>
             <option>Delivered before arrival</option>
@@ -372,7 +372,7 @@ function fetchStatesUrl () {
 
         <!-- Procedures -->
         <select id="procedure_done" name="procedure_done"
-        helpText="1<sup>st</sup> Procedure done"  condition ="$('states').value == '112' || $('states').value == '111'" tt_onLoad="changeNextButton();"  >
+        helpText="1<sup>st</sup> Procedure done"  condition ="$('states').value == '112' || $('states').value == '111'" tt_onLoad="changeNextButton()"  >
             <option></option>
             <option>None</option>
             <option>Hysterectomy</option>
@@ -391,109 +391,19 @@ function fetchStatesUrl () {
             <option>Explatory laparatomy +/- adnexectomy</option>
         </select>
 
-        <!-- <input type="text" name="procedure_diagnosis" 
-        id="procedure_diagnosis" field_type="alpha" 
-        helpText="Reason for Procedure" 
-        condition="$('procedure_done').value.toUpperCase() == 'HYSTERECTOMY'" />  
-
-         <input type="text" name="procedure_diagnosis1" 
-        id="procedure_diagnosis1" field_type="alpha" 
-        helpText="2nd Reason for Procedure" ajaxURL = "/encounters/procedure_diagnoses?procedure=biopsy&search_string="
-        condition="$('procedure_done').value.toUpperCase() == 'BIOPSY DIAGNOSIS'" /> 
-
-        <input type="text" name="procedure_diagnosis2" 
-          id="procedure_diagnosis2" field_type="alpha" 
-          ajaxURL = "/encounters/procedure_diagnoses?procedure=bilateral_tubal_ligation&search_string="
-          helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'BILATERAL TUBAL LIGATION'" /> 
-        
-          <input type="text" name="procedure_diagnosis3" 
-          id="procedure_diagnosis3" field_type="alpha" 
-          ajaxURL = "/encounters/procedure_diagnoses?procedure=ceclage&search_string="
-          helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'MYOMECTOMY'" /> 
-
-          <input type="text" name="procedure_diagnosis4" 
-          id="procedure_diagnosis4" field_type="alpha" 
-          ajaxURL = "/encounters/procedure_diagnoses?procedure=myomectomy&search_string="
-          helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'CECLAGE'" /> 
-        
-          <input type="text" name="procedure_diagnosis5" 
-          id="procedure_diagnosis5" field_type="alpha" 
-          ajaxURL = "/encounters/procedure_diagnoses?procedure=myomectomy&search_string="
-          helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'CYSTECTOMY'" /> 
-
-           <input type="text" name="procedure_diagnosis6" 
-          id="procedure_diagnosis6" field_type="alpha" 
-          ajaxURL = "/encounters/procedure_diagnoses?procedure=myomectomy&search_string="
-          helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'MARSUPILISATION'" />  
-
-          <input type="text" name="procedure_diagnosis7" 
-          id="procedure_diagnosis7" field_type="alpha" 
-          ajaxURL = "/encounters/procedure_diagnoses?procedure=myomectomy&search_string="
-          helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'EXCISION'" /> 
-
-           <input type="text" name="procedure_diagnosis7" 
-          id="procedure_diagnosis7" field_type="alpha" 
-          ajaxURL = "/encounters/procedure_diagnoses?procedure=myomectomy&search_string="
-          helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'INCISION AND DRAINAGE'" />  
-
-          <input type="text" name="procedure_diagnosis8" 
-          id="procedure_diagnosis8" field_type="alpha" 
-          ajaxURL = "/encounters/procedure_diagnoses?procedure=myomectomy&search_string="
-          helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'CAESAREAN SECTION'" /> 
-
-          <input type="text" name="procedure_diagnosis8" 
-          id="procedure_diagnosis8" field_type="alpha" 
-          ajaxURL = "/encounters/procedure_diagnoses?procedure=myomectomy&search_string="
-          helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'EXAM UNDER ANAESTHESIA'" /> 
-
-          <input type="text" name="procedure_diagnosis9" 
-          id="procedure_diagnosis8" field_type="alpha" 
-          ajaxURL = "/encounters/procedure_diagnoses?procedure=myomectomy&search_string="
-          helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'EVACUATION/MANUAL VACUUM ASPIRATION'" /> 
-
-          <input type="text" name="procedure_diagnosis10" 
-          id="procedure_diagnosis10" field_type="alpha" 
-          ajaxURL = "/encounters/procedure_diagnoses?procedure=myomectomy&search_string="
-          helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'DILATION AND CURETTAGE'" /> 
-
-          <input type="text" name="procedure_diagnosis11" 
-          id="procedure_diagnosis11" field_type="alpha" 
-          ajaxURL = "/encounters/procedure_diagnoses?procedure=myomectomy&search_string="
-          helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'EXPLORATORY LAPARATOMY ADNEXECTOMY'" /> 
-
-          <input type="text" name="procedure_diagnosis11" 
-          id="procedure_diagnosis11" field_type="alpha" 
-          ajaxURL = "/encounters/procedure_diagnoses?procedure=myomectomy&search_string="
-          helpText="Reason for Procedure" 
-          condition="$('procedure_done').value.toUpperCase() == 'LAPARATOMY DIAGNOSIS'" />  -->
-          <!-- END PROCEDURES -->
-
-
           <!-- PATIENT DIED -->
         <input type="text" name="date_of_death" 
         id="date_of_death" field_type="date" 
         helpText="Date of Death" 
         tt_pageStyleClass="date" 
-        condition = "$('touchscreenInput0').value == 'Patient died'" /> 
+        condition = "$('states').value == '113'" /> 
 
         <input type="text" name="time_of_death" 
         id="time_of_death" field_type="advancedTime" 
         helpText="Time of Death" 
         condition = "$('states').value == '113'" /> 
 
-        <select id="place_of_death" name="place_of_death" tt_onLoad="changeNextBTN();"
+        <select id="place_of_death" name="place_of_death" tt_onLoad=""
         helpText="Place of Death" condition = "$('states').value == '113'"> 
             <option></option>
             <option>Home</option>
@@ -508,8 +418,8 @@ function fetchStatesUrl () {
         tt_pageStyleClass="date" 
         condition = "$('states').value == '113'" /> 
 
-        <select id="condition_at_death" name="condition_at_death" tt_onLoad="changeNextButton();"
-        helpText="Condition at Death" condition = "$('states').value == '113'"> 
+        <select id="condition_at_death" name="condition_at_death" 
+        helpText="Condition at Death" condition = "$('states').value == '113'" tt_onLoad="changeNextAdmitBTN();"> 
             <option></option>
             <option>Antenatal</option>
             <option>Postpartum</option>
@@ -522,7 +432,7 @@ function fetchStatesUrl () {
         <!-- End martenity -->
         <select objectType="location" ajaxURL="/locations?name=" 
           allowFreeText="true" 
-          condition="$('touchscreenInput0').value == 'Patient transferred out'" 
+          condition="$('states').value == '2'" 
           field_type="alpha" 
           helpText="Please select facility name" 
           id="facility_name" 
@@ -562,7 +472,7 @@ function fetchStatesUrl () {
         </select>
 
         <input type="text" name="outcome_day" id="outcome_day" field_type="number" helpText="Outcome Day" condition="($('outcome_year').value != 'Unknown') && ($('outcome_month').value != 'Unknown')"
-          tt_onLoad="getDayOfMonthPicker($('outcome_year').value, $('outcome_month').value);setUpPageForDateValidation();"
+          tt_onLoad="getDayOfMonthPicker($('outcome_year').value, $('outcome_month').value);setUpPageForDateValidation(); "
           tt_onUnLoad="" />
 
       </form>
@@ -574,7 +484,7 @@ function fetchStatesUrl () {
 <script>
   var patientID = sessionStorage.getItem("patientID");
   var tstCurrentDate = moment(tstCurrentDate).format("YYYY-MM-DD");
-  var  state;
+  var  states;
 
   function changeNextAdmitBTN() {
       var nextButton =  document.getElementById('nextButton');
@@ -629,65 +539,67 @@ function fetchStatesUrl () {
 
 
   function postUpdateOutcomeObs(encounter) {
-
+    console.log('Heeeeeeeeeeeee');
       var admitSection = document.getElementById('admission_section').value;
       var dischargedWhere = document.getElementById('discharged_to_where').value;
       var healthFacility = document.getElementById('health_facility').value;
       var dischargeDiagnosis = document.getElementById('diagnosis').value;
       var procedure = document.getElementById('procedure_done').value;
       var procedureDiagnosis = document.getElementById('procedureDiagnosis');
+
+
       var dischargedWhere = document.getElementById('discharged_to_where').value;
       var dateOfDeath = document.getElementById('date_of_death').value;
       var timeOfDeath = document.getElementById('time_of_death').value;
       var placeOfDeath = document.getElementById('place_of_death').value;
       var reasonOfDeath = document.getElementById('reason_of_death').value;
       var conditionOfDeath = document.getElementById('condition_at_death').value;
-       state = document.getElementById('states').value;
+      states = document.getElementById('states').value;
       var conceptAnswers = 
        [
           // Admission section
           {
               "deliveredInWard": 7428,
-              "deliveredBeforeArrival": 7429,
-              "deliveredInTheatre": 7428,
-              "deliveredInAntenatalWard": 7429
+              "deliveredBeforeArrival": 7162,
+              "deliveredInTheatre": 9730,
+              "deliveredInAntenatalWard": 9731
           },
           // Discharged to where
           {
               "homeWaiting": 7445,
-              "anotherHealthFacility": 1275
+              "anotherHealthFacility": 7446
           },
           // procedure done
           {
               "none": 1107,
               "hysterectomy": 5276,
-              "myomectomy": 7478,
-              "bilateralTubal":1719,
-              "biopsy": 3593,
-              "ceclage": 7470,
-              "cystectomy": 3742,
+              "myomectomy": 9095,
+              "bilateralTubal":9096,
+              "biopsy": 9092,
+              "ceclage": 9097,
+              "cystectomy": 9094,
               "marsupilisation": 7472,
-              "excision": 218,
-              "incisionDrainage": 7476,
-              "caesareanSection": 1171,
-              "examAnaesthesia": 7441,
-              "evacuationVacuum": 7139,
-              "dilation": 7475,
-              "laparatomy": 7470
+              "excision": 9091,
+              "incisionDrainage": 9090,
+              "caesareanSection": 9089,
+              "examAnaesthesia": 9088,
+              "evacuationVacuum": 9087,
+              "dilation": 9086,
+              "laparatomy": 9085
           },
 
           //Place of death
           {
-              "home": 7445,
-              "currentFacility": 5937,
-              "onTheWay": 7398,
-              "other":5462
+              "home": 8850,
+              "currentFacility": 8847,
+              "onTheWay": 9732,
+              "other":6408
 
           },
 
           //Condition at death
           {
-              "antenatal": 2232,
+              "antenatal": 9733,
               "postpartum": 1180,
               "intrapartum": 1179
           }
@@ -804,15 +716,15 @@ function fetchStatesUrl () {
               break;
       }
 
-      if(state == 113){
+      if(states == 113){
         stateAnswer = "Patient died";
-      }else if(state == 109){
+      }else if(states == 109){
         stateAnswer = "Admitted";
-      }else if(state == 110){
+      }else if(states == 110){
         stateAnswer = "Absconded";
-      }else if(state == 111){
+      }else if(states == 111){
           stateAnswer = "Delivered";
-      }else if(state == 112){
+      }else if(states == 112){
           stateAnswer = "Discharged";
       }
 
@@ -830,7 +742,7 @@ function fetchStatesUrl () {
             obs.observations.push(  { concept_id: 3626, value_coded: dischargedAnswer } ); //saving
         }
         if(healthFacility !== '') {
-            obs.observations.push(  { concept_id: 5937, value_text: healthFacility } ); 
+            obs.observations.push(  { concept_id: 8341, value_text: healthFacility } ); 
         }
         if(dischargeDiagnosis !== '') {
             obs.observations.push(  { concept_id: 7366, value_text: dischargeDiagnosis  } ); 
@@ -839,34 +751,40 @@ function fetchStatesUrl () {
             obs.observations.push(  { concept_id: 7439, value_text: procedure } ); 
         }
         if(procedureDiagnosis !== '') {
-            obs.observations.push(  { concept_id: 3065, value_coded: procedureAnswer } ); 
+            obs.observations.push(  { concept_id: 7448, value_coded: procedureAnswer } ); 
         }
         if(dateOfDeath !== '') {
-            obs.observations.push(  { concept_id: 5928, value_datetime: dateOfDeath } ); 
+           var dayOfDeath = dateOfDeath.split('-')[0];
+           var monthOfDeath = dateOfDeath.split('-')[1];
+           var yearOfDeath = dateOfDeath.split('-')[2];
+
+           var deathValue = yearOfDeath + '-' + monthOfDeath + '-' + dayOfDeath;
+            obs.observations.push(  { concept_id: 1815, value_datetime: deathValue } ); 
         }
         if(timeOfDeath !== '') {
-            obs.observations.push(  { concept_id: 2120, value_text: timeOfDeath } ); 
+            obs.observations.push(  { concept_id: 9161, value_text: timeOfDeath } ); 
         }
         if(placeOfDeath !== '') {
-            obs.observations.push(  { concept_id: 1640, value_coded: placeOfDeathAnswer } ); 
+            obs.observations.push(  { concept_id: 8429, value_coded: placeOfDeathAnswer } ); 
         }
         if(reasonOfDeath !== '') {
             obs.observations.push(  { concept_id: 5002, value_text: reasonOfDeath } ); 
         }
         if(conditionOfDeath !== '') {
-            obs.observations.push(  { concept_id: 5241, value_coded: conditionOfDeathAnswer } ); 
+            obs.observations.push(  { concept_id: 9162, value_coded: conditionOfDeathAnswer } ); 
         }
-        console.log(obs);
-       submitParameters(obs, "/observations", "nextPage")
-
-      
+       submitParameters(obs, "/observations", "submitState")
+ 
   }
-
-  function nextPage(){
-    if(state == 111 || state == 112){
-        window.location.href = "../../apps/MATERNITY/views/encounters/baby_outcome.html?patient_id=" + patientID;
-       }else{
-       window.location.href = "/views/patient_dashboard.html?patient_id=" + patientID;
-    }
-  }
+  function submitState(){
+    var outcome_date = new Date().toISOString().slice(0,10);
+       state = {
+        state: document.getElementById('states').value,
+        date: outcome_date
+      }
+      postState(state);
+      if(states == 111 || states == 112){
+        window.location.href = "../../apps/MATERNITY/views/encounters/baby_demographics.html?patient_id=" + patientID;
+      }
+   }
 </script>
