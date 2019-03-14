@@ -74,7 +74,7 @@ function checkIfEncounterCaptured(encounter_name, id, redirect) {
 function confirmCancelEntryWithMessage(save, message = "Are you sure you want to Cancel", patientDashboard) {     // If you want to save state set save =
   // true
   if (tstConfirmCancel) {
-    tstMessageBar.innerHTML = message + "?<br/>" +
+    tstMessageBar.innerHTML = message + "<br/>" +
       "<button onmousedown='hideMessage(); window.location.href = &#034" + patientDashboard + "&#034;'><span>Yes</span></button>" +
       (save ? "<button onmousedown='var completeField = document.createElement(\"input\"); \n\
       completeField.type = \"hidden\"; completeField.value = \"false\"; completeField.name = \"complete\"; \n\

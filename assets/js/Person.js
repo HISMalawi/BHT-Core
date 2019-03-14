@@ -25,7 +25,26 @@ var Person = function () {
       })
   }
 
+  function isOfGender (gender) {
+    return person.gender === gender
+  }
+
+  function isAgedBetween (min, max) {
+    return person.age >= min && person.age <= max
+  }
+
+  function setAge (moment) {
+    person.age = moment().diff(moment(person.birthdate), 'years')
+  }
+
+  function isEligibleForPregnancyQuestion () {
+    return isOfGender('F') && isAgedBetween(9, 55)
+  }
+
   return {
-    get
+    init,
+    get,
+    setAge,
+    isEligibleForPregnancyQuestion
   }
 }()

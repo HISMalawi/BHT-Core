@@ -252,7 +252,7 @@ function checkIfFilingNumberIsNotValid () {
       "labs",
       "Program info",
       "Outcome",
-      "Gurdian(s)"
+      "Guardian(s)"
     ];
 
     var count = 0;
@@ -329,6 +329,8 @@ function checkIfFilingNumberIsNotValid () {
           var locals = JSON.parse(this.responseText)["locals"];
           if (remotes.length > 1 || locals.length > 1) {
             location.href = "/views/npid_duplicates.html?health_id=" + patient_id;
+          }else if (locals.length >= 1 && remotes.length >=1) {
+            location.href = "/views/npid_duplicates.html?health_id=" + patient_id;
           } else if (locals.length == 1) {
             populatePatient(locals[0], locals[0]);
           } else {
@@ -338,7 +340,7 @@ function checkIfFilingNumberIsNotValid () {
           var obj = JSON.parse(this.responseText)[0];
           var obj_2 = JSON.parse(this.responseText)[0];
           if (JSON.parse(this.responseText).length > 1) {
-            location.href = "/views/ duplicates.html?health_id=" + patient_id;
+            location.href = "/views/duplicates.html?health_id=" + patient_id;
           } else if (JSON.parse(this.responseText).length == 1) {
             populatePatient(obj, obj_2);
           } else {
@@ -348,6 +350,10 @@ function checkIfFilingNumberIsNotValid () {
         
       } else if (this.status == 204) {
         window.location.href = "/";
+      }else if (this.status == 422) {
+        var f = JSON.parse(this.responseText);
+        sessionStorage.patientID = f.patient_id;
+        window.location.href = "/views/patient/edit_demographics.html";
       }
     };
     xhttp.open("GET", url, true);
@@ -374,12 +380,13 @@ function checkIfFilingNumberIsNotValid () {
       if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
         var obj = JSON.parse(this.responseText);
         var obj_2 = JSON.parse(this.responseText);
-        // if(obj.length > 1) {
-        // location.href = "/views/duplicates.html?health_id="+ patient_id;
-        // }else {
         populatePatient(obj, obj_2);
       } else if (this.status == 204) {
         window.location.href = "/";
+      }else if (this.status == 422) {
+        var f = JSON.parse(this.responseText);
+        sessionStorage.patientID = f.patient_id;
+        window.location.href = "/views/patient/edit_demographics.html";
       }
     };
     xhttp.open("GET", url, true);
@@ -772,12 +779,20 @@ function checkIfFilingNumberIsNotValid () {
   }
 
   function buildProgramInfo(patient_id) {
-    document.getElementById("section-body-3").innerHTML +=
-      "<table class='info-tables'><tr><td style=\"color:blue; font-weight:bold;\">Next Appointment Date:</td><td id='nextAptDate'>N/A</td>" +
-      "</tr><tr><td>ART Duration:</td><td id='artDuration'>N/A</td></tr><tr><td style=\"color:blue; font-weight:bold;\">ON FAST TRACK:</td><td id='onFastTrack'>N/A</td></tr></table>";
-    populateNextAppointmentDate({ elementToUse: "nextAptDate" }, patient_id);
-    populateArtDuration({ elementToUse: "artDuration" }, patient_id);
-    populateOnFastTrack({ elementToUse: "onFastTrack" }, patient_id);
+    if (sessionStorage.programID === "12"){
+      document.getElementById("section-body-3").innerHTML +=
+        "<table class='info-tables'><tr><td style=\"color:blue; font-weight:bold;\">Next Appointment Date:</td><td id='nextAptDate'>N/A</td>" +
+        "</tr></table>";
+      populateNextAppointmentDate({ elementToUse: "nextAptDate" }, patient_id);
+      
+    }else if (sessionStorage.programID === "1"){
+      document.getElementById("section-body-3").innerHTML +=
+        "<table class='info-tables'><tr><td style=\"color:blue; font-weight:bold;\">Next Appointment Date:</td><td id='nextAptDate'>N/A</td>" +
+        "</tr><tr><td>ART Duration:</td><td id='artDuration'>N/A</td></tr><tr><td style=\"color:blue; font-weight:bold;\">ON FAST TRACK:</td><td id='onFastTrack'>N/A</td></tr></table>";
+      populateNextAppointmentDate({ elementToUse: "nextAptDate" }, patient_id);
+      populateArtDuration({ elementToUse: "artDuration" }, patient_id);
+      populateOnFastTrack({ elementToUse: "onFastTrack" }, patient_id);
+    }
   }
 
   function populateNextAppointmentDate(options, patient_id) {

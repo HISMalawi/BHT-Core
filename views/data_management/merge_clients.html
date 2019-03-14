@@ -189,7 +189,7 @@ function initSearch() {
 function searchClient(first_name, last_name, gender, side) {
   var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1";
   if(sessionStorage.dde_enabled === "true") {
-    url += "/dde/patients/find_by_name_and_gender?given_name=" + first_name +"&family_name=" + last_name +"&gender="+ gender;
+    url += "/dde/patients/find_by_name_and_gender?program_id="+sessionStorage.programID+"&given_name=" + first_name +"&family_name=" + last_name +"&gender="+ gender;
   }else {
     url += "/search/people?given_name=" + first_name + "&family_name=" + last_name +"&gender=" + gender;
   }
@@ -198,7 +198,24 @@ function searchClient(first_name, last_name, gender, side) {
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
       var obj = JSON.parse(this.responseText);
-      processResults(obj, side);
+      if(sessionStorage.dde_enabled === "true") {
+        var obj2 = [];
+        for (var index = 0; index < obj["locals"].length; index++) {
+          obj2.push(obj["locals"][index]["person"]);
+          
+        }
+        for (var index = 0; index < obj["remotes"].length; index++) {
+          var doc_id = getIdentifier(obj["remotes"][index]["patient_identifiers"], 27);
+          // console.log(doc_id);
+          var current_patient = obj["remotes"][index]["person"];
+          current_patient.dde_doc_id = doc_id;
+          obj2.push(current_patient);
+          
+        }
+        processResults(obj2, side);
+      }else {
+        processResults(obj, side);
+      }
     }
   };
   xhttp.open("GET", url, true);
@@ -221,7 +238,7 @@ function processResults(results, side) {
     result_container.appendChild(container_row);
 
     var container_cell = document.createElement('div');
-    container_cell.setAttribute('class','result-container-cell ' + side + "-cells");
+    container_cell.setAttribute('class','result-container-cell ' + side + "-cells" + " checkboxes");
     container_cell.setAttribute('side', side);
     container_cell.setAttribute('selected', 'false');
     container_cell.setAttribute('patient_id', '');
@@ -310,11 +327,13 @@ function addResult(result, cell) {
   tr.appendChild(td);
   /* ............................. */
 
-  if(result['person_id'] != null)
+  if(result['person_id'] != null) {
     cell.setAttribute('patient_id', result['person_id'])
-
-  if(result['doc_id'] != null)
+  }
+  
+  if(result['dde_doc_id'] != null) {
     cell.setAttribute('dde_doc_id', result['dde_doc_id'])
+  }
 
 
 }
@@ -367,6 +386,67 @@ function selectRow(e) {
   }
 }
 
+function mergeClients(){
+  var checkboxes = document.getElementsByClassName('checkboxes');
+  var client_ids = {};
+  var chkdbox_counter = 0;
+  client_ids.secondary = [];
+    for(var i = 0; i < checkboxes.length; i++){
+      if(checkboxes[i].getAttribute("selected") === "true") {
+          if (chkdbox_counter == 0) {
+            client_ids.primary = {
+            patient_id: (checkboxes[i].getAttribute("patient_id") === "null" ? "": checkboxes[i].getAttribute("patient_id")),
+            doc_id: checkboxes[i].getAttribute("dde_doc_id")
+            };
+          }else if(chkdbox_counter > 0) {
+            client_ids.secondary.push(
+              {
+                patient_id: (checkboxes[i].getAttribute("patient_id") === "null" ? "": checkboxes[i].getAttribute("patient_id")),
+                doc_id: checkboxes[i].getAttribute("dde_doc_id")
+              });
+          }
+        chkdbox_counter++
+      }
+   }
+
+    client_ids.program_id = sessionStorage.programID;
+
+    var http = new XMLHttpRequest();
+    url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/dde/patients/merge';
+    var params = JSON.stringify(client_ids);
+    
+    http.open('POST', url, true);
+    //Send the proper header information along with the request
+    http.setRequestHeader('Content-type', 'application/json');
+    http.onreadystatechange = function () { //Call a function when the state changes.
+      if (http.readyState == 4) {
+        if (http.status == 201 || http.status == 200) {
+          var v = JSON.parse(http.responseText);
+          sessionStorage.patientID = v.patient_id;
+          document.location = "/views/patient/print.html?person_id=" + v.patient_id;
+        } else if (http.status == 409) {
+          alert('Username already exists');
+        } else {
+         alert('error' + http.status);
+        }
+      }
+    }
+    http.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
+    http.send(params);
+
+}
+
+function getIdentifier(identifiers, identifier_type) {
+  var identifier = "";
+  for (var index = 0; index < identifiers.length; index++) {
+    if(identifiers[index]["identifier_type"] == identifier_type) {
+      identifier =  identifiers[index]["identifier"];
+    }else {
+      identifier = "";
+    }
+  }
+    return identifier;
+}
 </script>
 
 

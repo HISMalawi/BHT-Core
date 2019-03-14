@@ -45,7 +45,7 @@
       "activitiesIcon": "/assets/images/dispensing.png",
       "url": "/views/patient/dispensing.html"
     },
-    "Fast track": {
+    "fast track assesment": {
     "available": true,
     "activitiesIcon": "/assets/images/fast-track.png",
     "url": "/apps/ART/views/encounters/fast_track.html"

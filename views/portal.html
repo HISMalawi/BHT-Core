@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <link rel="stylesheet" href="/stylesheets/background.css" type="text/css">
+    <script src="/assets/js/jquery.min.js"> </script>
+    <script language="javascript" defer="true">
+        tstUsername = "";
+        tstUserKeyboardPref = "abc";
+        var d = new Date();
+        d.toDateString();
+        var choices = {};
+
+        
+
+        function getInput() {
+            key = $('touchscreenInput' + tstCurrentPage).getAttribute("key");
+            value = $('touchscreenInput' + tstCurrentPage).value;
+            choices[key] =  value;
+            console.log(choices);
+        }
+
+        function getPass() {
+        }
+
+    </script>
+
+    <script language="javascript" type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js"
+        defer="true"></script>
+    <script language="javascript" type="text/javascript" src="/javascripts/show_category_hack.js" defer="true"></script>
+    <script language="javascript" type="text/javascript" src="/assets/js/core.js" defer="true"></script>
+    <script language="javascript" type="text/javascript" src="/assets/js/post_parameters.js" defer="true"></script>
+</head>
+
+<body id="mateme">
+    <div id="container">
+        <div id="content">
+            <div id="description" style="color:#777;position:absolute;margin-top:-70px;">
+            </div>
+            <script src="/javascripts/barcode.js?1503047298" type="text/javascript"></script>
+            <script type="text/javascript">
+                var barcode = "";
+                var tt_cancel_destination = "/";
+
+                function inform() {
+                    $('infoBar' + tstCurrentPage).innerHTML =
+                        "Muli bwanji, enter your Portal information";
+                }
+
+                function validateLocation() {
+                    __$("nextButton").removeAttribute("onmousedown");
+                    document.getElementById('touchscreenInput3').removeEventListener('keyup', checkKey, false);
+                    document.getElementById('touchscreenInput3').addEventListener('keyup', function (event) {
+                        event.preventDefault();
+                        if (event.keyCode === 13) {
+                            getInput();
+                            getPass();
+                            doSignIn();
+                        }
+                    });
+                    __$("nextButton").onmousedown = function () {
+                        getInput();
+                        getPass();
+                        doSignIn();
+                    }
+
+                }
+
+                function doSignIn() {
+                    var choice = choices.protocol + "://"+choices["ip-address"] + ":" + choices.port;
+                    submitPortal(choice, "portal.properties", "submitEnabled");
+                }
+
+                function submitEnabled() {
+                    submitPortal("true", "portal.enabled", "goHome");
+                }
+
+                function checkEnable() {
+                    if($('enable').value.toLowerCase() === 'yes') {
+
+                    }else {
+                        submitPortal("false", "portal.enabled", "goHome");
+                    }
+                }
+
+            function submitPortal(passed_property, property_name, functionToBePassed) {
+                var url = "/global_properties";
+                var global_property = {property: property_name, property_value: passed_property}
+                submitParameters(global_property, url, functionToBePassed);
+            }
+
+            function goHome(e) {
+                document.location = '/';
+            }
+
+
+            </script>
+
+            <form id='sessions' action="/" method='post'>
+                <label for="enable">Enable Portal?</label>
+				<select id="enable" name="enable">
+					<option></option>
+					<option>Yes</option>
+					<option>No</option>
+				</select>   
+              
+                <label for="protocol">Choose portal Protocol</label>
+                <select id="protocol" name="protocol" tt_onUnload="getInput();" tt_onLoad="checkEnable();" key="protocol">
+          
+					<option></option>
+					<option>http</option>
+					<option>https</option>
+				</select>
+
+                <label for="ip-address">ip address</label>
+                <input field_type="number" tt_pageStyleClass="numeric NumbersOnlyWithDecimal" helpText="Enter API IP address" id="ip-address" name="ip-address" textCase="lower"
+                    tt_onLoad="" type="text" tt_onUnload="getInput();" key="ip-address" /><br>
+
+                <label for="port">port</label>
+                <input field_type="number" tt_pageStyleClass="numeric NumbersOnlyWithDecimal" helpText="Enter port" id="port" name="port" key="port" textCase="lower"
+                    tt_onLoad="validateLocation();" type="text"
+                    tt_onUnload="getInput();" /><br>
+
+
+                <input name="commit" onclick="myfunction(); " type="submit" value="Submit" tt_onUnload="" />
+            </form>
+            <div id="footer">
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

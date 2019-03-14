@@ -6,6 +6,10 @@ var Concept = function () {
     concept = data
   }
 
+  function getConceptIdByName (conceptName) {
+    return CONCEPT_IDS[conceptName] || null
+  } 
+
   const CONCEPT_IDS = {
     'Cough lasting >1 week': 2762,
     'Cough lasting >2 weeks': 2573,
@@ -25,12 +29,18 @@ var Concept = function () {
     'Mining Communities': 9696,
     'HIV Clinic / PLHIV / Prisoners': 9697,
     HTS_CLINIC: 7796,
-    ART_CLINIC: 8181,
     PRIVATE_PRACTITIONER: 8349,
     SPUTUM_COLLECTION_POINT: 8350,
     PMTCT: 1939,
     WALK_IN: 1791,
-    SOURCE_OF_REFERRAL: 8021
+    SOURCE_OF_REFERRAL: 8021,
+    NEGATIVE: 664,
+    MCH: 1018,
+    OPD: 7799,
+    MINING_COMMUNITIES: 9696,
+    ART_CLINIC: 7054,
+    POSITIVE: 703,
+    PRISONER: 9734
   }
 
   function create (data = {}) {
@@ -56,6 +66,7 @@ var Concept = function () {
 
   return {
     create,
+    getConceptIdByName,
     CONCEPT_IDS
   }
 }()

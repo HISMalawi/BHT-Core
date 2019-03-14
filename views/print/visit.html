@@ -63,7 +63,7 @@
   var apiPort = sessionStorage.getItem("apiPort");
   var apiProtocol = sessionStorage.getItem("apiProtocol");
 
-  var url = "/programs/1/patients/" + sessionStorage.patientID + "/labels/visits"
+  var url = "/programs/"+sessionStorage.programID+"/patients/" + sessionStorage.patientID + "/labels/visits"
   url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1" + url;
   document.location = url;
 

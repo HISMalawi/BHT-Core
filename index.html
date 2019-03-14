@@ -190,6 +190,7 @@
         var apiURL = sessionStorage.apiURL;
         var apiPort = sessionStorage.apiPort;
         getDDEStatus();
+        getPortalStatus();
        function getLocationID() {
             var url =apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/global_properties?property=current_health_center_id";
 
@@ -251,7 +252,14 @@
 
     modalConfirm(function (confirm) {
         if (confirm) {
-            window.location = "/views/login.html";
+            if(sessionStorage.portal_enabled === "true") {
+                
+                var portal_location = sessionStorage.portal_location;
+                sessionStorage.clear();
+                window.location = portal_location;
+            }else {
+                window.location = "/views/login.html";
+            }
         } else {
             $("#mi-modal").modal('hide');
         }
@@ -276,6 +284,7 @@
       document.getElementById('findByButton').style = 'display: none;';
     }
   }
+
   disableNoneART();
 </script>
 

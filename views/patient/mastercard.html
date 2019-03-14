@@ -11,6 +11,16 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script type="text/javascript">
 
+    try { 
+      var url = window.location.href;
+      url = new URL(url);
+      var patient_id = url.searchParams.get("patient_id");
+      if(patient_id != undefined)
+         patient_id = sessionStorage.patientID;
+
+    }catch(i){
+    }
+
     var name = "";
     var name_edit_url = "/views/patient/edit_demographics/name.html?patient_id=" + sessionStorage.patientID + "&source=mastercard";
 
@@ -1309,3 +1319,22 @@
     </div>
 </div>
 </body>
+    
+<script>
+    
+  try { 
+    var url = window.location.href;
+    url = new URL(url);
+    var patient_id = url.searchParams.get("patient_id");
+    if(patient_id != undefined) {
+      var btn = document.getElementById('btnNext');
+      btn.setAttribute('onclick','gotoCohort();');
+    }
+  }catch(i){
+  }
+
+  function gotoCohort() {
+    window.location = sessionStorage.cohort_url;
+  }
+</script>
+

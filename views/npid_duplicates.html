@@ -405,25 +405,25 @@ function changeClearButton() {
 function mergeClients(){
   var checkboxes = document.getElementsByClassName('checkboxes');
   var client_ids = {};
+  var chkdbox_counter = 0;
   client_ids.secondary = [];
-  for(var i = 0; i < checkboxes.length; i++){
-    if(checkboxes[i].checked == true) {
-        if (i == 0) {
-          client_ids.primary = {
-           patient_id: (checkboxes[i].getAttribute("person_id") === "null" ? "": checkboxes[i].getAttribute("person_id")),
-           doc_id: checkboxes[i].getAttribute("doc_id")
-          };
-        }else if(i > 0) {
-          client_ids.secondary.push(
-            {
-              patient_id: (checkboxes[i].getAttribute("person_id") === "null" ? "": checkboxes[i].getAttribute("person_id")),
-              doc_id: checkboxes[i].getAttribute("doc_id")
-            });
-          
-        }
-        
-    }
-  }
+    for(var i = 0; i < checkboxes.length; i++){
+      if(checkboxes[i].checked == true) {
+          if (chkdbox_counter == 0) {
+            client_ids.primary = {
+            patient_id: (checkboxes[i].getAttribute("person_id") === "null" ? "": checkboxes[i].getAttribute("person_id")),
+            doc_id: checkboxes[i].getAttribute("doc_id")
+            };
+          }else if(chkdbox_counter > 0) {
+            client_ids.secondary.push(
+              {
+                patient_id: (checkboxes[i].getAttribute("person_id") === "null" ? "": checkboxes[i].getAttribute("person_id")),
+                doc_id: checkboxes[i].getAttribute("doc_id")
+              });
+          }
+        chkdbox_counter++
+      }
+   }
           
     client_ids.program_id = sessionStorage.programID;
 

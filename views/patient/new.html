@@ -240,6 +240,7 @@
    
     function importPatient(doc_id) {
         url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/dde/patients/import_by_doc_id?doc_id='+doc_id;
+        url = url + "&program_id=" + sessionStorage.programID;
         var req = new XMLHttpRequest();
         req.onreadystatechange = function(){
         
@@ -795,7 +796,8 @@
 
                 client +=  "&home_district=" + homeDistrict;
                 client +=  "&home_traditional_authority=" + homeTA;
-                client +=  "&home_village=" + homeVillage;  
+                client +=  "&home_village=" + homeVillage;
+                client +=  "&program_id=" + sessionStorage.programID;  
                 
                 var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/dde/patients/match_by_demographics?' + client;
 
