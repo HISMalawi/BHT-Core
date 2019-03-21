@@ -11,7 +11,7 @@ var Concept = function () {
   } 
 
   const CONCEPT_IDS = {
-    'Cough lasting >1 week': 2762,
+    'Cough lasting >1 week': 9694,
     'Cough lasting >2 weeks': 2573,
     'Cough (any duration)': 8261,
     'Weight loss': 832,
@@ -40,7 +40,17 @@ var Concept = function () {
     MINING_COMMUNITIES: 9696,
     ART_CLINIC: 7054,
     POSITIVE: 703,
-    PRISONER: 9734
+    PRISONER: 9734,
+    WARD: 7829,
+    HIV_TEST_DATE: 1837,
+    PREVIOSULY_TESTED: 9656,
+    PREVIOUS_TEST_DATE: 9657,
+    ON_ART: 7010,
+    NOT_ON_ART: 8037,
+    HIV_STATUS: 3753,
+    HIV_TEST_DONE_TODAY: 9568,
+    NOT_DONE: 2475,
+    REASON_HIV_TEST_NOT_DONE: 9569
   }
 
   function create (data = {}) {

@@ -11,7 +11,7 @@ var GlobalProperty = function GlobalProperty() {
           Authorization: options.authToken
         }
       }, {}, function (data) {
-        if (data[property] === 'true') {
+        if (data[property] === 'true' || data[property].toLowerCase() === "yes") {
           success(true);
         } else {
           success(false);

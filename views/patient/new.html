@@ -568,10 +568,17 @@
             }
 
             function setAbsoluteMaxBirthYear() {
-                var element = document.getElementById('touchscreenInput' + tstCurrentPage);
-                element.setAttribute("absoluteMax", (new Date().getFullYear()));
-                element.setAttribute("min", (new Date().getFullYear() - 100));
-                element.setAttribute("absoluteMin", (new Date().getFullYear() - 120));
+                if(sessionStorage.programID === "12"){
+                    var element = document.getElementById('touchscreenInput' + tstCurrentPage);
+                    element.setAttribute("absoluteMax", (new Date().getFullYear() - 13));
+                    element.setAttribute("min", (new Date().getFullYear() - 100));
+                    element.setAttribute("absoluteMin", (new Date().getFullYear() - 100));
+                } else{
+                    var element = document.getElementById('touchscreenInput' + tstCurrentPage);
+                    element.setAttribute("absoluteMax", (new Date().getFullYear()));
+                    element.setAttribute("min", (new Date().getFullYear() - 100));
+                    element.setAttribute("absoluteMin", (new Date().getFullYear() - 120));
+                }
             }
 
             function validateYear() {
@@ -689,6 +696,14 @@
                 }
 
                 gotoNextPage();
+            }
+
+            function addMaxValue(){
+                if (sessionStorage.programID === "12"){
+                    $("person_age_estimate").setAttribute('absoluteMin', 13);
+                }else{
+                    $("person_age_estimate").setAttribute('absoluteMin', 1);
+                }
             }
 
             function setDOB() {
@@ -872,8 +887,8 @@
 
             <input type="text" name="person[birth_year]" id="person_birth_year" helpText="Year of Birth"
                    field_type="number"
-                   absoluteMin="1900" min="1900" tt_onLoad="setAbsoluteMaxBirthYear()"
-                   tt_pageStyleClass="Numeric NumbersOnly" />
+                   absoluteMin="1900" min="1900" tt_onLoad="setAbsoluteMaxBirthYear(); addMaxValue();"
+                   tt_pageStyleClass="Numeric NumbersOnly"/>
 
             <select name="person[birth_month]" id="person_birth_month" helpText="Month of Birth"
                     condition="$('person_birth_year').value.toLowerCase() != 'unknown'"
@@ -896,9 +911,14 @@
             </select>
 
             <input type="text" name="person[age_estimate]" id="person_age_estimate" helpText="Age Estimate"
-                   absoluteMin="1" absoluteMax="120" field_type="number"
-                   condition="$('person_birth_year').value == 'Unknown'"
-                   tt_onLoad="$(nextButton).style.display = block;" tt_pageStyleClass="Numeric NumbersOnly" />
+                   absoluteMax="120" field_type="number"
+                   condition="$('person_birth_year').value == 'Unknown';"
+                   tt_onLoad="" tt_pageStyleClass="Numeric NumbersOnly"/>
+
+            <!--input type="text" name="person[age_estimate]" id="person_age_estimate" helpText="Age Estimate"
+                   absoluteMin="13" absoluteMax="120" field_type="number"
+                   condition="$('person_birth_year').value == 'Unknown' && sessionStorage.programID = 12"
+                   tt_onLoad="$(nextButton).style.display = block;testing();" tt_pageStyleClass="Numeric NumbersOnly"/ -->
 
             <input type="text" name="person[birth_day]"
                    id="person_birth_day"

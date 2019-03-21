@@ -14,10 +14,8 @@ function POST(config) {
   var request = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
 
   request.onreadystatechange = function () {
-    if (request.readyState === 4 && request.status === 201) {
-      successCallback(JSON.parse(request.responseText), request.status);
-    } else if (request.readyState === 4 && request.status === 204) {
-      successCallback({}, request.status);
+    if (request.readyState === 4 && request.status >=200 && request.status < 400) {
+      successCallback(request.responseText, request.status);
     } else if (request.readyState === 4 && request.status >= 400) {
       failureCallback(request.responseText, request.status);
     }

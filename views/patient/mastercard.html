@@ -1328,7 +1328,7 @@
     var patient_id = url.searchParams.get("patient_id");
     if(patient_id != undefined) {
       var btn = document.getElementById('btnNext');
-      btn.setAttribute('onclick','gotoCohort();');
+      btn.setAttribute('onclick','gotoPatientDashboard();');
     }
   }catch(i){
   }

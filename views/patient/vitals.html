@@ -2,6 +2,7 @@
         defer="true"></script>
 <!-- <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/standard.js" defer="true"></script> -->
 <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/dashboard.js"></script>
 
 <link rel="stylesheet" href="/assets/css/vitals-keypad.css" type="text/css">
 <script type="text/javascript" src="/assets/js/vitals-keypad.js"></script>
@@ -14,6 +15,8 @@
 
 <link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
 <script type="text/javascript" src="/assets/js/demographics.js"></script>
+<script type="text/javascript" src="/apps/ANC/assets/js/common.js"></script>
+<script type="text/javascript" src="/apps/ANC/assets/js/vitals.js"></script>
 
 <style>
 
@@ -227,6 +230,7 @@
     }
 
     function getHeight(patient_id) {
+        sessionStorage.removeItem("currentHeight");
         var url = apiProtocol + "://" + apiURL + ":" + apiPort;
         url += "/api/v1/observations?person_id=" + patient_id + "&concept_id=5090";
         url += "&date=" + moment(new Date(sessionStorage.sessionDate)).format('YYYY-MM-DD');
@@ -257,7 +261,7 @@
         xhttp.setRequestHeader('Content-type', "application/json");
         xhttp.send();
     }
-
+    
     getHeight(patientID);
 </script>
 
@@ -702,7 +706,9 @@
 
         if(sessionStorage.programID == 12) {
             // Validations specifically FOR ANC
-
+            // Moved to vitals javascript file
+            // with new error messages.
+            /**
             if (bp_systolic >= 140 && bp_diastolic >= 90) {
 
                 showMessage("Client is at risk of pre-eclampsia, refer for urine protein test.");
@@ -730,6 +736,7 @@
                 return true;
 
             }
+            */
 
 
         } else {
@@ -1101,6 +1108,7 @@
 
             if (this.readyState == 4 && this.status == 204) {
                 modal.style.display = "none";
+                sessionStorage.removeItem("currentHeight");
                 getHeight(sessionStorage.patientID);
             } else {
             }

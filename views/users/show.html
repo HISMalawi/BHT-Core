@@ -1,30 +1,35 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-  <head>
-    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 
-    <script language="javascript" defer="true">
-      tstUsername = "";
-      tstUserKeyboardPref = "qwerty";
-      var d = new Date();
-      d.toDateString();
-    </script>
-    <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
-    <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
-    <script type="text/javascript" src="/assets/js/data.js"></script>
-    <script type="text/javascript" src="/assets/js/core.js"></script>
-    <script type="text/javascript" src="/assets/js/moment.js"></script>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 
-  </head>
-  <body id="mateme">
-    <div id="container">
-      <div id="content">
-        <script>
-          var tt_cancel_destination = "/";
-        </script>
-<style>
-  h1 { padding-left:10px; }
+  <script language="javascript" defer="true">
+    tstUsername = "";
+    tstUserKeyboardPref = "qwerty";
+    var d = new Date();
+    d.toDateString();
+  </script>
+  <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
+  <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/assets/js/data.js"></script>
+  <script type="text/javascript" src="/assets/js/core.js"></script>
+  <script type="text/javascript" src="/assets/js/moment.js"></script>
+  <script type="text/javascript" src="/assets/js/httpUtils.js"></script>
+  <script type="text/javascript" src="/assets/js/uiUtils.js"></script>
+  <script type="text/javascript" src="/assets/js/User.js"></script>
+
+</head>
+
+<body id="mateme">
+  <div id="container">
+    <div id="content">
+      <script>
+        var tt_cancel_destination = "/";
+      </script>
+      <style>
+        h1 { padding-left:10px; }
 
   .user_info {
     background-color: #DDDDDD;
@@ -65,93 +70,258 @@
   }
 </style>
 
-<br />
-<h1>User information</h1>
-<br />
-<div class = 'user_info'>
-  <table class = 'userdata'  style="float:left">
-    <tr>
-      <th class='blue'>Username:&nbsp;</th>
-      <td class='blue'id="username">&nbsp;</td>
-    </tr>
-    <tr>
-      <th>Role:&nbsp;</th>
-      <td id="role">&nbsp;</td>
-    </tr>
-    <tr>
-      <th class='blue'>First name:&nbsp;</th>
-      <td class='blue' id="first_name"></td>
-    </tr>
-    <tr>
-      <th>Last name:&nbsp;</th>
-      <td id="last_name">&nbsp;</td>
-    </tr>
-    <tr>
-      <th class='blue'>Date created:&nbsp;</th>
-      <td class='blue' id="date_created">&nbsp;</td>
-    </tr>
-  </table>
+      <br />
+      <h1>User information</h1>
+      <br />
+      <div class='user_info'>
+        <table class='userdata' style="float:left">
+          <tr>
+            <th class='blue'>Username:&nbsp;</th>
+            <td class='blue' id="username">&nbsp;</td>
+          </tr>
+          <tr>
+            <th>Role:&nbsp;</th>
+            <td id="role">&nbsp;</td>
+          </tr>
+          <tr>
+            <th class='blue'>First name:&nbsp;</th>
+            <td class='blue' id="first_name"></td>
+          </tr>
+          <tr>
+            <th>Last name:&nbsp;</th>
+            <td id="last_name">&nbsp;</td>
+          </tr>
+          <tr>
+            <th class='blue'>Date created:&nbsp;</th>
+            <td class='blue' id="date_created">&nbsp;</td>
+          </tr>
+          <tr>
+            <th class='blue'>Status:&nbsp;</th>
+            <td class='blue' id="status">&nbsp;</td>
+          </tr>
+        </table>
 
-  <div>
-    <table id = 'button_container' style = "float:right;">
-      <tr>
-        <td>
-          <button id="edit" class="silver" style="margin-top:10px;"
-                  onmousedown="editUser();"><span>Edit User names</span>
+        <div>
+          <table id='button_container' style="float:right;">
+            <tr>
+              <td>
+                <button id="edit" class="silver" style="margin-top:10px;" onmousedown="editUser();"><span>Edit
+                    User names</span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <button id="change_password" class="silver" style="margin-top:10px;" onmousedown="editPassword();"><span>Change
+                    Password</span>
+                </button>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <button id="edit" class="silver" style="margin-top:10px;" onmousedown="editRole();"><span>Update Role</span>
+                </button>
+              </td>
+            </tr>
+        </div>
+
+        <div id="nav" style="position: absolute;bottom: 0%; left: 0px; width:99.5%; height: 10%; background: #333333;">
+          <button class="green" style="float: right; margin-right: 20px; margin-top: 9px; width: 150px;" onclick="clearCreatedUserSession();window.location= tt_cancel_destination">
+            <span>
+              Finish
+            </span>
           </button>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <button id="change_password" class="silver" style="margin-top:10px;"
-                  onmousedown="editPassword();"><span>Change Password</span>
-          </button>
-        </td>
-      </tr>
-   
-         <tr>
-          <td>
-            <button id="edit" class="silver" style="margin-top:10px;"
-                    onmousedown="editRole();"><span>Update Role</span>
-            </button>
-          </td>
-        </tr>
-      </div>
 
-  <div id="nav" style="position: absolute;bottom: 0%; left: 0px; width:99.5%; height: 10%; background: #333333;">
-    <button class="green" style="float: right; margin-right: 20px; margin-top: 9px; width: 150px;" onclick="clearCreatedUserSession();window.location= tt_cancel_destination">
-      <span>
-        Finish
-      </span>
-    </button>
-
-  </div>
-</div>
-
-        <div id="footer">
         </div>
       </div>
+
+      <div id="footer">
+      </div>
     </div>
-  </body>
+  </div>
+</body>
+
 </html>
 
 <script type="text/javascript">
-  var url = new URL(url);
-  var id = url.searchParams.get("user_id");
-  getName(id, sessionStorage.getItem("apiURL"), sessionStorage.getItem("apiPort"), sessionStorage.getItem("apiProtocol"));
-  var tt_cancel_destination = "/";
-  function editUser() {
-    document.location = '/views/users/edit_user.html?user_id='+id;
+  var userId = fetchArgumentFromUrlString('user_id')
+  var protocol = sessionStorage.apiProtocol
+  var url = sessionStorage.apiURL
+  var port = sessionStorage.apiPort
+  var root = `${protocol}://${url}:${port}/api/v1`
+
+  function getUser (options = {}) {
+    GET(
+      {
+        url: options.url,
+        async: true,
+        headers: {
+          Authorization: options.authToken
+        }
+      },
+      {},
+      function (res) {
+        User.init(res)
+        displayUserDetails(User)
+
+        if (User.isActive()) {
+          addButtonToContainer(
+            document.getElementById('button_container'),
+            createToolkitButton({
+              text: 'Deactivate User',
+              listeners: [{
+                event: 'click',
+                handler: deactivateUser
+              }],
+              attributes: [{
+                name: 'id', value: 'deactivateButton'
+              }]
+            })
+          )
+        } else {
+          addButtonToContainer(
+            document.getElementById('button_container'),
+            createToolkitButton({
+              text: 'Activate User',
+              listeners: [{
+                event: 'click',
+                handler: activateUser
+              }],
+              attributes: [{
+                name: 'id', value: 'activateButton'
+              }]
+            })
+          )
+        }
+      },
+      function (error) {
+        console.error(error)
+        showMessage('There was a problem fetching the user.')
+      }
+    )
   }
-  function editPassword() {
-    document.location = '/views/users/change_password.html?user_id='+id;
+
+  function displayUserDetails (User) {
+    var names = User.getUsernames()
+    document.getElementById('username').innerText = names.username
+    document.getElementById('first_name').innerText = names.given_name
+    document.getElementById('last_name').innerText = names.family_name
+
+    document.getElementById('date_created').innerText = moment(User.getDateOfCreation()).format('DD/MM/YYYY')
+    document.getElementById('role').innerText = User.getRoles()
+
+    document.getElementById('status').innerText = (User.isActive()) ? 'Active' : 'Inactive'
   }
-  function editRole() {
-    document.location = '/views/users/change_role.html?user_id='+id;
+
+  function saveUsernamesInSession () {
+    var names = User.getUsernames()
+    sessionStorage.setItem('given_name', names.given_name)
+    sessionStorage.setItem('family_name', names.family_name)
+    sessionStorage.setItem('username', names.username)
   }
+
+  function addButtonToContainer (container, button) {
+    var row = document.createElement('tr')
+    var rowData = document.createElement('td')
+
+    rowData.appendChild(button)
+    row.appendChild(rowData)
+    container.appendChild(row)
+  }
+
+  function activateUser (options = {}) {
+    deactivateButton('activateButton')
+    POST(
+      {
+        url: `${root}/users/${userId}/activate`,
+        async: true,
+        headers: {
+          Authorization: sessionStorage.authorization
+        }
+      },
+      {},
+      function () {
+        showMessage('The user was successfully activated.')
+        setTimeout(function () {
+          location.reload()
+        }, 3000)
+      },
+      function (error) {
+        console.error(error)
+        showMessage('There was an error activating the user.')
+      }
+    )
+  }
+
+  function deactivateUser () {
+    deactivateButton('deactivateButton')
+    POST(
+      {
+        url: `${root}/users/${userId}/deactivate`,
+        async: true,
+        headers: {
+          Authorization: sessionStorage.authorization
+        }
+      },
+      {},
+      function () {
+        showMessage('The user was successfully deactivated.')
+        setTimeout(function () {
+          location.reload()
+        }, 3000)
+      },
+      function (error) {
+        console.error(error)
+        showMessage('There was an error deactivating the user.')
+      }
+    )
+  }
+
+  function deactivateButton (id) {
+    document.getElementById(id).disabled = true
+  }
+
+  function editUser () {
+    document.location = '/views/users/edit_user.html?user_id=' + userId;
+  }
+
+  function editPassword () {
+    document.location = '/views/users/change_password.html?user_id=' + userId;
+  }
+
+  function editRole () {
+    document.location = '/views/users/change_role.html?user_id=' + userId;
+  }
+
+  getUser(
+    {
+      url: `${root}/users/${userId}`,
+      authToken: sessionStorage.authorization,
+    }
+  )
   function clearCreatedUserSession() {
     sessionStorage.removeItem('user_username');
     sessionStorage.removeItem('user_family_name');
     sessionStorage.removeItem('user_given_name');
   }
+
+  function editUser () {
+    document.location = '/views/users/edit_user.html?user_id=' + userId;
+  }
+
+  function editPassword () {
+    document.location = '/views/users/change_password.html?user_id=' + userId;
+  }
+
+  function editRole () {
+    document.location = '/views/users/change_role.html?user_id=' + userId;
+  }
+
+  getUser(
+    {
+      url: `${root}/users/${userId}`,
+      authToken: sessionStorage.authorization,
+    }
+  )
 </script>

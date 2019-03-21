@@ -811,7 +811,7 @@
     }
 
     function populateModal() {
-        getValue(sessionStorage.sessionDate, sessionStorage.patientID, "encounters2", "btn btn-primary btn-lg", "button");
+        getValue(moment(encDate).format("YYYY-MM-DD"), sessionStorage.patientID, "encounters2", "btn btn-primary btn-lg", "button");
     }
 
     function getMedication(id, itemType, div) {
