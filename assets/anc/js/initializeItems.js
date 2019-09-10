@@ -10,7 +10,6 @@ var apiPort = sessionStorage.apiPort;
 
 var authToken = sessionStorage.authorization;
 
-
 $(document).ready(function(){
 
   if (parseInt(sessionStorage.programID) === 12){
@@ -21,7 +20,7 @@ $(document).ready(function(){
 
     getPatientHIVStatus();
 
-    //getPatientSummary();
+    getPatientSummary();
 
   }
 
@@ -76,8 +75,6 @@ function getPatientSummary() {
   
 }
 
-
-
 /** Function getting previous ANC Visit if exist */
 
 function getAncVisitNumber() {
@@ -114,12 +111,70 @@ function getAncVisitNumber() {
 
     req.open('GET', url, true);
 
-    req.setRequestHeader('Authorization',sessionStorage.getItem('authorization'));
+    req.setRequestHeader('Authorization', authToken);
 
     req.send(null);
 
   } catch (e) {
   
+    console.log(e);
+
+  }
+
+}
+/** Patient summary:
+ * Date of last menstral period, 
+ * Week of first visit, 
+ * Total ANC Visits and 
+ * Current outcome.
+ */
+
+function getPatientSummary() {
+
+  var url = 'http://' + apiURL + ':' + apiPort 
+
+  url += '/api/v1/programs/' + programID + '/patients/' + patientID;
+
+  url += '?date=' + sessionStorage.sessionDate;
+
+  
+  var req = new XMLHttpRequest();
+  
+  req.onreadystatechange = function () {
+
+    if (this.readyState == 4 && this.status == 200) {
+        
+      var results = JSON.parse(this.responseText);
+
+      try{
+
+        sessionStorage.setItem("dateOfLMP", results.date_of_lnmp);
+
+        sessionStorage.setItem("fundusByLMP", results.fundus);
+
+        sessionStorage.setItem("totalANCVisits", results.anc_visits);
+
+        sessionStorage.setItem("currentOutcome", results.current_outcome);
+       
+      }catch(e){
+        
+        console.log(e);
+
+      }
+        
+    }
+  
+  };
+  try {
+
+    req.open('GET', url, true);
+    
+    req.setRequestHeader('Authorization', authToken);
+    
+    req.send(null);
+  
+  } catch (e) {
+
     console.log(e);
 
   }
