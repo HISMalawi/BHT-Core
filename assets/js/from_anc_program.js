@@ -13,7 +13,7 @@ function enrollPatient(person_id) {
 
   var http = new XMLHttpRequest();
 
-  var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/' + person_id + "/programs/";
+  var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients/' + person_id + "/programs/";
 
   var params = JSON.stringify({
 

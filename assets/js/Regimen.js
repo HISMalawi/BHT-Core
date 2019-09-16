@@ -34,16 +34,33 @@ const Regimen = function () {
    * 
    * @return {Promise}
    */
-  function getApplicableProgramRegimens (params = {}) {
+  function getApplicableRegimens (params = {}) {
     return fetch (
-      `${apiRoot}/programs/${params.programId}/regimens/?patient_id=${params.patientId}`,
+      `${apiRoot}/programs/${params.programId}/regimens?patient_id=${params.patientId}`,
       {
         method: 'GET',
         headers: { 'Authorization': sessionStorage.authorization }
       })
   }
 
+  /**
+   * Function that asks the EMR-API for all Tuberculosis drug ingredients
+   * 
+   * @param {Number} programId
+   * @param {Number} patientId
+   * @return {Promise}
+   */
+  function getCustomIngredients (programId, patientId) {
+    return fetch(
+      `${apiRoot}/programs/${programId}/custom_tb_ingredients?patient_id=${patientId}`, {
+        method: 'GET',
+        headers: { 'Authorization': sessionStorage.authorization }
+      }
+    )
+  }
+
   return {
-    getApplicableProgramRegimens
+    getApplicableRegimens,
+    getCustomIngredients
   }
 }()

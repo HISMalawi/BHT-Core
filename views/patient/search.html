@@ -60,7 +60,7 @@ function validateName(element) {
 
   __$("nextButton").removeAttribute("onmousedown");
 
-  if(sessionStorage.programID === "12" && field_name === "family_name"){
+  if((sessionStorage.programID === "12" || sessionStorage.programID === "21") && field_name === "family_name"){
     
     __$('nextButton').children[0].innerHTML = "Finish";
 
@@ -78,7 +78,7 @@ function validateName(element) {
    
     }else if (value.match(validRegEx) != null) {
 
-      if(sessionStorage.programID === "12" && field_name === "family_name"){
+      if((sessionStorage.programID === "12" || sessionStorage.programID === "21") && field_name === "family_name"){
        
         submitSearchResults();
         return;
@@ -106,8 +106,9 @@ function validateName(element) {
     <input type="text" name="family_name" id="family_name" field_type="alpha"  tt_onLoad='validateName();' ajaxURL="/search/family_name?search_string=" helpText="Last name" key="family_name" allowFreeText="true" tt_onUnload="getInput();"/>
 
     <select allowFreeText="false" helpText="Gender" id="gender" tt_onUnLoad="getInput();" name="person[gender]" tt_onLoad="changeNextButton();" key="gender" ><option value=""></option>
+      <option value="F">Female</option>
       <option value="M">Male</option>
-      <option value="F">Female</option></select>
+    </select>
 
 </form>
         <div id="footer">
@@ -123,6 +124,9 @@ function validateName(element) {
     if(sessionStorage.programID === "12"){
       getInput();
       var gender = "F";
+    }else if(sessionStorage.programID === "21"){
+      getInput();
+      var gender = "M"
     }else{
       var gender = __$('gender').value;
     }

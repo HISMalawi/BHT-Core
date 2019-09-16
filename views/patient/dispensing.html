@@ -22,6 +22,8 @@
 <script type="text/javascript" src="/assets/js/generic_ajaxrequest.js"></script>
 <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
 <script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
+<link rel="stylesheet" href="/assets/css/provider.css" type="text/css">
+<script type="text/javascript" src="/assets/js/provider.js  "></script>
 
 <link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
 
@@ -79,7 +81,7 @@ var tt_cancel_destination = "/views/patient_dashboard.html?patient_id=" + patien
       <form>
 
         <input type="text" name="summary"
-          tt_onLoad="__$('keyboard').style.display = 'none';dispensingPage();initDataTable();getPrescriptions();changeNextButton();" 
+          tt_onLoad="checkIfInBDMode();__$('keyboard').style.display = 'none';dispensingPage();initDataTable();getPrescriptions();changeNextButton();"
           tt_pageStyleClass= "NoControls" helpText="Dispensing" optional = "true"/>
 
 

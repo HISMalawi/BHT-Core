@@ -127,7 +127,6 @@ function nextEncounter(patient_id, program_id, redirect) {
 
 function checkIfActivitySelected(encounter_name, url) {
   var selected_activities = sessionStorage.userActivities;
-  // alert(sessionStorage.programID);
 
   if  (parseInt(sessionStorage.programID) == 1 ){
     if (encounter_name == "art adherence" && !selected_activities.match(/ART adherence/i)) {
@@ -136,6 +135,14 @@ function checkIfActivitySelected(encounter_name, url) {
     } else if  (encounter_name == "hiv clinic consultation" && !selected_activities.match(/HIV clinic consultations/i) ) {
       window.location.href = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
       return;
+    } else if  (encounter_name == "hiv clinic consultation (clinician)" && !selected_activities.match(/HIV clinic consultations/i) ) {
+      window.location.href = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
+      return;
+    } else if  (encounter_name == "hiv clinic consultation (clinician)" && selected_activities.match(/HIV clinic consultations/i) ) {
+      if(sessionStorage.userRoles.match(/Nurse/i)) {
+        window.location.href = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
+        return;
+      }
     } else if (encounter_name == "hiv reception" && !selected_activities.match(/HIV reception visits/i)) {
       window.location.href = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
       return;
@@ -169,3 +176,5 @@ function setCurrentLocation() {
   $('touchscreenInput' + tstCurrentPage).setAttribute('ajaxURL', "/locations?name=");
   
 }
+
+

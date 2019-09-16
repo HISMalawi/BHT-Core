@@ -885,7 +885,7 @@
     getRelationships();
 
     function getVisitDates() {
-        var visits_dates_url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/' + sessionStorage.patientID + '/visits';
+        var visits_dates_url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients/' + sessionStorage.patientID + '/visits';
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {

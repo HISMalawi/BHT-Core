@@ -5,11 +5,17 @@
     <title>Baobab Health Trust</title>
     <meta charset="utf-8">
     <script>
+        var apiProtocol = sessionStorage.apiProtocol;
+        var apiURL = sessionStorage.apiURL;
+        var apiPort = sessionStorage.apiPort;
         if (sessionStorage.getItem("authorization") == null) {
             //alert("not logged in");
             window.location = "/views/login.html";
         }
-    </script>
+        if (top.location != location) {
+        top.location.href = document.location.href ;
+        }
+    </script>          
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="./assets/css/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="./assets/css/maindashboard/header.css">
@@ -56,13 +62,15 @@
             sessionStorage.patientARVStartDate = null;
             sessionStorage.dateOfLMP = "";
             sessionStorage.fundusByLMP = "";
+            sessionStorage.gestation = "";
             sessionStorage.totalANCVisits = "";
-            sessionStorage.currentOutcome = "";
+            sessionStorage.currentOutcome =  "";
+            sessionStorage.referToUrineTest = false;
           }
         }
 
         function setSessionDate(){
-            var url = 'http://'+apiURL+':'+apiPort+'/api/v1/current_time';
+            var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/current_time';
             var req = new XMLHttpRequest();
             req.onreadystatechange = function(){
 
@@ -79,6 +87,14 @@
                 req.send(null);
             } catch (e) {
             }
+        }
+
+        try {
+          if(sessionStorage.sessionDate == undefined) {
+              setSessionDate();
+          }
+        }catch(i){
+          setSessionDate();
         }
 
 
@@ -212,7 +228,10 @@
             <button class="btn btn-danger buttons red " style="width: 200px; font-size: 2rem;" id="logout">Logout</button>
             <button class="btn btn-success buttons blue" style="margin-right: 5px;" data-toggle="modal" data-target="#myModal">
             <span>&nbsp; &nbsp; &nbsp; Applications &nbsp; &nbsp; &nbsp;<img src="/assets/images/launcher.png"></span></button>
-            <button class="green" style="margin: 5px; width: 285px; padding: 0px;" visibility: hidden; id="registerButton" onmousedown="registerPatientRedirect();" ><span>Find or Register Patient</span></button>
+            <button class="green" style="margin: 5px; width: 285px; padding: 0px;" visibility: hidden; id="registerButton" onmousedown="checkProgram();" ><span>Find or Register Patient</span></button>
+            <button class="blue" style="margin: 5px; width: 205px; padding: 0px; margin-right:1px; display: none;" visibility: hidden; id="backdata" onclick="callPage(this.id)" ><span>Backdata Entry</span></button>
+            <button class="blue" style="margin: 5px; width: 205px; padding: 0px; margin-right:1px; display: none;" visibility: hidden; id="artReferral" onclick="callPage(this.id)" ><span>ART Referral</span></button>
+            <button class="blue" style="margin: 5px; width: 205px; padding: 0px; margin-right: 1px; display: none;" visibility: hidden; id="findRecord" onclick="callPage(this.id)" ><span>Find Entered Record</span></button>
             <button class="blue" style="margin: 5px; width: 200px; padding: 0px;" visibility: hidden; id="findByButton" onmousedown="gotoFindByMenu();" ><span>Find by</span></button>
         </div>
          </div>
@@ -220,13 +239,19 @@
    </body>
    <script src="/assets/js/core.js "></script>
    <script>
-        var apiProtocol = sessionStorage.apiProtocol;
-        var apiURL = sessionStorage.apiURL;
-        var apiPort = sessionStorage.apiPort;
         getDDEStatus();
         getPortalStatus();
-        if(sessionStorage.sessionDate == undefined) {
-            setSessionDate();
+        
+
+        if(sessionStorage.programID == "18"){
+            var btn_backdata = document.getElementById("backdata");
+            btn_backdata.style.display = "block";
+
+            var btn_art_referral = document.getElementById("artReferral");
+            btn_art_referral.style.display = "block";
+
+            var btn_find_record = document.getElementById("findRecord");
+            btn_find_record.style.display = "block";
         }
 
        function getLocationID() {
@@ -245,6 +270,22 @@
             xhttp.send();
         }
 
+        function checkProgram(){
+            if(sessionStorage.programID == "18"){
+                window.location.href = "apps/HTS/views/encounters/consent.html";
+            }else{
+                registerPatientRedirect();
+            }
+        }
+
+        function callPage(id){
+            if (id === "backdata") {
+                window.location.href = 'apps/HTS/views/encounters/backdata.html';
+            }
+            if (id === "artReferral") {
+                window.location.href = 'apps/HTS/views/encounters/refferal.html';
+            }
+        }
         function getLocationName(location_id){
             var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/locations/"+location_id;
 

@@ -134,7 +134,7 @@ function updateBMI() {
   try {
     var bmi = document.getElementById('bmi');
     var weight = document.getElementById('td-Weight').innerHTML;
-    var height = height = document.getElementById('td-Height').innerHTML;
+    var height = document.getElementById('td-Height').innerHTML;
   }catch(j) {
     return;
   }

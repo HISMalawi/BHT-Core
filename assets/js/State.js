@@ -14,7 +14,7 @@ const State = function () {
 
   function _void (options = {}) {
     fetch(
-      `${apiRoot}/programs/${options.programId}/patients/${options.patientId}/states/${options.stateId}`,
+      `${apiRoot}/programs/${options.programId}/patients/${options.patientId}/states/${options.stateId}?reason=${encodeURIComponent(void_reason)}`,
       {
         method: 'DELETE',
         headers: {
@@ -27,9 +27,7 @@ const State = function () {
   }
 
   function create (options = {}) {
-    return fetch(
-      `${apiRoot}/programs/${options.programId}/patients/${options.patientId}/states`,
-      {
+    return fetch(`${apiRoot}/programs/${options.programId}/patients/${options.patientId}/states`, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({state: options.stateId, date: options.startDate})
@@ -37,8 +35,21 @@ const State = function () {
     )
   }
 
+  /**
+   * @param {Number} patientId
+   * @param {Number} programId
+   * @return {Promise}
+   */
+  function getPatientStates (patientId, programId) {
+    return fetch(`${apiRoot}/programs/${programId}/patients/${patientId}/states`, {
+      method: 'GET',
+      headers: { Authorization: sessionStorage.authorization }
+    })
+  }
+
   return {
     _void,
-    create
+    create,
+    getPatientStates
   }
 }()

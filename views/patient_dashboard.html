@@ -3,6 +3,7 @@
 <head>
     <title>Baobab Health Trust</title>
     <meta charset="utf-8">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/assets/css/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/maindashboard/header.css">
@@ -10,9 +11,11 @@
     <link rel="stylesheet" href="/assets/css/custom.css">
     <link rel="stylesheet" href="/assets/css/patientdashboard.css">
     <link rel="stylesheet" href="/assets/css/demographics-header.css">
+    
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/bootstrap/bootstrap.min.js"></script>
     <script src="/assets/js/moment.js"></script>
+    <script src="/assets/js/Patient.js"></script>
 
     <!-- ...................... -->
     <link rel="stylesheet" href="/assets/css/datatables/fixedHeader.dataTables.min.css" type="text/css">
@@ -21,6 +24,7 @@
     <script type="text/javascript" src="/assets/js/datatables/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="/assets/js/datatables/dataTables.fixedHeader.min.js"></script>
     <script src="/assets/js/medication.history.js"></script>
+    
     <!-- ...................... -->
 
 
@@ -107,8 +111,12 @@
     }
 
     #todaysDate, #selectedDate {
-      font-size: 14px;
+      font-size: 12px;
     } 
+
+    .active-reason {
+        background-color: rgb(189, 189, 236);
+    }
 
 </style>
 
@@ -312,17 +320,25 @@
     </div>
     <!-- /encounters details modal -->
 
-    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" style="top:40%; "
+    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" style="top:25%; "
          aria-hidden="true" id="mi-modal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content" style="margin-left: 28%; margin-right:10%; width: 70%; height: 20%;">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Are You sure you want to void this encounter?</h4>
+                    <h4 class="modal-title" id="myModalLabel">Are you sure you want to void this encounter?</h4>
+                    <h5 class="modal-title">Please specify reason for voiding</h5>
+                </div>
+                <div class="modal-body">
+                        <ul class="list-group">
+                            <li class="list-group-item reason" onclick="selectReason(this)">Mistake / Wrong Entry</li>
+                            <li class="list-group-item reason" onclick="selectReason(this)">System Error</li>
+                            <li class="list-group-item reason" onclick="selectReason(this)">Duplicate Entry</li>
+                        </ul>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default btn-lg" id="modal-btn-si">yes</button>
+                    <button type="button" style="float:left" class="btn btn-default btn-lg" id="modal-btn-si" disabled>yes</button>
                     <button type="button" class="btn btn-primary btn-lg" id="modal-btn-no">No</button>
                 </div>
             </div>
@@ -529,6 +545,25 @@
         </div>
     </div>
     <!-- /tasks modal-->
+ <!-- tasks modal-->
+
+    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" style="top:40%; "
+    aria-hidden="true" id="modal-finish">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="margin-left: 28%; margin-right:10%; width: 70%; height: 20%;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Finishing will close both sessions. Are you sure you want to continue?</h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-lg" id="modal-yes">yes</button>
+                <button type="button" class="btn btn-primary btn-lg" id="modal-no">No</button>
+            </div>
+        </div>
+    </div>
+    </div>
+     <!-- /tasks modal-->
     <!-- /container -->
 </div>
 <!-- /body -->
@@ -538,8 +573,22 @@
 
 <script>
     var currentEncounter = null;
+    var void_reason = null;
     // Defined in core.js
     getSavedEncounters();
+    function selectReason(element) {
+        var items = document.getElementsByClassName("list-group-item reason active-reason");
+        for (let index = 0; index < items.length; index++) {
+            items[index].className = "list-group-item reason";
+        }
+        if(element != undefined) {
+        document.getElementById("modal-btn-si").removeAttribute("disabled");
+        element.className = "list-group-item reason active-reason"
+        void_reason = element.innerHTML;
+        }else {
+            document.getElementById("modal-btn-si").setAttribute('disabled', null);
+        }
+    }
 
     var modalConfirm = function (callback) {
 
@@ -555,6 +604,7 @@
 
         $("#modal-btn-no").on("click", function () {
             callback(false);
+            selectReason();
             $("#mi-modal").modal('hide');
         });
     };
@@ -574,8 +624,21 @@
     sessionStorage.showPregnantQuestion = true;
 
     function finish() {
-        window.location = "/";
+        if(sessionStorage.programID == "18"){
+            if (top.location != location) {
+                $("#modal-finish").modal();
+            }
+        }else{
+               window.location = "/";
+        }
     }
+
+    $("#modal-yes").on("click", function () {
+        window.location = "/";
+    });
+    $("#modal-no").on("click", function () {
+        $("#modal-finish").modal('hide');
+    });
 
     var nextEnc = "";
     nextEncounter(sessionStorage.patientID, sessionStorage.programID, false);
@@ -584,7 +647,7 @@
     } else {
         nextEnc = "None"
     }
-    document.getElementById("nextEncounter").innerHTML = nextEnc;
+    document.getElementById("nextEncounter").innerHTML = nextEnc.toUpperCase();
 
     function changeIcon(gender) {
         var img = document.getElementById('gender');
@@ -611,7 +674,7 @@
     var d = new Date();
 
     function ajaxRequest() {
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/' + id;
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients/' + id;
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
 
@@ -654,10 +717,6 @@
         }
     }
 
-    function finish() {
-        window.location = "/";
-    }
-
     function setValues(patient_name, gender, age, addressl1, addressl2, phone_number, identifier) {
         document.getElementById("patient_name").innerHTML = patient_name;
         var roundedAge = Math.floor(moment().diff(age, 'years', true));
@@ -689,7 +748,7 @@
     }
 
     function getDates(patient_id, index, pageNumber) {
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/' + patient_id + '/visits?program_id='+ sessionStorage.programID;
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients/' + patient_id + '/visits?program_id='+ sessionStorage.programID;
         var div = document.getElementById("dates");
         div.innerHTML = "";
         var req = new XMLHttpRequest();
@@ -771,7 +830,7 @@
             encounters.innerHTML = "";
         } else {
         }
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/encounters?paginate=false&patient_id=' + id + '&date=' + value;
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/encounters?paginate=false&patient_id=' + id + '&date=' + value;
         var req = new XMLHttpRequest();
         var counter = 0;
         req.onreadystatechange = function () {
@@ -788,7 +847,6 @@
                 for (var x = 0; x < results.length; x++) {
                     var d = new Date(results[x].encounter_datetime);
                     var f = moment(d).format("HH:mm A");
-
                     if (itemType == "table") {
                         var a = document.createElement("a");
                         var aclass = "list-group-item d-flex justify-content-between";
@@ -796,7 +854,14 @@
                         a.setAttribute("class", aclass);
                         a.setAttribute("href", "#");
                         //a.setAttribute("onmousedown","getEncounter('" + results[x].encounter_id + "')");
-                        a.innerHTML = results[x].type.name;
+                        if(results[x].program_id === 2 && sessionStorage.programID === 2){
+                            a.innerHTML = results[x].type.name + " | TB";
+                        }else if(results[x].program_id === 1 && sessionStorage.programID === 2){
+                            a.innerHTML = results[x].type.name + " | ART";
+                        }else {
+                            a.innerHTML = results[x].type.name 
+                        }
+                        
 
                         var s = document.createElement("span");
                         s.setAttribute("class", "badge badge-primary badge-pill");
@@ -814,10 +879,23 @@
                             break;
                         }
                     } else if (itemType == "button") {
-                        encounters.innerHTML +=
+                        if(results[x].program_id == 2){
+                            encounters.innerHTML +=
                             '<button type="button" id="' + results[x].encounter_ixd + '" value="' + results[x] +
                             '" class="btn btn-primary btn-sm" style="width: 98%;  margin: 1%; border-radius: 0%; height: 50px;" onClick="getEncounter(' + results[x].encounter_id + ')">' +
-                            '<span class="h5">' + results[x].type.name + '</span></button>';
+                            '<span class="h5">' + results[x].type.name + " | TB" + '</span></button>';
+                        }else if(results[x].program_id == 1){
+                            encounters.innerHTML +=
+                            '<button type="button" id="' + results[x].encounter_ixd + '" value="' + results[x] +
+                            '" class="btn btn-primary btn-sm" style="width: 98%;  margin: 1%; border-radius: 0%; height: 50px;" onClick="getEncounter(' + results[x].encounter_id + ')">' +
+                            '<span class="h5">' + results[x].type.name + " | ART" + '</span></button>';
+                        }else {
+                            encounters.innerHTML +=
+                            '<button type="button" id="' + results[x].encounter_ixd + '" value="' + results[x] +
+                            '" class="btn btn-primary btn-sm" style="width: 98%;  margin: 1%; border-radius: 0%; height: 50px;" onClick="getEncounter(' + results[x].encounter_id + ')">' +
+                            '<span class="h5">' + results[x].type.name   + '</span></button>';
+                        }
+                        
                     }
 
                 }
@@ -842,7 +920,12 @@
             programs.innerHTML = "";
         } else {
         }
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/drug_orders?patient_id=' + id + "&program_id="+sessionStorage.programID+"&paginate=false";
+
+        if(sessionStorage.programID == 2){ // TB Program - fetch all patient medications
+            var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/drug_orders?patient_id=' + id +"&paginate=false";
+        }else{ // fetch all patient medications
+            var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/drug_orders?patient_id=' + id + "&program_id="+sessionStorage.programID+"&paginate=false";
+        }
         var req = new XMLHttpRequest();
 
         var listGroup = document.createElement("div");
@@ -916,7 +999,7 @@
             obsDiv.innerHTML = "";
         } else {
         }
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/encounters/' + id;
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/encounters/' + id;
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
 
@@ -938,7 +1021,7 @@
                     } else if (results.observations[x].value_coded != null) {
                         value = results.observations[x].value_coded;
                         sessionStorage.removeItem("value_coded");
-                        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/concepts/' + results.observations[x].value_coded;
+                        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/concepts/' + results.observations[x].value_coded;
                         var req = new XMLHttpRequest();
                         req.onreadystatechange = function () {
 
@@ -979,7 +1062,7 @@
 
     function voidEncounter(id) {
         currentEncounter = id;
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/encounters/' + id;
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/encounters/' + id + '?reason=' + encodeURIComponent(void_reason);
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
 
@@ -1006,7 +1089,7 @@
             programsTable.innerHTML = "";
         } else {
         }
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/' + sessionStorage.patientID + "/programs/" + id;
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients/' + sessionStorage.patientID + "/programs/" + id;
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
             if (this.readyState == 4) {
@@ -1046,7 +1129,7 @@
     }
 
     function buildAlerts(patient_id) {
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/observations?person_id=' + patient_id + '&concept_id=7755';
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/observations?person_id=' + patient_id + '&concept_id=7755';
         var req = new XMLHttpRequest();
         var table = document.getElementById("alerts");
         table.setAttribute("class", "info-tables");
@@ -1099,11 +1182,12 @@
         } catch (e) {
 
         }
+        checkIfDueLabOrder()
         buildDefaulter(patient_id, table)
     }
 
     function buildDefaulter(patient_id, table) {
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/observations?person_id=' + patient_id + '&concept_id=6828';
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/observations?person_id=' + patient_id + '&concept_id=6828';
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
             if (this.readyState == 4) {
@@ -1131,7 +1215,7 @@
     }
 
     function buildProgramInfo(patient_id) {
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/' + patient_id + '/next_appointment_date';
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients/' + patient_id + '/next_appointment_date';
         var req = new XMLHttpRequest();
         var table = document.createElement("table");
         table.setAttribute("class", "info-tables");
@@ -1171,7 +1255,7 @@
     }
 
     function buildFT(patient_id, table) {
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/observations?person_id=' + patient_id + '&concept_id=9561';
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/observations?person_id=' + patient_id + '&concept_id=9561';
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
             if (this.readyState == 4) {
@@ -1193,7 +1277,7 @@
     }
 
     function buildFTAssessment(table, encounter_id) {
-        var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/encounters/' + encounter_id;
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/encounters/' + encounter_id;
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
             if (this.readyState == 4) {
@@ -1243,6 +1327,30 @@
         }
         button.style.color = "white";
         button.style.backgroundColor = "#204d74";
+    }
+
+    function checkIfDueLabOrder () {
+        const patientId = sessionStorage.patientID
+        const programId = sessionStorage.programID
+
+        Patient.isDueLabOrder(patientId, programId)
+            .then(payload => payload.ok && payload.json().then(data => data.message && renderLabOrderAlert()))
+            .catch(console.error)
+    }
+
+    function renderLabOrderAlert () {
+        const alertsContainer = document.getElementById('alerts')
+
+        const row = document.createElement('tr')
+        row.setAttribute('class', 'alerts')
+        row.className = 'list-group-item d-flex justify-content-between align-items-center list-group-item-action list-group-item- primary list-group-links'
+
+        const data = document.createElement('td')
+        data.innerText = 'Patient is due a lab order!'
+        data.style.borderTop = '0'
+
+        row.appendChild(data)
+        alertsContainer.appendChild(row)
     }
 
     GetApplicationInfo();

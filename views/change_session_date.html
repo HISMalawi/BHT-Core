@@ -24,7 +24,7 @@
 <script>
 
     function setSessionDate(redirect){
-        var url = 'http://'+apiURL+':'+apiPort+'/api/v1/current_time';
+        var url = sessionStorage.apiProtocol + '://'+apiURL+':'+apiPort+'/api/v1/current_time';
         var req = new XMLHttpRequest();
         req.onreadystatechange = function(){
 
@@ -83,7 +83,7 @@
 
         var set_date = (year + '-' + month + '-' + day);
         set_date = moment(new Date(set_date)).format('YYYY-MM-DD');
-        var todays_date = moment(new Date()).format('YYYY-MM-DD');
+        var todays_date = moment(new Date(sessionStorage.sessionDate)).format('YYYY-MM-DD');
 
         if (set_date > todays_date) {
             showMessage('Date is greater than current date');

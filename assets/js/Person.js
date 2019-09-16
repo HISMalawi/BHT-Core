@@ -8,6 +8,12 @@ const Person = function () {
   const apiRoot =  `${sessionStorage.apiProtocol}://${sessionStorage.apiURL}:${sessionStorage.apiPort}/api/v1`
 
   /** @type {object} */
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': sessionStorage.authorization
+  }
+
+  /** @type {object} */
   let person = {}
 
   /**
@@ -19,6 +25,21 @@ const Person = function () {
    */
   function init (data = {}) {
     person = data
+  }
+
+  /**
+   * Function to ask the EMR-API to create a person
+   * 
+   * @param {Object} params
+   * 
+   * @return {Promise}
+   */
+  function create (params) {
+    return fetch(`${apiRoot}/people`, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(params)
+    })
   }
 
   /**
@@ -84,12 +105,27 @@ const Person = function () {
    * A TB number (Tuberculosis number) is given to TB+ patients
    * These patients must be staying near or assigned to the TB facility
    * 
-   * @param {number} personId
+   * @param {Object} params
    * 
    * @return {Promise}
    */
-  function assignTbRegistrationNumber (personId) {
-    return fetch (`${apiRoot}/patients/${personId}/assign_tb_number`, {
+  function assignTbRegistrationNumber (params) {
+    let args = `?date=${params.sessionDate}`
+    if (params.bdeNumbers !== null) args = `${args}&number=${params.bdeNumbers.number}`
+    return fetch (`${apiRoot}/patients/${params.personId}/assign_tb_number${args}`, {
+      method: 'GET',
+      headers: { 'Authorization': sessionStorage.authorization }
+    })
+  }
+
+  /**
+   * Ask to EMR-API to return a person's relationships
+   * 
+   * @param {Number} personId
+   * @return {Promise}
+   */
+  function getRelationships (personId) {
+    return fetch(`${apiRoot}/people/${personId}/relationships`, {
       method: 'GET',
       headers: { 'Authorization': sessionStorage.authorization }
     })
@@ -98,8 +134,10 @@ const Person = function () {
   return {
     init,
     get,
+    create,
     setAge,
     isEligibleForPregnancyQuestion,
-    assignTbRegistrationNumber
+    assignTbRegistrationNumber,
+    getRelationships
   }
 }()

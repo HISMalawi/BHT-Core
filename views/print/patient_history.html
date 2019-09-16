@@ -1,0 +1,76 @@
+
+<style>
+  * {
+    -webkit-touch-callout: none;
+    /* iOS Safari */
+    -webkit-user-select: none;
+    /* Safari */
+    -khtml-user-select: none;
+    /* Konqueror HTML */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+    user-select: none;
+    /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+  }
+
+  .print-table {
+    display: table;
+    width: 99%;
+    height: 99%;
+  }
+
+  .print-table-row {
+    display: table-row;
+  }
+
+  .print-table-cell {
+    display: table-cell;
+    text-align: center;
+  }
+
+  .barcode {
+    top: 12%;
+  }
+
+  .print-table-cell p {
+    font-size: 50px;
+  }
+</style>
+
+
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/core.js"></script>
+
+<div class="print-table">
+  <div class="print-table-row">
+
+    <div class="print-table-cell">
+      <img src="/assets/images/zebra-label-printer.jpeg" class="barcode" />
+      <p>Printing barcode label.</p>
+      <p>Please wait <blink>....</blink>
+        <p>
+    </div>
+
+
+  </div>
+</div>
+
+<script>
+  var apiURL = sessionStorage.getItem("apiURL");
+  var apiPort = sessionStorage.getItem("apiPort");
+  var apiProtocol = sessionStorage.getItem("apiProtocol");
+
+  var url = "/programs/"+ sessionStorage.programID +"/patients/" + sessionStorage.patientID + "/labels/history"
+  url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1" + url;
+  document.location = url;
+
+  function red() {
+    finishRedirect('/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID);
+  }
+    
+  setTimeout('red()', 3000);
+</script>
+

@@ -153,15 +153,22 @@ function initiateDataTable() {
     scrollY: 555,
     scroller: {
       loadingIndicator: true
-    }
+    },
+    order: [[2, 'desc']]
   } );
 }
 
 function fetchMedicationOrders() {
-  var url = apiProtocol + "://" + apiURL + ":" + apiPort;
-  url +="/api/v1/drug_orders?patient_id=" + sessionStorage.patientID;
-  url += "&program_id="+sessionStorage.programID+"&page_size=100000";
-  //url += "&date=" + sessionStorage.sessionDate;
+  // TB Program - fetch all patient medications
+  if(sessionStorage.programID == 2){
+    var url = apiProtocol + "://" + apiURL + ":" + apiPort;
+    url +="/api/v1/drug_orders?patient_id=" + sessionStorage.patientID;
+  }else{ // fetch medications by program
+    var url = apiProtocol + "://" + apiURL + ":" + apiPort;
+    url +="/api/v1/drug_orders?patient_id=" + sessionStorage.patientID;
+    url += "&program_id="+sessionStorage.programID+"&page_size=100000";
+    //url += "&date=" + sessionStorage.sessionDate;
+  }
 
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {

@@ -42,7 +42,16 @@ const Encounter = function () {
     })
   }
 
+  function retrieve(queryString = ''){
+    console.log(queryString)
+    return fetch (`${apiRoot}/encounters${queryString}`, {
+      method: 'GET',
+      headers: headers
+    })
+  }
+  
   return {
-    create
+    create,
+    retrieve
   }
 }()

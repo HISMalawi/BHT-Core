@@ -9,6 +9,8 @@ getAPI();
 var url = window.location.href;
 var url = new URL(url);
 var backupPatientID = "";
+var consent = "";
+var circumcision_consent = "";
 var id = url.searchParams.get("patient_id");
 sessionStorage.setItem("backupPatientID", id);
 // var url_string = "http://www.example.com/t.html?a=1&b=3&c=m2-m3-m4-m5"; //window.location.href
@@ -29,9 +31,14 @@ if(sessionStorage.userRoles && sessionStorage.userRoles.match(/Program Manager|S
 
 admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="view-change-date" onclick="redirect(this.id); "><img src="/assets/images/time.png" class="btn-icons"/><span>Change sesison date</span></button>';
 
-admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="cleaner" onclick="redirect(this.id); "><img src="/assets/images/clean.jpg" class="btn-icons"/><span>Data cleaning tool</span></button>';
-
 admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="print-location" onclick="redirect(this.id); "><img src="/assets/images/location.png" class="btn-icons"/><span>Print Location</span></button>';
+admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="view-duplicates" onclick="redirect(this.id); "><img src="/assets/images/duplicate.png" class="btn-icons"/><span>View Duplicates</span></button>';
+
+admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="military-site" onclick="redirect(this.id); "><img src="/assets/images/soldier.png" class="btn-icons"/><span>Is this a military site?</span></button>';
+
+admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="registers" onclick="redirect(this.id); "><img src="/assets/images/location.png" class="btn-icons"/><span>Manage Registers</span></button>';
+
+admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="userStats" onclick="redirect(this.id); "><img src="/assets/images/add-user.png" class="btn-icons"/><span>User Stats</span></button>';
 
 // alert(window.innerHeight);
 
@@ -343,7 +350,7 @@ function getTasks(encountersData) {
     
     var tasks = [];
 
-    if (parseInt(sessionStorage.programID) == 12){
+    if ((parseInt(sessionStorage.programID) == 12) || (parseInt(sessionStorage.programID) == 21)){
         // This is for ANC Program to be able to differnctiate
         // two different activities using a single encounter.
         // e.g. ART Treatment and ANC Treatment both using Treatment encounter.
@@ -355,7 +362,6 @@ function getTasks(encountersData) {
                 var url = j[encounter].url;
                 var icon = j[encounter].activitiesIcon
                 tasks.push([values, icon, url, encounter.toUpperCase()])
-
             }
         }
 
@@ -366,7 +372,9 @@ function getTasks(encountersData) {
             var values = encountersData.encounters[j]
             var url = values.url;
             var icon = values.activitiesIcon;
-            tasks.push([j, icon, url])
+            var show = values.show;
+
+            if (show || show == undefined) tasks.push([j, icon, url]);
         });
     }
 
@@ -392,6 +400,18 @@ function printTransferOut() {
 
 function printDemographics() {
     print_and_redirect('/views/print/demographics.html', '/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID);
+}
+
+function printPatientHistory() {
+    print_and_redirect('/views/print/patient_history.html', '/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID);
+}
+
+function printLabResults() {
+    print_and_redirect('/views/print/lab_results.html', '/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID);
+}
+
+function printTBNumber() {
+    print_and_redirect('/views/print/tb_ipt_number.html', '/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID);
 }
 
 function download(filename, text) {
@@ -421,7 +441,10 @@ function buildDashboardButtons(tasks, container) {
     containerTableRow.setAttribute("style", "display: table-row;");
     containerTable.appendChild(containerTableRow);
 
-
+    if (sessionStorage.programID === "21") {
+        checkConsent();
+        circumcisionConsent();
+    }
     var use_filling_number = false;
     var use_filling_number_property_url = apiProtocol + "://" + apiURL + ":" + apiPort;
     use_filling_number_property_url += "/api/v1/global_properties?property=use.filing.numbers";
@@ -438,7 +461,11 @@ function buildDashboardButtons(tasks, container) {
 
             }
 
+
             for (var i = 0; i < tasks.length; i++) {
+                if (tasks[i][0].toUpperCase() == 'HIV CLINIC CONSULTATION (CLINICIAN)')
+                  continue;
+
                 if (count == 3) {
                     containerTableRow = document.createElement("div");
                     containerTableRow.setAttribute("class", "tasks-table-row");
@@ -448,15 +475,16 @@ function buildDashboardButtons(tasks, container) {
                 }
 
                 if (!use_filling_number) {
-                    if (tasks[i][0].match(/filing/i) || tasks[i][0].match(/Archive client/i)) {
+                    if (tasks[i][0].match(/filing/i)) {
                         continue;
                     }
                 }
-                if (!((tasks[i][0].match(/ART/) || tasks[i][0].match(/HIV/)) &&  sessionStorage.programID == "12")){
+                if (!((tasks[i][0].match(/ART/) || tasks[i][0].match(/HIV/)) && (sessionStorage.programID == "12"))){
 
                 containerTableCell = document.createElement("div");
 
-                if (sessionStorage.programID == "12"){ //Disable already saved encounters in ANC
+
+                if (sessionStorage.programID == "12" || sessionStorage.programID == "21"){ //Disable already saved encounters in ANC and VMMC
 
                     if (sessionStorage.savedEncounters.includes(tasks[i][3])){
                     
@@ -469,33 +497,37 @@ function buildDashboardButtons(tasks, container) {
                     }
                     
                 }else{
-                    
-                    containerTableCell.setAttribute("class", "tasks-table-cell");
-                    
+                  containerTableCell.setAttribute("class", "tasks-table-cell");
                 }
 
-                
+                if (sessionStorage.programID === "21" && consent === "NO"){ //Disable all VMMC tasks if consent is No
+                    
+                        containerTableCell.setAttribute("class", "tasks-table-cell-grayed");
+
+                }
+
+                if (sessionStorage.programID === "21" && circumcision_consent === "NO"){ //Disable all VMMC tasks if circumcision consent is No
+
+                        containerTableCell.setAttribute("class", "tasks-table-cell-grayed");
+
+                }
+
                 containerTableCell.setAttribute("style", "display: table-cell;");
                 if (tasks[i][0].match(/National Health ID/i)) {
                     containerTableCell.setAttribute("onmousedown", "printNPID();");
                 } else if (tasks[i][0].match(/Filing Number \(Print\)/i)) {
-                    var buildURL = '/apps/' + sessionStorage.applicationName;
-                    buildURL += '/views/filing_number/filing_number_management.html';
-                    buildURL += '?patient_id=' + sessionStorage.patientID;
-                    buildURL += '&print_fn=true';
-                    containerTableCell.setAttribute("onmousedown", "document.location='" + buildURL +"'");
+                    containerTableCell.setAttribute("onmousedown", "printFilingNumber();");
                 } else if (tasks[i][0].match(/Visit Summary/i)) {
                     containerTableCell.setAttribute("onmousedown", "printVisitSummary();");
                 } else if (tasks[i][0].match(/Transfer Out/i)) {
                     containerTableCell.setAttribute("onmousedown", "printTransferOut();");
                 }else if (tasks[i][0].match(/Demographics \(Print\)/i)) {
                     containerTableCell.setAttribute("onmousedown", "printDemographics();");
-                }else if (tasks[i][0].match(/Archive client/i)) {
-                    var buildURL = tasks[i][2] + "?patient_id=" + sessionStorage.patientID;
-                    buildURL += '&archive_client=true'
-                    containerTableCell.setAttribute("onmousedown", "document.location='" + buildURL +"'");
-                }
-                else {
+                } else if (tasks[i][0].match(/Lab Results \(Print\)/i)) {
+                    containerTableCell.setAttribute("onmousedown", "printLabResults();");
+                }else if (tasks[i][0].match(/Patient History \(Print\)/i)) {
+                    containerTableCell.setAttribute("onmousedown", "printPatientHistory();");
+                }else {
                     containerTableCell.setAttribute("onmousedown", "document.location='" + tasks[i][2] + "'");
                 }
 
@@ -521,19 +553,94 @@ function buildDashboardButtons(tasks, container) {
                 tr.appendChild(td);
 
                 containerTableCell.appendChild(infoTable);
-
+                containerTableCell.setAttribute('data-name', tasks[i][0].toUpperCase());
 
                 containerTableRow.appendChild(containerTableCell);
 
                 count++;
                 }
             }
+
+
+            if(sessionStorage.programID == '21') {
+
+            var url = `${apiProtocol}://${apiURL}:${apiPort}/api/v1/encounters?patient_id=${sessionStorage.patientID}&${sessionStorage.programID}&paginate=false`;
+            var headers = {
+              'Authorization': sessionStorage.authorization,
+              'Content-Type': 'application/json'
+            };
+            fetch(url, {
+              'headers': headers
+            }).then(function (response) {
+              response.json().then(function (encounters) {
+                encounters.forEach(function (encounter) {
+                  var type = encounter.type.name;
+                  var taskButton = document.querySelector("[data-name='".concat(type, "']"));
+                  if (!taskButton) return;
+                  taskButton.setAttribute('class', 'tasks-table-cell-grayed');
+                });
+              });
+            });
+
+          }
+
+
         }
     };
     xhttp1.open("GET", use_filling_number_property_url, true);
     xhttp1.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
     xhttp1.setRequestHeader('Content-type', "application/json");
     xhttp1.send();
+
+}
+function checkConsent() {
+    var url = apiProtocol + "://" + apiURL + ":" + apiPort;
+    url += "/api/v1/observations?person_id=" + sessionStorage.patientID + "&concept_id=9420";
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+        var obj = JSON.parse(this.responseText);
+        if (obj.length > 0) {
+          var consent_vc = (obj[0].value_coded);
+          consent = (parseInt(consent_vc) == 1065 ? "YES" : "NO");
+          return(consent);
+        }
+      }
+    };
+    xhttp.open("GET", url, false);
+    xhttp.setRequestHeader(
+      "Authorization",
+      sessionStorage.getItem("authorization")
+    );
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send();
+    // console.log(fff); 
+    // return "hello";
+
+}
+
+function circumcisionConsent() {
+
+    var url = apiProtocol + "://" + apiURL + ":" + apiPort;
+    url += "/api/v1/observations?person_id=" + sessionStorage.patientID + "&concept_id=9644";
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+        var obj = JSON.parse(this.responseText);
+        if (obj.length > 0) {
+          var circumcision_vc = (obj[0].value_coded);
+          circumcision_consent = (parseInt(circumcision_vc) == 1065 ? "YES" : "NO");
+          return(circumcision_consent);
+        }
+      }
+    };
+    xhttp.open("GET", url, false);
+    xhttp.setRequestHeader(
+      "Authorization",
+      sessionStorage.getItem("authorization")
+    );
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send();
 
 }
 
@@ -614,6 +721,8 @@ function redirect(id) {
         window.location.href = '/views/print_location.html';
     }if (id === "enable-portal") {
         window.location.href = '/views/portal.html';
+    }if (id === "view-duplicates") {
+        window.location.href = '/views/search_identifiers.html';
     }
     if (id === "view-sys-settings") {
       var obj = document.createElement("object");
@@ -621,6 +730,10 @@ function redirect(id) {
       obj.setAttribute("type", "text/html");
       obj.setAttribute("style", "width: 97%; height: 430px; text-align: left;");
       dvTable.appendChild(obj);
+    }
+    //if it is a military site
+    if (id === "military-site") {
+        window.location.href = "/views/military_site.html";
     }
     //view-drug-management-settings
     if (id === "view-drug-management-settings") {
@@ -631,6 +744,13 @@ function redirect(id) {
         dvTable.appendChild(obj);
     }
     if (id === "report-1") {
+    }
+    if (id === "registers") {
+        window.location.href = './././apps/HTS/views/encounters/registers.html';
+    }
+    
+    if (id === "userStats") {
+        window.location.href = './././apps/HTS/views/encounters/user_stats.html';
     }
  
     if (id === "cleaner") {
@@ -1006,7 +1126,7 @@ function getPortalLocation(){
 
 function getSavedEncounters() {
 
-    var url = 'http://'+apiURL+':'+apiPort+'/api/v1';
+    var url = sessionStorage.apiProtocol + '://'+apiURL+':'+apiPort+'/api/v1';
     url += '/programs/'+sessionStorage.programID+'/patients/'+sessionStorage.patientID+'/saved_encounters';
     url += '?date='+sessionStorage.sessionDate;
   

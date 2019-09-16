@@ -42,7 +42,22 @@ const Observation = function () {
     })
   }
 
+  /**
+   * Function to look up an observation
+   * 
+   * @param {String} queryString
+   * 
+   * @return {Promise}
+   */
+  function find (queryString = '') {
+    return fetch (`${apiRoot}/observations?${queryString}`, {
+      method: 'GET',
+      headers: { Authorization: sessionStorage.authorization }
+    })
+  }
+
   return {
-    create
+    create,
+    find
   }
 }()

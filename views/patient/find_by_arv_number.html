@@ -125,8 +125,10 @@
                         var patient_identifiers = people[0]["patient_identifiers"];
                         for (key in patient_identifiers){
                             var identifier = patient_identifiers[key]["identifier"];
+                            console.log(identifier);
+
                             var type =  patient_identifiers[key]["type"];
-                            if (type.name.match(/National ID/i)){
+                            if (type.name.match(/National ID|Old Identification/i)){
                                 patient_identifier = identifier;
                                 break;
                             }

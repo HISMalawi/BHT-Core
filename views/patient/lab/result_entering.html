@@ -24,8 +24,8 @@
     <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
     <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
     <script type="text/javascript" src="/assets/js/core.js"></script>
-      <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
-      <script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
+    <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
+    <script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
 
       <link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
 
@@ -123,6 +123,7 @@
     var test_name = "";
     var trackingNumber = "";
 
+    var tt_cancel_destination = "test_without_results.html";
        
     function validateEntry(){
         var button = document.getElementById("nextButton");
@@ -145,12 +146,10 @@
     {
       test_name = JSON.parse(sessionStorage.getItem("select_test_for_result"))[1];
       trackingNumber = JSON.parse(sessionStorage.getItem("select_test_for_result"))[0];
-      console.log(test_name);
       var select = document.getElementById("test_measure");
-         
 
-          var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1";
-          url += '/programs/1/lab_tests/measures?test_name=' + test_name;        
+      var url = sessionStorage.apiProtocol + "://" + sessionStorage.apiURL + ":" + sessionStorage.apiPort + "/api/v1";
+      url += '/programs/1/lab_tests/measures?test_name=' + test_name;        
 
           var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
@@ -160,14 +159,13 @@
                     var select = document.getElementById("test_measure");
                     obs.forEach(element => {                     
                         var option = document.createElement("option");
-                        console.log(element);
                         option.innerHTML = element;
                         option.setAttribute("value",element);
                         select.appendChild(option);
                     });
                 }
                 else{
-                  console.log(this.status);
+                  console.log(this.readyState);
                 }
             };
             xhttp.open("GET", url, false);

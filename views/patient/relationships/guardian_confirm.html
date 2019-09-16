@@ -208,7 +208,7 @@
 
   function ajaxGuardianRequest() {
     console.log(id);
-    var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/' + id;
+    var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients/' + id;
     var req = new XMLHttpRequest();
     req.onreadystatechange = function () {
 
@@ -330,7 +330,7 @@
 
     function build_guardian_options() {
 
-      var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/types/relationships';
+      var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/types/relationships';
       var req = new XMLHttpRequest();
       req.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
@@ -359,8 +359,8 @@
 
     }
 
-    const patient_url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/' + backupPatientID
-    const guardian_url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/' + id;
+    const patient_url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients/' + backupPatientID
+    const guardian_url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients/' + id;
     
     const ajaxUrls = {
       patient: patient_url, 
@@ -436,7 +436,7 @@ function savePatienttypeThenRedirect(obs){
 function enrollPatient(person_id) {
   sessionStorage.patientID = person_id;
   var http = new XMLHttpRequest();
-  var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/patients/'+person_id +"/programs/";
+  var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients/'+person_id +"/programs/";
   var params = JSON.stringify({
     program_id: sessionStorage.programID,
     date_enrolled: moment(sessionStorage.sessionDate).format("YYYY-MM-DD")

@@ -95,7 +95,64 @@
   overflow: auto;
 }
 
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 100; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
 
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%;
+  height: 36%;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+ul {
+  list-style-type: none; /* Remove bullets */
+  padding: 0; /* Remove padding */
+  margin: 0; /* Remove margins */
+}
+
+ul li {
+  border: 1px solid #ddd; /* Add a thin border to each list item */
+  margin-top: -1px; /* Prevent double borders */
+  background-color: #f6f6f6; /* Add a grey background color */
+  padding: 12px; /* Add some padding */
+}
+
+.modal-footer{
+  margin-top: 10px; 
+}
+.active-reason {
+        background-color: rgb(189, 189, 236);
+    }
 </style>
 
 
@@ -110,7 +167,36 @@
           tt_pageStyleClass= "NoControls" helpText="Programs" optional = "true"/>
 
       </form>
+      <div id="myModal" class="modal">
 
+        <!-- Modal content -->
+        <div class="modal-content"> 
+          <!-- <div class="modal-content" style="margin-left: 28%; margin-right:10%; width: 70%; height: 20%;"> -->
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Are you sure you want to void this state?</h4>
+                <h5 class="modal-title">Please specify reason for voiding</h5>
+            </div>
+            <div class="modal-body">
+                    <ul class="list-group">
+                        <li class="list-group-item reason" onclick="selectReason(this)">Mistake / Wrong Entry</li>
+                        <li class="list-group-item reason" onclick="selectReason(this)">System Error</li>
+                        <li class="list-group-item reason" onclick="selectReason(this)">Duplicate Entry</li>
+                    </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" style="float:left" class="btn btn-default btn-lg" id="modal-btn-si" disabled>yes</button>
+                <button type="button" style="float:right" onclick="closeModal();" class="btn btn-primary btn-lg" id="modal-btn-no">No</button>
+            </div>
+        <!-- </div> -->
+        </div>
+      
+      </div>
+      <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" style="top:25%; "
+      aria-hidden="true" id="mi-modal">
+     <div class="modal-dialog modal-lg">
+         
+     </div>
+ </div>
    </div>
  </div>
 </body>

@@ -4,7 +4,7 @@
 <script type="text/javascript" src="/assets/js/httpUtils.js"></script>
 <script>
   var useFilingNumbers = false;
-  var API_PATH = 'http://' + sessionStorage.getItem('apiURL') + ':' + sessionStorage.getItem('apiPort') + '/api/v1';
+  var API_PATH = sessionStorage.apiProtocol + '://' + sessionStorage.getItem('apiURL') + ':' + sessionStorage.getItem('apiPort') + '/api/v1';
   var FILING_NUMBERS_ROUTE = '/apps/ART/views/filing_number/filing_number_management.html';
   var PERSON_ID = fetchArgumentFromUrlString('person_id');
   var PROGRAM_ID = sessionStorage.getItem('programID');
@@ -32,10 +32,40 @@
     sessionStorage.showWeightChart = 'true';
 
     if (useFilingNumbers && (Number(PROGRAM_ID) === HIV_PROGRAM_ID)) {
-      document.location = FILING_NUMBERS_ROUTE + '?patient_id=' + PERSON_ID;
+      checkTypeOfPatient(PERSON_ID);
     } else {
       nextEncounter(PERSON_ID, PROGRAM_ID, true);
     }
+  }
+
+  function checkTypeOfPatient(patient_id) {
+    var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1";
+    url += '/observations?person_id=' + patient_id;
+    url += '&concept_id=3289';
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 ) {
+        if (this.status == 200) {
+          var obj = JSON.parse(this.responseText);
+          var type_of_pat = 'New patient';
+          for(var i = 0 ; i < obj.length; i++){
+            type_of_pat = (parseInt(obj[i].value_coded) == 9684 ? 'External consultation' : 'New patient');
+          }
+          
+          if(type_of_pat == 'New patient'){
+            document.location = FILING_NUMBERS_ROUTE + '?patient_id=' + patient_id;
+          }else{
+            nextEncounter(PERSON_ID, PROGRAM_ID, true);
+          }
+
+        }
+      }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    xhttp.setRequestHeader('Content-type', "application/json");
+    xhttp.send();
   }
 
   function filingNumberIsActivated() {

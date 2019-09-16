@@ -26,7 +26,7 @@ function addBarcode() {
   function scannedBarcode(barcode) {
     barcode = barcode.slice(0, barcode.length);
     
-    var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/locations/' + barcode;
+    var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/locations/' + barcode;
     var req = new XMLHttpRequest();
     req.onreadystatechange = function () {
 

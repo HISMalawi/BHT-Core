@@ -1,0 +1,52 @@
+
+<script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
+<!-- <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/standard.js" defer="true"></script> -->
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+
+
+<script type="text/javascript" src="/assets/js/post_parameters.js"></script>
+<script type="text/javascript" src="/assets/js/client-scan-barcode.js"></script>
+<script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
+<script type="text/javascript" src="/assets/js/generic_ajaxrequest.js"></script>
+<script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
+
+<link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
+<script>
+tt_cancel_destination = "/";
+
+function changeNextButton(){
+    __$('nextButton').onmousedown = function(){
+        value = __$('touchscreenInput' + tstCurrentPage).getAttribute("tstvalue");
+        var id_name = __$('touchscreenInput' + tstCurrentPage).value;
+        console.log(id_name);
+        if (value != null) {
+         window.location = "/views/identifier_duplicates.html?identifier_type=" + value + "&name=" + id_name; 
+        }
+    }
+}
+</script>
+<style>
+  input {
+    display: none;
+  }
+</style>
+<body id="mateme">
+  <div id="container">
+    <div id="content">
+
+
+      <form onsubmit="submitEncounter();">
+                    <select objectType="patient_identifiers" ajaxURL="/types/patient_identifiers"
+                    allowFreeText="true"
+                    tt_pageStyleClass="NoKeyboard NoInput small"
+                    tt_onLoad="changeNextButton();"
+                    field_type="alpha"
+                    helpText="Please select identifier type"
+                    id="facility_name"
+                    name="facility_name"></select>
+      </form>
+
+   </div>
+ </div>
+</body>
+

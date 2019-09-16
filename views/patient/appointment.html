@@ -7,6 +7,7 @@
 <script type="text/javascript" src="/assets/js/post_parameters.js"></script>
 <script type="text/javascript" src="/assets/js/generic_ajaxrequest.js"></script>
 <script type="text/javascript" src="/assets/js/moment.js"></script>
+<script type="text/javascript" src="/assets/js/httpUtils.js"></script>
 <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
 <script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
 
@@ -15,6 +16,11 @@
 
 <script type="text/javascript" src="/assets/js/post_parameters.js"></script>
 <script type="text/javascript" src="/apps/ANC/assets/js/common.js"></script>
+<link rel="stylesheet" href="/assets/css/provider.css" type="text/css">
+<script type="text/javascript" src="/assets/js/provider.js  "></script>
+<script type="text/javascript" src="/assets/js/Observation.js"></script>
+<script type="text/javascript" src="/assets/js/Program.js"></script>
+<script type="text/javascript" src="/assets/js/Concept.js"></script>
 
 <style>
 #system-selected-date {
@@ -148,6 +154,11 @@
 <script type="text/javascript">
   var patient_id = sessionStorage.patientID;
   var tt_cancel_destination = "/views/patient_dashboard.html?patient_id=" + patient_id;
+
+  var waitingForDelivery = false;
+
+  var totalANCVisits = 0;
+
 </script>
 
 
@@ -295,6 +306,7 @@ function monthController() {
 }
 
 var currentSetDate;
+let currentSetDateTb;
 
 function buildCalendar() {
   var frame = document.getElementById("inputFrame" + tstCurrentPage);
@@ -322,7 +334,7 @@ function buildCalendar() {
 
   buildControls();
 
-  if (parseInt(programID) !== 12){
+  if ((parseInt(programID) !== 12) || (parseInt(programID !== 21))){
 
     systemDate = document.getElementById("medication-runout-date");
     systemDate.innerHTML = medication_runout_date;
@@ -350,7 +362,7 @@ function buildDisplayArea() {
     ["&nbsp;","system-selected-date"]
   ];
 
-  if (parseInt(programID) == 12){
+  if ((parseInt(programID) == 12) || (parseInt(programID) == 21)){
     tds.shift();
   }
 
@@ -495,9 +507,18 @@ function setAppointmentDate() {
     patient_id: sessionStorage.patientID,
     encounter_datetime: encounter_datetime
   }
-
   submitParameters(encounter, "/encounters", "postAppointmentObs");
-
+  /*
+    Save TB Appointment Encounter for TB-ART patient
+    Tip: for TB-ART patient saves same instances of 
+    Appointment for each program: TB and ART
+  */
+  tbPatientArtTreatmentNeed().then(treatTbPatientForArt => {
+    if(treatTbPatientForArt){
+      Program.switchProgram(2)
+      submitParameters(encounter, "/encounters", "postAppointmentObs");
+    }
+  })
 }
 
 function postAppointmentObs(encounter) {
@@ -522,16 +543,33 @@ function postAppointmentObs(encounter) {
   sysDate = year + "-" + month + "-" + day;
 
   if (parseInt(programID) == 12){
+
+    var value = (appointment)
+    var obs = {
+      encounter_id: encounter["encounter_id"],
+      observations: []
+    }
+
+    if (waitingForDelivery == true){
+      obs.observations.push({ concept_id: 5096, value_coded: 1107 })
+    }else{
+      obs.observations.push({ concept_id: 5096, value_datetime: appointment })
+    }
+
+    submitParameters(obs, "/observations", "red"); 
+
+  }else if (parseInt(programID) == 21){
+
+    var value = (appointment)
     var obs = {
       encounter_id: encounter["encounter_id"],
       observations: [
-        { 
-          concept_id: 5096, value_datetime: appointment
-        }
-      ]
-    }; 
-    
-    submitParameters(obs, "/observations", "red"); 
+      { 
+        concept_id: 5096, value_datetime: appointment 
+      }
+      ]};
+
+    submitParameters(obs, "/observations", "nextPage"); 
 
   }else{
     
@@ -717,7 +755,8 @@ function showConfirm(message, returnFunction) {
       <form>
 
         <input type="text" name="summary"
-          tt_onLoad="__$('keyboard').style.display = 'none'; getSuggestedAppointmentDate();changeNextButton();" 
+          tt_onLoad="checkIfInBDMode();__$('keyboard').style.display = 'none'; getSuggestedAppointmentDate();changeNextButton();
+            setTimeout(function(){displayDeliveryButton();}, 2000)" 
           tt_pageStyleClass= "NoControls" helpText="Appointment booking" optional = "true"/>
 
 
@@ -732,8 +771,11 @@ function showConfirm(message, returnFunction) {
 <script>
 
 var suggestedYear;
+let tBsuggestedYear;
 var suggestedMonth;
+let tBsuggestedMonth;
 var suggestedDay;
+let tBsuggestedDay;
 
 var medication_runout_date;
 
@@ -741,11 +783,83 @@ function addWeeks(date, n) {
   return new Date(date.setDate(date.getDate() + (n * 7))); 
 }
 
+let giveTbPatientArt = false
+
+function buildAntiretroviralTreatmentNeedQueryString() {
+    const TODAY = moment(sessionStorage.sessionDate).format('YYYY-MM-DD')
+    const PAGE_SIZE = 1
+    const CONCEPT_ID = Concept.getConceptIdByName('ANTIRETROVIRAL_TREATMENT_NEED')
+    const YES_CONCEPT = Concept.getConceptIdByName('YES_ANSWER')
+
+    return `person_id=${sessionStorage.patientID}&date=${TODAY}&page_size=${PAGE_SIZE}&concept_id=${CONCEPT_ID}&value_coded =${YES_CONCEPT}`
+}
+
+function tbPatientArtTreatmentNeed() {
+  return Observation.find(buildAntiretroviralTreatmentNeedQueryString())
+  .then(payload => {
+      if (payload.ok) {
+          return payload.json()
+      } else {
+          logErrorAndNotify(payload.statusText)
+      }
+  }).then(data => {
+      var YES = Concept.getConceptIdByName('YES_ANSWER')
+      var answerConcept = data.map(data=> data.value_coded)
+      if(data.length > 0 && answerConcept[0] == YES){
+        return true
+      }
+  })
+  .catch(error => logErrorAndNotify(error))
+}
+ /*
+    Assign appointment to most recent medication run out date
+    by compare suggested ART and TB appointment dates
+  */
+function compareSuggestedTbArtAppointmentDates(){
+  if(new Date(medication_runout_date) > new Date(tb_medication_runout_date)){
+    medication_runout_date = tb_medication_runout_date
+    suggestedYear = tBsuggestedYear
+    suggestedMonth = tBsuggestedMonth
+    suggestedDay = tBsuggestedDay
+    currentSetDate = currentSetDateTb
+  }
+  buildCalendar();
+}
+
+function getSuggestedAppointmentDateForTb() {
+  var patient_id = sessionStorage.patientID;
+  var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/programs/2/patients/";
+  url += patient_id + "/next_appointment_date?date=" + sessionStorage.sessionDate;
+  
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+      var obj = JSON.parse(this.responseText);
+      tBsuggestedYear  = parseInt(obj.appointment_date.split("-")[0]);
+      tBsuggestedMonth = parseInt(obj.appointment_date.split("-")[1]);
+      tBsuggestedDay   = parseInt(obj.appointment_date.split("-")[2]);
+      try {
+        tb_medication_runout_date = moment(obj.drugs_run_out_date).format('DD/MMM/YYYY');
+      }catch(e){
+      }
+
+      currentSetDateTb = new Date(tBsuggestedYear, (tBsuggestedMonth - 1), 1);
+
+      compareSuggestedTbArtAppointmentDates();
+      
+    }
+  };
+  xhttp.open("GET", url, true);
+  xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+  xhttp.setRequestHeader('Content-type', "application/json");
+  xhttp.send();
+}
+
 function getSuggestedAppointmentDate() {
   var patient_id = sessionStorage.patientID;
   var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/programs/"+ sessionStorage.programID +"/patients/";
   url += patient_id + "/next_appointment_date?date=" + sessionStorage.sessionDate;
-
+  
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
@@ -760,9 +874,9 @@ function getSuggestedAppointmentDate() {
         suggestedMonth = parseInt(obj.appointment_date.split("-")[1]);
         suggestedDay   = parseInt(obj.appointment_date.split("-")[2]);
       }else{
-        suggestedYear  = parseInt(obj.appointment_date.split("-")[0]);
-        suggestedMonth = parseInt(obj.appointment_date.split("-")[1]);
-        suggestedDay   = parseInt(obj.appointment_date.split("-")[2]);
+          suggestedYear  = parseInt(obj.appointment_date.split("-")[0]);
+          suggestedMonth = parseInt(obj.appointment_date.split("-")[1]);
+          suggestedDay   = parseInt(obj.appointment_date.split("-")[2]);
       }
       try {
         medication_runout_date = moment(obj.drugs_run_out_date).format('DD/MMM/YYYY');
@@ -770,7 +884,21 @@ function getSuggestedAppointmentDate() {
       }
 
       currentSetDate = new Date(suggestedYear, (suggestedMonth - 1), 1);
-      buildCalendar();
+
+      /*
+        This has been added align/sync ART/TB appointments 
+        to earliest suggested date - hence earliest date
+        will be picked for TB/ART patient as the patient's next appointment
+        date
+      */
+      tbPatientArtTreatmentNeed().then(treatTbPatientForArt => {
+        if(treatTbPatientForArt){
+          getSuggestedAppointmentDateForTb()
+        }else{
+          buildCalendar();
+        }
+      })
+      
     }
   };
   xhttp.open("GET", url, true);
@@ -843,6 +971,86 @@ function getHolidays() {
 }
 
 getHolidays();
+getPatientVisits();
+
+function displayDeliveryButton(){
+  if (sessionStorage.programID == "12" && parseInt(totalANCVisits) >= 3){
+    deliveryButton = document.getElementById("backButton");
+    deliveryButton.innerHTML = "<span>Waiting for Delivery</span>";
+    deliveryButton.setAttribute("onmousedown","updateState()");
+    deliveryButton.style.display = "block";
+  }
+}
+
+function updateState() {
+  var apiPath = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/programs/'; 
+  apiPath += sessionStorage.programID + '/patients/' + sessionStorage.patientID + '/states';
+
+  POST (
+    {
+      url: apiPath,
+      async: true,
+      headers: {
+        'Authorization': sessionStorage.authorization,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    },
+    {
+      state: 115,
+      date: sessionStorage.sessionDate
+    },
+    function (data) {
+      waitingForDelivery = true;
+      setAppointmentDate();
+    },
+    function (error) {
+      console.error(error)
+      showMessage('Something went wrong!');
+      return;
+    }
+  )
+}
+
+/** Function getting patient's total visits */
+function getPatientVisits() {
+
+  var url = 'http://' + apiURL + ':' + apiPort 
+
+  url += '/api/v1/programs/'+programID+'/patients/' + patientID;
+
+  var req = new XMLHttpRequest();
+
+  req.onreadystatechange = function () {
+
+    if (this.readyState == 4) {
+      if (this.status == 200) {
+
+        var results = JSON.parse(this.responseText);
+
+        totalANCVisits = results.anc_visits;
+    
+      }
+  
+    }
+
+  };
+
+  try {
+  
+    req.open('GET', url, true);
+  
+    req.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
+  
+    req.send(null);
+
+  } catch (e) {
+
+    console.log(e);
+
+  }
+
+}
+
 </script>
 
 

@@ -41,6 +41,20 @@ const Patient = function () {
   }
 
   /**
+   * Function to ask the EMR-API for a patient
+   * 
+   * @param {Number} params
+   * 
+   * @return {Object}
+   */
+  function retrieve (patientId) {
+    return fetch(`${apiRoot}/patients/${patientId}`, {
+      method: 'GET',
+      headers: { 'Authorization': sessionStorage.authorization }
+    })
+  }
+
+  /**
    * Function to ask the EMR-API to create a patient
    * 
    * @param {object} params
@@ -55,8 +69,57 @@ const Patient = function () {
     })
   }
 
+  /**
+   * Ask EMR-API to create patient identifier
+   * 
+   * @param {Number} patientId
+   * @param {String} identifier
+   * @param {Number} identifierType
+   * @return {Promise}
+   */
+  function createIdentifier (patientId, identifier, identifierType) {
+    return fetch(`${apiRoot}/patient_identifiers`, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({ patient_id: patientId, identifier: identifier, identifier_type: identifierType })
+    })
+  }
+
+  /**
+   * Ask the EMR-API if the patient has any lab orders in recent times
+   * 
+   * @param {Number} patientId
+   * @param {Number} programId
+   * @param {String} referenceDate
+   * @return {Promise}
+   */
+  function recentLabOrders (patientId, programId, referenceDate) {
+    return fetch(`${apiRoot}/patients/${patientId}/recent_lab_orders?program_id=${programId}&reference_date=${referenceDate}`, {
+      method: 'GET',
+      headers: { 'Authorization': sessionStorage.authorization }
+    })
+  }
+
+  /**
+   * Ask the EMR-API if the patient is due a lab order
+   * 
+   * @param {Number} patientId
+   * @param {Number} programId
+   * @return {Promise}
+   */
+  function isDueLabOrder (patientId, programId) {
+    return fetch(`${apiRoot}/programs/${programId}/patients/${patientId}/is_due_lab_order`, {
+      method: 'GET',
+      headers: { 'Authorization': sessionStorage.authorization }
+    })
+  }
+
   return {
     get,
-    create
+    retrieve,
+    create,
+    createIdentifier,
+    recentLabOrders,
+    isDueLabOrder
   }
 }()

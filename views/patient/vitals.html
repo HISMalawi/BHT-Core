@@ -17,6 +17,8 @@
 <script type="text/javascript" src="/assets/js/demographics.js"></script>
 <script type="text/javascript" src="/apps/ANC/assets/js/common.js"></script>
 <script type="text/javascript" src="/apps/ANC/assets/js/vitals.js"></script>
+<link rel="stylesheet" href="/assets/css/provider.css" type="text/css">
+<script type="text/javascript" src="/assets/js/provider.js  "></script>
 
 <style>
 
@@ -275,13 +277,11 @@
 <script>
 
     var show_bp_only = false;
-
     try {
       var url = window.location.href;
       url = new URL(url);
       var bp_only = url.searchParams.get("bp_only");
       show_bp_only = (bp_only == 'true' ? true : false);
-      console.log(show_bp_only)
     }catch(z) {
       show_bp_only = false;
     }
@@ -1086,6 +1086,7 @@
         jQuery("#innerPop").show()
         jQuery("#inputFrame" + tstCurrentPage).show();
         jQuery(".loader").hide();
+
     }
 
 </script>
@@ -1097,7 +1098,7 @@
 
         <form onsubmit="submitEncounter();">
             <input type="text" name="vitals"
-                   tt_onLoad="initializeVariables();"
+                   tt_onLoad="checkIfInBDMode();initializeVariables();"
                    tt_onUnLoad="resetPage();"
                    tt_pageStyleClass="NoControls" optional="true"/>
 

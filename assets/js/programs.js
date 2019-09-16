@@ -226,27 +226,33 @@ function createVoidLink (options = {}) {
       {
         event: 'click',
         handler: (event) => {
-          event.preventDefault()
-          State._void({
-            stateId: options.stateId,
-            programId: options.programId,
-            patientId: options.patientId,
-            success: (response) => {
-              if (response.status === 204) {
-                showMessage('State successfully voided.')
-                setTimeout(() => {
-                  location.reload()
-                }, 1000)
-              } else {
-                console.error(response)
+          var modal = document.getElementById("myModal");
+          modal.style.display = "block";
+          var btn = document.getElementById("modal-btn-si");
+          btn.onclick = function() {
+            event.preventDefault()
+            State._void({
+              stateId: options.stateId,
+              programId: options.programId,
+              patientId: options.patientId,
+              success: (response) => {
+                if (response.status === 204) {
+                  showMessage('State successfully voided.')
+                  setTimeout(() => {
+                    location.reload()
+                  }, 1000)
+                } else {
+                  console.error(response)
+                  showMessage('There was a problem voiding the state.')
+                }
+              },
+              fail: (error) => {
+                console.error(error)
                 showMessage('There was a problem voiding the state.')
               }
-            },
-            fail: (error) => {
-              console.error(error)
-              showMessage('There was a problem voiding the state.')
-            }
-          })
+            })
+          }
+          
         }
       }
     ],
@@ -313,3 +319,22 @@ function fetchPrograms() {
   xhttp.send();
 }
 
+
+function selectReason(element) {
+  var items = document.getElementsByClassName("list-group-item reason active-reason");
+  for (let index = 0; index < items.length; index++) {
+      items[index].className = "list-group-item reason";
+  }
+  if(element != undefined) {
+  document.getElementById("modal-btn-si").removeAttribute("disabled");
+  element.className = "list-group-item reason active-reason"
+  void_reason = element.innerHTML;
+  }else {
+      document.getElementById("modal-btn-si").setAttribute('disabled', null);
+  }
+}
+
+function closeModal() {
+  var modal = document.getElementById("myModal");
+  modal.style.display = "none";
+}

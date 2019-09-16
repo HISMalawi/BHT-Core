@@ -89,7 +89,7 @@
                 "<16.0": "Severely Underweight",
                 "16.0-16.9": "Moderately Underweight",
                 "17.0-18.4": "Mildly Underweight",
-                "18.5-24.4": "Normal",
+                "18.5-24.9": "Normal",
                 "25.0-29.9": "overweight",
                 ">=30.0": "Obese"
             }
@@ -184,7 +184,7 @@
                 "<16.0": "Severely Underweight",
                 "16.0-16.9": "Moderately Underweight",
                 "17.0-18.4": "Mildly Underweight",
-                "18.5-24.4": "Normal",
+                "18.5-24.9": "Normal",
                 "25.0-29.9": "overweight",
                 ">=30.0": "Obese"
             }
