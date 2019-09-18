@@ -1329,6 +1329,8 @@ var global_property = GlobalProperty({
   </button>
   <button class="blue" onmousedown="getFilingNumberType()" 
     style="float: right;" id="continue">Continue</button>
+  <button class="green" style="display: none;" onmousedown="newPregnancy()" 
+    style="float: right;" id="new-pregnancy">New Prenancy</button>
 </div>
 
 <!-- Modal -->
@@ -1814,7 +1816,70 @@ function closeFilingNumPopUP() {
   nextEncounter(sessionStorage.patientID, sessionStorage.programID);
 }
 
+function showNewPregnancyButton() {
+  if(sessionStorage.programID == "12"){
+    var url = apiProtocol + "://" + apiURL + ":" + apiPort;
+    url += "/api/v1/patients/" + sessionStorage.patientID;
+    url += "/visits?program_id=" + sessionStorage.programID;
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+        var obj = JSON.parse(this.responseText);
+        var last_visit = obj[0];
+        if (last_visit !== ""){
+          date_diff = moment(sessionStorage.sessionDate).diff(moment(last_visit), "months", true);
+
+          if (parseInt(date_diff) > 2){
+            document.getElementById('new-pregnancy').style.display = "inline";
+            document.getElementById('new-pregnancy').style.float = "right";
+          }
+        }
+      }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.setRequestHeader("Authorization",sessionStorage.getItem("authorization"));
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send();
+  } 
+  
+}
+
+function newPregnancy(){
+  updateState();
+  console.log("New pregnancy in offing");
+}
+
+function updateState() {
+  var apiPath = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/programs/'; 
+  apiPath += sessionStorage.programID + '/patients/' + sessionStorage.patientID + '/states';
+
+  POST (
+    {
+      url: apiPath,
+      async: true,
+      headers: {
+        'Authorization': sessionStorage.authorization,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    },
+    {
+      state: 117,
+      date: sessionStorage.sessionDate
+    },
+    function (data) {
+      finish(sessionStorage.patientID)
+    },
+    function (error) {
+      console.error(error)
+      showMessage('Something went wrong!');
+      return;
+    }
+  )
+}
+
 userFilingNumbers();
 filingNumberPrefix();
+showNewPregnancyButton();
 </script>
 <script src="/assets/js/show.lab.orders.js"></script>
