@@ -431,7 +431,8 @@ var global_property = GlobalProperty({
   function buildInfoBoxes() {
     var infoBox = document.getElementsByClassName("info-table")[0];
     
-    if(sessionStorage.programID == '1' || sessionStorage.programID == '12' || sessionStorage.programID == '21') {
+    if(sessionStorage.programID == '1' || sessionStorage.programID == '12'
+     || sessionStorage.programID == '21' || sessionStorage.programID == "23") {
       var cells = [
         "Patient identifiers", "Alert(s)",
         "labs", "Program info", 
@@ -637,7 +638,7 @@ var global_property = GlobalProperty({
     sessionStorage.patientID = patient_id;
     
     buildIdentifiers(patient["patient_identifiers"], patient_id);
-    if(sessionStorage.programID == '1') {
+    if(sessionStorage.programID == '1' || sessionStorage.programID == "23") {
       showOrders();
       buildStates(obj, patient_id);
       var orders = obj_2;

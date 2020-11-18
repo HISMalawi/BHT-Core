@@ -189,6 +189,24 @@
             <h4 class="headers"> Next Task: <span id="nextEncounter"></span> | </h4>
             <h4 class="headers todays-date"> Set Date: <span id="selectedDate"></span></h4>
         </div>
+
+
+
+
+
+
+        <span style="display: none;" id="lab-ordering-section">
+            <div class="col-sm-12 col-lg-12 col-md-6 col-xs-12"
+                 style="margin-left: 2%;border: solid 0px; width: 99%; margin-left: 3%;">
+                 ........
+            </div>
+        </span>
+
+
+
+        <span id="all-programs-section" style="display: none;">
+
+
         <div class="row">
             <div class="col-sm-6 col-lg-6 col-md-6 col-xs-6"
                  style="margin-left: 2%;border: solid 0px; width: 47%; margin-left: 3%;">
@@ -248,7 +266,15 @@
                     </div>
                 </div>
             </div>
+
         </div>
+
+
+
+        </span>
+
+
+
     </div>
     <!-- /visit details div-->
 
@@ -1366,6 +1392,13 @@
     generateTasks();
     buildAlerts(sessionStorage.patientID);
     // loadAlerts();
+
+
+    if(sessionStorage.programID == "23"){
+        document.getElementById("lab-ordering-section").style="display: inline;";
+    }else{
+        document.getElementById("all-programs-section").style="display: inline;";
+    }
 </script>
 
 <script src="/assets/js/show.lab.orders.js"></script> 
