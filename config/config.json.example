@@ -57,6 +57,15 @@
 			"applicationIcon": "/assets/images/vmmclogo.png",
 			"applicationDescription": "VMMC Program",
 			"comment": "these are examples, add another application with this template at the end of these curly braces by adding a comma and copying this template"
+		},
+		{
+			"applicationName": "LOS",
+	      	"programID": "23",
+			"applicationFolder": "LOS",
+			"url": "",
+			"applicationIcon": "/assets/images/microscope.png",
+			"applicationDescription": "Lab Order System",
+			"comment": "these are examples, add another application with this template at the end of these curly braces by adding a comma and copying this template"
 		}
 
 		
