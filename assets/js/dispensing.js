@@ -676,6 +676,7 @@ function getPrescriptions() {
     var url = apiProtocol + "://" + apiURL + ":" + apiPort;
     url += "/api/v1/drug_orders?patient_id=" + sessionStorage.patientID;
     url += "&date=" + sessionStorage.sessionDate;
+    url += "&program_id=" + sessionStorage.programID;
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
