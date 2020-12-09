@@ -496,7 +496,10 @@ function submiFastTracktDispensationEncounter() {
     submitParameters(encounter, "/encounters", "postFastTrackObs");
 }
 function cTable(order_id) {
-
+    if(!dispen[order_id]) {
+        dispen[order_id] = [];
+    }
+    let packSize = 30;
     beautifyPop();
     var modalDiv = document.getElementById('prescription-modal-content');
     let table = document.createElement("table");
@@ -568,25 +571,25 @@ function cTable(order_id) {
     tabsNeededTD.setAttribute('class', 'dispensing-tds');
     medicationRow.appendChild(tabsNeededTD);
     td = document.createElement('td');
-    td.innerHTML = 0;
+    td.innerHTML = packSize;
     td.setAttribute('colspan', '1');
     td.setAttribute('class', 'dispensing-tds');
     medicationRow.appendChild(td);
-    td = document.createElement('td');
-    td.innerHTML = 0;
-    td.setAttribute('colspan', '2');
-    td.setAttribute('class', 'dispensing-tds');
-    medicationRow.appendChild(td);    
-    td = document.createElement('td');
-    td.innerHTML = 0;
-    td.setAttribute('colspan', '1');
-    td.setAttribute('class', 'dispensing-tds');
-    medicationRow.appendChild(td);    
-    td = document.createElement('td');
-    td.innerHTML = 0;
-    td.setAttribute('colspan', '2');
-    td.setAttribute('class', 'dispensing-tds');
-    medicationRow.appendChild(td);
+    packsTD = document.createElement('td');
+    packsTD.innerHTML = 0;
+    packsTD.setAttribute('colspan', '2');
+    packsTD.setAttribute('class', 'dispensing-tds');
+    medicationRow.appendChild(packsTD);    
+    totalTabsTD = document.createElement('td');
+    totalTabsTD.innerHTML = 0;
+    totalTabsTD.setAttribute('colspan', '1');
+    totalTabsTD.setAttribute('class', 'dispensing-tds');
+    medicationRow.appendChild(totalTabsTD);    
+    totalPacksTD = document.createElement('td');
+    totalPacksTD.innerHTML = 0;
+    totalPacksTD.setAttribute('colspan', '2');
+    totalPacksTD.setAttribute('class', 'dispensing-tds');
+    medicationRow.appendChild(totalPacksTD);
     
     td = document.createElement('td');
     td.setAttribute('colspan', '1');
@@ -597,7 +600,13 @@ function cTable(order_id) {
     btn.style.width = "25px";
     btn.style.height = "40%%";
     // btn.setAttribute("onmousedown", "voidDrugDispensations('" + order_id + "');");
-    
+    btn.onclick = function() {
+        totalPacksTD.innerHTML = parseInt(totalPacksTD.innerText) + 1;
+        totalTabsTD.innerHTML = parseInt(totalPacksTD.innerText) * packSize;
+        console.log('up');
+        dispen[order_id].push(packSize);
+        
+    }
     span.appendChild(btn);
     let br = document.createElement('br');
     td.appendChild(span);
@@ -608,6 +617,15 @@ function cTable(order_id) {
     btn.style.width = "25px";
     btn.style.height = "40%%";
     // btn.setAttribute("onmousedown", "voidDrugDispensations('" + order_id + "');");
+    btn.onclick = function() {
+        if(parseInt(totalPacksTD.innerText) > 0) {
+            totalPacksTD.innerHTML = parseInt(totalPacksTD.innerText) - 1;
+            totalTabsTD.innerHTML = parseInt(totalPacksTD.innerText) * packSize;
+            console.log('down');
+            dispen[order_id].splice(-1, 1);
+        }
+        
+    }
     span.appendChild(btn);
     td.appendChild(span);
     medicationRow.appendChild(td);
@@ -617,20 +635,35 @@ function cTable(order_id) {
     // return span.innerHTML;
 
     modalDiv.appendChild(table);
+    var dispenseButton = document.createElement('button');
+    dispenseButton.setAttribute('class', 'dispense-btn');
+    dispenseButton.style.textAlign = "center";
+    dispenseButton.style.paddingTop = "20px";
+    dispenseButton.style.backgroundColor = "green";
+    dispenseButton.onclick = function() {
+        if(dispen[order_id].length > 0) {
+            manualDispensation(order_id);
+            document.getElementById("prescription-modal").style = "display: none;";
+        }
+    }
+    
+    modalDiv.appendChild(dispenseButton);
     var row = document.getElementById(order_id);
     var cells = row.getElementsByTagName("td");
 
     for (var j = 0; j < cells.length; j++) {
         if (j == 1) {
-            medicationTD.innerHTML = cells[j].innerHTML;
+            medicationTD.innerHTML = cells[j].innerText;
         } else if (j == 2) {
             if(cells.length == 6){
-              tabsNeededTD.innerHTML = cells[(j + 1)].innerHTML;
+                packsTD.innerHTML = parseInt(parseInt(cells[j].innerText)/ 30);
+                tabsNeededTD.innerHTML = cells[(j + 1)].innerText;
             }else{
-              tabsNeededTD.innerHTML = cells[j].innerHTML;
+              tabsNeededTD.innerHTML = cells[j].innerText;
             }
         } else if (j == 3) {
             if(cells.length != 6){
+
             //   document.getElementById("amount-dispensed-td").innerHTML = cells[j].innerHTML;
               totalDispensed = (cells[j].innerHTML).replace(/<[^>]*>/g, "");
             }else{
@@ -639,7 +672,7 @@ function cTable(order_id) {
             }
         }
     }
-   
+    
     document.getElementById('prescription-modal').style = "display: block;";
 }
 
