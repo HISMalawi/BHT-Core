@@ -669,8 +669,14 @@ function cTable(order_id) {
         }
     }
     modalDiv.appendChild(table);
+// var span = document.createElement("span");
+//     var btn = document.createElement("button");
+//     btn.setAttribute("class", "dispense-button btn btn-primary");
+//     btn.setAttribute("onmousedown", "displayKeyPad('" + order_id + "');");
+//     btn.innerHTML = "Dispense";
+//     span.appendChild(btn);
     var dispenseButton = document.createElement('button');
-    dispenseButton.setAttribute('class', 'dispense-btn');
+    dispenseButton.setAttribute('class', 'dispense-button btn btn-primary');
     dispenseButton.style.textAlign = "center";
     dispenseButton.innerText = "Dispense";
     dispenseButton.style.background = 'green';
@@ -683,7 +689,7 @@ function cTable(order_id) {
     
     modalDiv.appendChild(dispenseButton);
     var closeButton = document.createElement('button');
-    closeButton.setAttribute('class', 'dispense-btn');
+    closeButton.setAttribute('class', ' btn btn-primary');
     closeButton.style.textAlign = "center";
     closeButton.innerText = "Close";
     closeButton.style.background = 'red';
