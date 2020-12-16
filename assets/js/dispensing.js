@@ -588,12 +588,12 @@ function cTable(order_id) {
         packsTD.setAttribute('colspan', '2');
         packsTD.setAttribute('class', 'dispensing-tds');
         medicationRow.appendChild(packsTD);    
-        var totalTabsTD = document.createElement('td');
+        let totalTabsTD = document.createElement('td');
         totalTabsTD.innerHTML = 0;
         totalTabsTD.setAttribute('colspan', '1');
         totalTabsTD.setAttribute('class', 'dispensing-tds');
         medicationRow.appendChild(totalTabsTD);    
-        var totalPacksTD = document.createElement('td');
+        let totalPacksTD = document.createElement('td');
         totalPacksTD.innerHTML = 0;
         totalPacksTD.setAttribute('colspan', '2');
         totalPacksTD.setAttribute('class', 'dispensing-tds');
@@ -601,12 +601,12 @@ function cTable(order_id) {
         
         td = document.createElement('td');
         td.setAttribute('colspan', '1');
+        td.setAttribute('style', 'text-align: center;');
         // td.setAttribute('class', 'dispensing-tds');
         var span = document.createElement("span");
         var btn = document.createElement("img");
         btn.setAttribute("src","/assets/images/up.png");
-        btn.style.width = "25px";
-        btn.style.height = "40%%";
+        btn.setAttribute("style", "width: 30%;");
         // btn.setAttribute("onmousedown", "voidDrugDispensations('" + order_id + "');");
         btn.onclick = function() {
             totalPacksTD.innerHTML = parseInt(totalPacksTD.innerText) + 1;
@@ -622,8 +622,7 @@ function cTable(order_id) {
         btn = document.createElement("img");
         btn.setAttribute("src","/assets/images/down.png");
         btn.style.marginTop = "10px";
-        btn.style.width = "25px";
-        btn.style.height = "40%%";
+        btn.setAttribute("style", "width: 30%;");
         // btn.setAttribute("onmousedown", "voidDrugDispensations('" + order_id + "');");
         btn.onclick = function() {
             if(parseInt(totalPacksTD.innerText) > 0) {
@@ -675,31 +674,34 @@ function cTable(order_id) {
 //     btn.setAttribute("onmousedown", "displayKeyPad('" + order_id + "');");
 //     btn.innerHTML = "Dispense";
 //     span.appendChild(btn);
+
+    let buttonContainer = document.createElement("div");
+    buttonContainer.setAttribute("id","button-container");
+    modalDiv.appendChild(buttonContainer);
+
     var dispenseButton = document.createElement('button');
-    dispenseButton.setAttribute('class', 'dispense-button btn btn-primary');
-    dispenseButton.style.textAlign = "center";
-    dispenseButton.innerText = "Dispense";
-    dispenseButton.style.background = 'green';
-    dispenseButton.onclick = function() {
+    dispenseButton.setAttribute('class', 'button green navButton');
+    dispenseButton.setAttribute('style', 'margin-top: 10px;min-width: 140px; float: right;');
+    dispenseButton.innerHTML = "<span>Dispense</span>";
+    
+    dispenseButton.onmousedown = function() {
         if(dispen[order_id].length > 0) {
             manualDispensation(order_id);
             document.getElementById("prescription-modal").style = "display: none;";
         }
     }
-    
-    modalDiv.appendChild(dispenseButton);
+    buttonContainer.appendChild(dispenseButton);
+
     var closeButton = document.createElement('button');
-    closeButton.setAttribute('class', ' btn btn-primary');
-    closeButton.style.textAlign = "center";
-    closeButton.innerText = "Close";
-    closeButton.style.background = 'red';
-    closeButton.style.float = 'right';
-    closeButton.onclick = function() {
+    closeButton.setAttribute('class', 'button red navButton');
+    closeButton.setAttribute('style', 'margin-top: 10px;min-width: 140px;');
+    closeButton.innerHTML = "<span>Close</span>";
+    
+    closeButton.onmousedown = function() {
         document.getElementById("prescription-modal").style.display = "none";
     }
-    
-    modalDiv.appendChild(closeButton);
-    
+    buttonContainer.appendChild(closeButton);
+   
     document.getElementById('prescription-modal').style = "display: block;";
 }
 
