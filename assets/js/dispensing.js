@@ -144,7 +144,7 @@ function displayKeyPad(order_id) {
     if(sessionStorage.programID === "1") {
         cTable(order_id);
     }else {
-        showLegacyKeypad(order_id);
+        showLegacyKeypad(order_id.order_id);
     }
 }
 
@@ -501,7 +501,45 @@ function submiFastTracktDispensationEncounter() {
 
     submitParameters(encounter, "/encounters", "postFastTrackObs");
 }
-function cTable(order_id) {
+function cTable(order) {
+    let order_id = order.order_id;
+let packs = {
+  '11': [ 30 ],
+  '21': [ 25 ],
+  '22': [ 60 ],
+  '24': [ 30, 60, 90, 100 ],
+  '30': [ 90 ],
+  '39': [ 60 ],
+  '73': [ 120 ],
+  '74': [ 60 ],
+  '76': [ 1000 ],
+  '297': [ 30, 60, 90,1000 ],
+  '576': [ 30, 60, 90,1000 ],
+  '613': [ 60 ],
+  '731': [ 60 ],
+  '732': [ 60 ],
+  '733': [ 60 ],
+  '734': [ 30 ],
+  '735': [ 30 ],
+  '736': [ 60 ],
+  '738': [ 60 ],
+  '931': [ 30, 60, 90,1000 ],
+  '932': [ 30 ],
+  '954': [ 60 ],
+  '963': [ 30, 60, 90,1000 ],
+  '968': [ 60 ],
+  '969': [ 30 ],
+  '971': [ 30,60,90, 100 ],
+  '976': [ 60 ],
+  '977': [ 30 ],
+  '982': [ 30 ],
+  '983': [ 30 ],
+  '1039': [ 30,60,90, 1000 ],
+  '1043': [ 60 ],
+  '1044': [ 60 ],
+  '1056': [ 24 ]
+}
+
     if(!dispen[order_id]) {
         dispen[order_id] = [];
     }
@@ -562,7 +600,7 @@ function cTable(order_id) {
     packRow.appendChild(td);
     table.appendChild(headerRow);
     table.appendChild(packRow);
-    var packSizes = [30, 60]
+    var packSizes = packs[order.drug_id];
     for (var index = 0; index < packSizes.length; index++) {
         var packSize = packSizes[index];
         var medicationRow = document.createElement('tr');
@@ -758,7 +796,7 @@ function addPrescriptions(data, onFinishCallback) {
         complete_pack = complete_pack < 0 ? 0 : complete_pack;
 
         const row = [addDeleteBTN(order_id),
-                     addValue(order_id, medication, true),
+                     addValue({order_id: order_id, drug_id: drug_id}, medication, true),
                      addValue(order_id, complete_pack, false),
                      addValue(order_id, quantity, false),
                      addReset(order_id)];
@@ -859,14 +897,36 @@ function addValue(order_id, value, clickable) {
     var span = document.createElement("span");
     var btn = document.createElement("p");
     // btn.setAttribute("class","dispense-button btn btn-primary");
-    if(clickable) {
-        btn.setAttribute("onmousedown", "displayKeyPad('" + order_id + "');");
-    }
+    
     btn.innerHTML = value;
     span.appendChild(btn);
+    if(clickable) {
+        // btn.addEventListener("click", function() {
+        //     triggerKBD(order_id);
+        // })
+        // btn.addEventListener("mousedown", function() {
+        //     triggerKBD(order_id);
+        //   });
+        // // btn.onmousedown = function(){
+        // //     // displayKeyPad(order_id);
+        // // };
+        // // btn.addEventListener('mousedown', e => {
+        // //     console.log(e);
+        // //     // x = e.offsetX;
+        // //     // y = e.offsetY;
+        // //     // isDrawing = true;
+        // // });
+        // btn.setAttribute("onmousedown", triggerKBD
+        // );
+        btn.setAttribute("onmousedown", `triggerKBD(${order_id.order_id}, ${order_id.drug_id});`);
+    }
     return span.innerHTML;
 }
-
+function triggerKBD(event, event2) {
+    console.log(event, event2);
+    displayKeyPad({order_id: event, drug_id: event2});
+    // displayKeyPad(order_id);
+}
 function deleteOrder(row) {
     var order_id = row.id;
     alert(document.getElementById(order_id).innerHTML);
