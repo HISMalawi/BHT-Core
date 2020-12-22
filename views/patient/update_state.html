@@ -101,7 +101,7 @@ function submitTO() {
         var obs = {
             encounter_id: encounter["encounter_id"],
             observations: [{
-                  value_text: transfer_location.innerText,
+                  value_text: transfer_location.options[transfer_location.selectedIndex].innerText,
                   value_coded: transfer_location.value,
                   concept_id: 3003,
             }]
