@@ -602,9 +602,9 @@ let packs = {
     table.appendChild(packRow);
     var packSizes = packs[order.drug_id];
     for (var index = 0; index < packSizes.length; index++) {
-        var packSize = packSizes[index];
-        var medicationRow = document.createElement('tr');
-        var medicationTD = document.createElement('td');
+        let packSize = packSizes[index];
+        let medicationRow = document.createElement('tr');
+        let medicationTD = document.createElement('td');
         // td.innerHTML = "AZT/3tcazasas";
         medicationTD.setAttribute("id", "medication-td");
         medicationTD.setAttribute('colspan', '2');
