@@ -280,40 +280,32 @@ function addPopDescription(order_id) {
 
 function enterKeypadValue(e, order_id) {
     var inputBox = document.getElementById('prescription-input');
-    if(!dispen[order_id]) {
-        dispen[order_id] = [];
-    }
+
     try {
 
         if (e.innerHTML.match(/Del/i)) {
-            dispen[order_id].splice(-1, 1);
-            inputData(inputBox, order_id);            
+            inputBox.value = inputBox.value.substring(0, inputBox.value.length - 1);
         } else if (e.innerHTML.match(/Clear/i)) {
             inputBox.value = null;
-            dispen[order_id] =  null;
         } else if (e.innerHTML.match(/Dispense/i)) {
-            if(dispen[order_id].length > 0) {
-                manualDispensation(order_id);
-                document.getElementById("prescription-modal").style = "display: none;";
-            }
+            var amount_dispensed = document.getElementById("prescription-input").value;
+            manualDispensation(order_id, amount_dispensed);
+            document.getElementById("prescription-modal").style = "display: none;";
         } else if (e.innerHTML.match(/Close/i)) {
             document.getElementById("prescription-modal").style = "display: none;";
         }else if (e.innerHTML.match(/Reset/i)) {
-            dispen[order_id] =  null;
             voidDrugDispensations(order_id);
             
             // manualDispensation(order_id, -+totalDispensed);
         }
         else {
-            dispen[order_id].push(e.innerHTML);
-            inputData(inputBox, order_id);
+            inputBox.value += e.innerHTML;
         }
 
     } catch (x) {
     }
 
 }
-
 function inputData(inputBox, order_id){
     inputBox.value = null;
     dispen[order_id].forEach(element => {
