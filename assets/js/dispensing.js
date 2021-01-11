@@ -600,7 +600,7 @@ let packs = {
     packRow.appendChild(td);
     table.appendChild(headerRow);
     table.appendChild(packRow);
-    var packSizes = packs[order.drug_id];
+    var packSizes = packs[order.drug_id] ?  packs[order.drug_id] :  [30,60,90];
     for (var index = 0; index < packSizes.length; index++) {
         let packSize = packSizes[index];
         let medicationRow = document.createElement('tr');
