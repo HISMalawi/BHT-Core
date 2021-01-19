@@ -235,6 +235,7 @@
           padding: 6px 12px;
           border: 1px solid #ccc;
           border-top: none;
+          height: 50vh;
         }
     </style>
 
@@ -253,13 +254,12 @@
 
 
                 <div id="Open" class="tabcontent">
-                    <h3>Open orders</h3>
-                    <p>Open  orders ...</p> 
+                    <h3>Drawn orders</h3>
+                    <p>Drawn orders  ...</p>
                 </div>
                   
                 <div id="Drawn" class="tabcontent">
-                    <h3>Drawn orders</h3>
-                    <p>Drawn orders  ...</p>
+                    <object id="los-orders" width="98%" height="99%"></object> 
                 </div>
 
                 <!--<div id="Results" class="tabcontent">
@@ -929,7 +929,7 @@
             encounters.innerHTML = "";
         } else {
         }
-        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/encounters?paginate=false&patient_id=' + id + '&date=' + value+'program_id='+sessionStorage.programID;
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/encounters?paginate=false&patient_id=' + id + '&date=' + value+'&program_id='+sessionStorage.programID;
         var req = new XMLHttpRequest();
         var counter = 0;
         req.onreadystatechange = function () {
@@ -1426,6 +1426,11 @@
         }
         button.style.color = "white";
         button.style.backgroundColor = "#204d74";
+
+        if(sessionStorage.programID == "23"){
+            console.log(button.innerHTML)
+            selectDate = button.innerHTML;
+        }
     }
 
     function checkIfDueLabOrder () {
@@ -1487,6 +1492,11 @@ function openOrders(evt, tabName) {
 
 if(parseInt(sessionStorage.programID) == 23) {
   $("#main-panel").click();
+
+  let losOrders = document.getElementById("los-orders");
+  let ordersApp = "/apps/" +  sessionStorage.applicationFolder;
+  ordersApp += "/views/orders.html";
+  losOrders.setAttribute("data", ordersApp);
 }
 
 </script>
