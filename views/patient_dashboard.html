@@ -663,9 +663,12 @@
 
 <script>
 
-    if(sessionStorage.programID == 23){
+    if(sessionStorage.programID == '23'){
         document.getElementById("all-programs").style = "display: none;";
         document.getElementById("nextEncounterHeader").style = "visibility: hidden;";
+    }else if(sessionStorage.applicationFolder.match(/ccm/i)){
+        //document.getElementById("nextEncounterHeader").style = "visibility: hidden;";
+        document.getElementById("lab-program").style = "display: none;";
     }else{
         document.getElementById("lab-program").style = "display: none;";
         document.getElementById("nextEncounterHeader").style = "visibility: visible;";

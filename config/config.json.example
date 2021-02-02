@@ -60,11 +60,20 @@
 		},
 		{
 			"applicationName": "LOS",
-	      	"programID": "23",
+      "programID": "23",
 			"applicationFolder": "LOS",
 			"url": "",
 			"applicationIcon": "/assets/images/order.png",
 			"applicationDescription": "Lab Order System",
+			"comment": "these are examples, add another application with this template at the end of these curly braces by adding a comma and copying this template"
+		},
+		{
+			"applicationName": "CCM",
+      "programID": "24",
+			"applicationFolder": "CCM",
+			"url": "",
+			"applicationIcon": "/assets/images/ccm.png",
+			"applicationDescription": "Cervical Cancer Module",
 			"comment": "these are examples, add another application with this template at the end of these curly braces by adding a comma and copying this template"
 		}
 

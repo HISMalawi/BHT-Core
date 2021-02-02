@@ -716,6 +716,11 @@ function getMonthInNum(str) {
 }
 
 function nextPage(obs){
+  if(sessionStorage.applicationFolder.match(/ccm/i)){
+    nextEncounter(patientID, programID);
+    return;
+  } 
+
   var url = "/programs/"+programID+"/patients/" + patientID + "/labels/visits?date=" + sessionStorage.sessionDate
   url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1" + url;
   document.location = url;

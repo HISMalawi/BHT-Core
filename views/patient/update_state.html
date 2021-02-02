@@ -258,7 +258,6 @@ function getOutcomeDate() {
 
 function setProgramStates() {
   var programID = fetchStatesUrl();
-  console.log(programID)
   // var elem = document.getElementById("touchscreenInput" + tstCurrentPage);
   $('touchscreenInput' + tstCurrentPage).setAttribute('ajaxURL', programID);
   listSuggestions(tstCurrentPage); 
@@ -280,10 +279,11 @@ function postState(state) {
     },
     state,
     function (data) {
-      showMessage('The patient\'s state was updated successfully.')
+      /*showMessage('The patient\'s state was updated successfully.')
       setTimeout(function() {
        document.location = '/views/patient/programs.html'
-      }, 3000)
+      }, 3000)*/
+      document.location = '/views/patient/programs.html'
     },
     function (error) {
       console.error(error)
@@ -365,7 +365,7 @@ function fetchStatesUrl () {
         <input type="text" name="states" id="states" 
           field_type="alpha" helpText="State" 
           setvalue="" tt_pageStyleClass="NoKeyboard"
-          ajaxURL="/programs/1/workflows" 
+          ajaxURL="" 
           tt_onLoad="setProgramStates();" objectType="states" />
 
         <select objectType="location" ajaxURL="/locations?name=" 

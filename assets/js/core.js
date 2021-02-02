@@ -177,13 +177,13 @@ function loadConfigurations() {
 
 function loadApplicationsIntoMenu(applications) {
     applications.forEach((application, idx) => {
-        const configFilePath = `/apps/${application.applicationFolder}/application.json`;
+        const configFilePath = `/apps/${application.applicationFolder.replace('/','')}/application.json`;
         $.getJSON(configFilePath)
             .done(() => {
                 createApplicationCard(application, idx)
             })
             .fail((error) => {
-                console.error(error)
+                //console.error(error)
             })
     })
 }
@@ -1319,7 +1319,7 @@ function fetchVersion() {
     req.setRequestHeader('Authorization',sessionStorage.getItem('authorization'));
     req.send();
   } catch (e) {
-    console.log(e);
+    //console.log(e);
   }
 
 }
