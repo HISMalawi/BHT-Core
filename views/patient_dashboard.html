@@ -28,7 +28,6 @@
     <!-- ...................... -->
 
 
-
 </head>
 <body>
 <script src="/assets/js/generic_ajaxrequest.js">
@@ -254,8 +253,7 @@
 
 
                 <div id="Open" class="tabcontent">
-                    <h3>Drawn orders</h3>
-                    <p>Drawn orders  ...</p>
+                    <object id="los-open-orders" width="98%" height="99%"></object> 
                 </div>
                   
                 <div id="Drawn" class="tabcontent">
@@ -880,12 +878,28 @@
                         }
 
                     }
-                    div.innerHTML += '<button type="button" id="' + x + '" value="' + results[x] +
-                        '" class="application-btn btn btn-primary" style="width: 90%;  margin-left: 5%;margin-top: 6%; margin-bottom: 6%; border-radius: 0%; color:black;"  onclick="activateButton(this);changeDate(this);getValue(this.value,' + patient_id + ',&#034encounters&#034, &#034h4&#034, &#034table&#034); getMedication(' + patient_id + ',&#034table&#034, &#034medication&#034);">' +
-                        moment(results[x]).format("DD/MMM/YYYY");
-                    +'</button>';
+                    let defaultBTN = `getValue(this.value, ${patient_id}, &#034encounters&#034, 
+                            &#034h4&#034, &#034table&#034);getMedication(${patient_id},
+                            &#034table&#034, &#034medication&#034);"`;
+
+                    if (sessionStorage.programID == '23'){
+                        defaultBTN = `fetchOrderData('${moment(results[x]).format("YYYY-MM-DD")}');"`;
+                        //fetchOrderData(moment(results[x]).format("DD/MMM/YYYY"));
+                    }
+
+                    div.innerHTML += `<button type="button" id="${x}" value="${results[x]}"
+                        class="application-btn btn btn-primary" 
+                        style="width: 90%;  margin-left: 5%;margin-top: 6%;
+                        margin-bottom: 6%; border-radius: 0%; color:black;"  
+                        onclick="activateButton(this);changeDate(this);${defaultBTN}>
+                        ${moment(results[x]).format("DD/MMM/YYYY")}</button>`;
+
                     encDate = moment(results[0]).format("DD/MMM/YYYY");
-                    getMedication(patient_id, "table", "medication");
+                    
+                    
+                    if (sessionStorage.programID != '23')
+                        getMedication(patient_id, "table", "medication");
+
                     activateButton(document.getElementsByClassName("application-btn btn btn-primary")[0]);
                     // getMedication(patient_id ,"encounters", "h4"034, &#034table&#034);
                     if (counter == 4 || (results.length - (index + counter) == 1)) {
@@ -1430,10 +1444,6 @@
         button.style.color = "white";
         button.style.backgroundColor = "#204d74";
 
-        if(sessionStorage.programID == "23"){
-            console.log(button.innerHTML)
-            selectDate = button.innerHTML;
-        }
     }
 
     function checkIfDueLabOrder () {
@@ -1500,6 +1510,17 @@ if(parseInt(sessionStorage.programID) == 23) {
   let ordersApp = "/apps/" +  sessionStorage.applicationFolder;
   ordersApp += "/views/orders.html";
   losOrders.setAttribute("data", ordersApp);
+
+  losOrders = document.getElementById("los-open-orders");
+  ordersApp = "/apps/" +  sessionStorage.applicationFolder;
+  ordersApp += "/views/open_orders.html";
+  losOrders.setAttribute("data", ordersApp);
+}
+
+
+function fetchOrderData(setDate) {
+    let LOSorders = document.getElementById('los-orders');
+    LOSorders.contentWindow.fetchLabOrders(setDate);
 }
 
 </script>
