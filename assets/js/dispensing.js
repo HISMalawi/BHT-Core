@@ -12,6 +12,7 @@ function getDataTable() {
       fixedHeader: true,
       searching: false,
       paging: false,
+      destroy: true,
       scrollY: 330,
       scroller: {
         loadingIndicator: true
