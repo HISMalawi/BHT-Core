@@ -400,7 +400,7 @@
                     <button type="button" class="button blue navButton" id="btn-confirm" style="visibility:hidden;">Void
                         Encounter
                     </button>
-                    <button onmousedown="location.reload()" type="button" class="button navButton red" data-dismiss="modal">&nbsp;&nbsp;&nbsp;&nbsp;Close&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                    <button onmousedown="reloadPage();" type="button" class="button navButton red" data-dismiss="modal">&nbsp;&nbsp;&nbsp;&nbsp;Close&nbsp;&nbsp;&nbsp;&nbsp;</button>
                 </div>
 
             </div>
@@ -1520,6 +1520,10 @@ if(parseInt(sessionStorage.programID) == 23) {
 function fetchOrderData(setDate) {
     let LOSorders = document.getElementById('los-orders');
     LOSorders.contentWindow.fetchLabOrders(setDate);
+}
+
+function reloadPage(){
+  location = window.url.href.replace("#","");
 }
 
 </script>

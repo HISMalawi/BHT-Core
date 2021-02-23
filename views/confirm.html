@@ -5,9 +5,10 @@
 <script src="/apps/ART/assets/js/fast_track_alert.js"></script>
 
 <script src="/assets/js/generic_ajaxrequest.js"></script>
-<link rel="stylesheet" href="/assets/css/bootstrap/bootstrap.min.css" />
+<!--link rel="stylesheet" href="/assets/css/bootstrap/bootstrap.min.css" /-->
 <!-- <rel="stylesheet" href="/assets/css/maindashboard/headefooter.css">  -->
-<link rel="stylesheet" href="/assets/css/custom.css" />
+<link rel="stylesheet"  href="/public/touchscreentoolkit/lib/stylesheets/touch-fancy.css" />
+<!--ink rel="stylesheet" href="/assets/css/custom.css" /-->
 <script src="/assets/js/jquery.min.js"></script>
 <script src="/assets/js/moment.js"></script>
 <script src="/assets/js/bmi.js"></script>
@@ -112,7 +113,7 @@
     z-index: 10;
   }
 
-  .buttonsDIV button {
+  /*.buttonsDIV button {
     margin: 5px 0px 0px;
     margin-right: 10px;
     height: 60px;
@@ -197,7 +198,7 @@
     background-image: linear-gradient(to bottom, #77021d, #3a000d);
     filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#77021d, endColorstr=#3a000d);
     color: #fff;
-  }
+  }*/
 
   .info-tables {
     width: 99%;
@@ -1391,14 +1392,12 @@ var global_property = GlobalProperty({
 </div>
 <div class="buttonsDIV">
   <button
-    class="red"
-    style="float: left; margin-left: 10px;"
-    onmousedown="location='/'"
-  >
-    Cancel
-  </button>
-  <button class="blue" onmousedown="getFilingNumberType()" 
-    style="float: right;" id="continue">Continue</button>
+    class="red button navButton" style="float: left; margin-left: 10px;" 
+      onmousedown="location='/'"><span>Cancel</span></button>
+  <button class="button red navButton" onmousedown="confirmVoid();" 
+    id="voidBTN"><span>Void client</span></button>
+  <button class="button green navButton" onmousedown="getFilingNumberType()" 
+    style="float: right;" id="continue"><span>Continue</span></button>
 </div>
 
 <!-- Modal -->
@@ -1961,5 +1960,193 @@ function closeFilingNumPopUP() {
 
 userFilingNumbers();
 filingNumberPrefix();
+
+if(sessionStorage.userRoles.match(/super|admin/i)){
+  document.getElementById('voidBTN').style = "display: inline; float: left; margin-left: 40px;";
+}else{
+  document.getElementById('voidBTN').style = "display: none;";
+}
+
+function voidClient(void_reason){
+  document.getElementById('void-confirm-message').style = "display: none;";
+  let passedPatient = window.location.href;
+  let patient = new URL(passedPatient);
+  let person_id = patient.searchParams.get("person_id");
+
+  let url = apiProtocol + "://" + apiURL + ":" + apiPort;
+  url += "/api/v1/patients/" + person_id;
+  url += "?reason=" + void_reason;
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 204) {
+      document.location = "/";
+    }
+  };
+  xhttp.open("DELETE", url, true);
+  xhttp.setRequestHeader("Authorization",sessionStorage.getItem("authorization"));
+  xhttp.setRequestHeader("Content-type", "application/json");
+  xhttp.send();
+}
+
+function cancelVoid(){
+  document.getElementById('void-confirm-message').style = "display: none;";
+  document.getElementById('page-cover').style = "display: none;";
+
+  let cells = document.getElementsByClassName('void-reason');
+  for(let i =  0; i < cells.length; i++){
+    cells[i].setAttribute("class", "void-reason unselected-cells");
+  }
+
+  let voidButton = document.getElementById("voidButton");
+  voidButton.setAttribute("onmousedown","");
+  voidButton.style.backgroundColor="lightgrey";
+}
+
+
+function confirmVoid(){
+  document.getElementById('void-confirm-message').style = "display: inline;";
+  document.getElementById('page-cover').style = "display: inline;";
+}
+
+
+function selectReason(reason, e){
+  let cells = document.getElementsByClassName('void-reason');
+  for(let i =  0; i < cells.length; i++){
+    cells[i].setAttribute("class", "void-reason unselected-cells");
+  }
+  e.setAttribute("class", "void-reason selected-cells");
+  let voidButton = document.getElementById("voidButton");
+  voidButton.setAttribute("onmousedown","voidClient('" + reason + "');");
+  voidButton.style.backgroundColor="green";
+}
+
 </script>
 <script src="/assets/js/show.lab.orders.js"></script>
+
+
+<style>
+
+  #void-confirm-message {
+    background: #ffffff;
+    border-radius: 0.5em;
+    box-shadow: 0 10px 20px rgba(black, 0.2);
+    left: 50%;
+    max-width: 90%;
+    position: absolute;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    width: 30em;
+    text-align: left;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000000;
+    border-color: black;
+    border-style: solid;
+    display: none;
+  }
+
+  #void-confirm-message p {
+    margin: 10px;
+    font-size: 24px;
+  }
+
+  #page-cover {
+    display: none;
+    position: absolute;
+    background-color: black;
+    width: 100%;
+    height: 102%;
+    left: 0%;
+    top: 0%;
+    z-index: 999;
+    opacity: 0.65;
+  }
+
+  .modal-title {
+    width: 100%;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+  }
+  
+  .modal-title h1 {
+    font-size: 20px;
+    margin-left: 10px;
+    color: red;
+  }
+ 
+  .void-reason {
+    border-style: solid;
+    border-width: 1px;
+    text-align: center;
+    font-size: 24px;
+    padding: 20px;
+  }
+
+  .void-btns {
+    border-style: solid;
+    width: 47%;
+    border-width: 1px;
+    font-size: 30px;
+    color: white;
+  }
+
+  .unselected-cells {
+    background-color: white;
+  }
+
+  .selected-cells {
+    background-color: lightblue;
+  }
+
+</style>
+
+<div  id="page-cover"></div>
+<div id="void-confirm-message">
+  <div class="modal-title">
+    <h1>Warning</h1>
+  </div>
+  <p>Are you sure you want to void this client?</p>
+  <p>Voiding will remove the client in all programs and void all encounters created.</p>
+
+  <div style="width: 97%; display: table; padding: 5px;">
+    <div style="display: table-row;">
+      <div style="display: table-cell; 
+      border-top-left-radius: 9px; border-top-right-radius: 9px;" 
+        onmousedown="selectReason('Duplicate entry', this)" class="void-reason">Duplicate entry</div>
+    </div>
+    <div style="display: table-row;">
+      <div style="display: table-cell;" 
+        onmousedown="selectReason('Ghost client', this)" class="void-reason">Ghost client</div>
+    </div>
+    <div style="display: table-row;">
+      <div style="display: table-cell;border-bottom-left-radius: 9px;
+        border-bottom-right-radius: 9px;" onmousedown="selectReason('Test client', this)" 
+        class="void-reason">Test client</div>
+    </div>
+  </div>
+
+  
+  <div style="width: 100%;margin: 5px;">
+    <div style="display: table; width: 97%;">
+      <div style="display: table-row;">
+        <div class="void-btns" style="display: table-cell;  
+          text-align: center; padding: 10%; border-top-left-radius: 9px;
+          border-bottom-left-radius: 9px; background-color: red;" onmousedown="cancelVoid();">
+          Cancel
+        </div>
+        <div class="void-btns" style="display: table-cell;  
+          text-align: center; padding: 10%; border-top-right-radius: 9px;
+          border-bottom-right-radius: 9px; background-color: lightgray;" id="voidButton">
+          Void
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+</div>
