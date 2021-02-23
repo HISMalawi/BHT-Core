@@ -2018,7 +2018,7 @@ function selectReason(reason, e){
   e.setAttribute("class", "void-reason selected-cells");
   let voidButton = document.getElementById("voidButton");
   voidButton.setAttribute("onmousedown","voidClient('" + reason + "');");
-  voidButton.style.backgroundColor="green";
+  voidButton.style.backgroundColor="red";
 }
 
 </script>
@@ -2133,7 +2133,7 @@ function selectReason(reason, e){
       <div style="display: table-row;">
         <div class="void-btns" style="display: table-cell;  
           text-align: center; padding: 10%; border-top-left-radius: 9px;
-          border-bottom-left-radius: 9px; background-color: red;" onmousedown="cancelVoid();">
+          border-bottom-left-radius: 9px; background-color: green;" onmousedown="cancelVoid();">
           Cancel
         </div>
         <div class="void-btns" style="display: table-cell;  
