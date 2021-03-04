@@ -1,236 +1,282 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-  <head>
-    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+<script>
 
-    <script language="javascript" defer="true">
-      tstUsername = "";
-      tstUserKeyboardPref = "qwerty";
+var tt_cancel_destination = "/views/patient/lab/test_without_results.html";
 
-      var d = new Date();
-      d.toDateString();
+</script>
 
-      function getInput(){
-        key = $('touchscreenInput' + tstCurrentPage).getAttribute("key");
-         value = $('touchscreenInput' + tstCurrentPage).value;
-         value = value.charAt(0).toUpperCase() + value.slice(1);     
-         sessionStorage.setItem(key, value);
-         var d = new Date();
-         sessionStorage.setItem("date_created", d.toDateString());
-      }  
-    </script>
+<script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
+<script type="text/javascript" src="/assets/js/moment.js"></script>
 
-    <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
-    <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
-    <script type="text/javascript" src="/assets/js/core.js"></script>
-    <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
-    <script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
+<style>
+  .inputFrameClass {
+    width: 95.5% !important;
+  }
 
-      <link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
+  .tt_controls_result_month .keyboard {
+    display: none !important;
+  }
 
-      <style>
-        .tt_controls_enter_result #lessthan {            
-            right: 65%;
-            display: inline !important;
-            top: -65px;
-        }
+  #tt_page_result_month .inputFrameClass {
+    height: 90% !important;
+  }
 
-        .tt_controls_enter_result #greaterthan {
-          
-            right: 65%;
-            display: inline !important;
-            top: 213px;
-            
-        }
-
-        .tt_controls_enter_result #equals {
-           
-            right: 65%;
-            display: inline !important;
-            top: 5px;
-            
-        }
-
-        .tt_controls_enter_result #na {
-           
-           right: 65%;
-           display: inline !important;
-           top: 5px;
-           
-       }
-    </style>
-
-  </head>
-  <body id="mateme">
-    <div id="container">
-      <div id="content">
-        <style>
-.tt_controls_first_name #date, #star, #slash, #minus, #plus, #percent, #decimal, #comma { display: none; }
-
-.tt_controls_last_name #date, #star, #slash, #minus, #plus, #percent, #decimal, #comma { display: none; }
+  #tt_page_result_month .options {
+    height: 100% !important;
+  }
 
 </style>
 
+<body id="mateme">
+  <div id="container">
+      <div id="content">
+
+        <form>
+
+          <input type="text" name="result_month" id="result_year" helpText="Result Year"
+          field_type="number"
+          absoluteMin="1900" min="1900" tt_onLoad="setAbsoluteMaxBirthYear();"
+          tt_pageStyleClass="Numeric NumbersOnly"/>
 
 
 
-<form action="result_entering.html" method="POST" id="search_results">
-    
-  
+          <select name="result_month" id="result_month" helpText="Result month"
+                    condition="$('result_year').value.toLowerCase() != 'unknown'"
+                    validationMessage="Please enter a valid date" tt_onUnLoad=""
+                    tt_onLoad=" validateMonth();__$(keyboard).style.display = none;">
+                <option value=""></option>
+                <option value="1">Jan</option>
+                <option value="2">Feb</option>
+                <option value="3">Mar</option>
+                <option value="4">Apr</option>
+                <option value="5">May</option>
+                <option value="6">Jun</option>
+                <option value="7">Jul</option>
+                <option value="8">Aug</option>
+                <option value="9">Sep</option>
+                <option value="10">Oct</option>
+                <option value="11">Nov</option>
+                <option value="12">Dec</option>
+            </select>
 
-    <select allowFreeText="false" helpText="Select Measure" id="test_measure"  name="test_measure" >
-        <option value=""></option>
-      </select>
 
-      <!-- input type="text" name="result" id="results" field_type="alpha" tt_onLoad="validateEntry();" tt_onUnload="getInput();submiteResultEntrly()"
-      helpText="Enter Test Result"  
-      allowFreeText="true"  / -->
+            <input type="text" name="result_day"
+            id="result_day"
+            field_type="number" helpText="Result Day"
+            condition="($('result_year').value != 'Unknown') && ($('result_month').value != 'Unknown')"
+            tt_onLoad="validateResultDate();getDayOfMonthPicker($('result_year').value, $('result_month').value);
+              setUpPageForDateValidation();"/>
 
-
-
-    <input  field_type="number"
-    helpText="Enter Result" id="results" name="result"
-    tt_pageStyleClass="Numeric NumbersOnly" type="text" 
-    validationMessage="You must enter a modifier plus numbers only (for example =90)"
-    validationRule="^(>|<|=)([0-9.]+)$|N/A$"/>
+            <select type="text" name="result_type" id="result_type"
+            helpText="Result type" tt_pageStyleClass="NoKeyboard">
+              <option value="Numeric (numbers only)">Numeric (numbers only)</option>
+              <option value="Alphanumeric (text / text and numbers)">Alphanumeric (text / text and numbers)</option>
+          </select>
 
 
-    <input type="text" 
-        name="results" 
-        id="results2" 
-        field_type="alpha" 
-        helpText="Enter Test Result"       
-        allowFreeText="true"
-        condition = "$('results').value == 'N/A'"
-    />
+          <input absoluteMin="0.0" condition="$('result_type').value == 'Numeric (numbers only)'" 
+          field_type="number" helpText="Test Result" id="numeric_results" 
+          name="numeric_results"
+          tt_onLoad="updateKeyPad();"
+          tt_pageStyleClass="Numeric NumbersOnly" type="text" 
+          validationMessage="You must enter a modifier plus numbers only (for example =90)"
+          validationRule="^(>|<|=)([0-9.]+)$|Unknown$"/>
 
-    <input type="text" name="approved_by" id="approved_by" field_type="alpha" tt_onLoad="validateEntry()"
-        helpText="Result Aproved by"  
-        allowFreeText="true"  />
+          <input type="text" name="alpha_results"
+          id="alpha_results" field_type="alpha"
+          key="alpha_results" helpText="Test Result" tt_onLoad="lastPage();"
+          condition="$('result_type').value == 'Alphanumeric (text / text and numbers)';"/>
 
-</form>
-        <div id="footer">
-        </div>
-      </div>
+
+
+         </form>
+
     </div>
-  </body>
-</html>
+  </div>
+</body>
 
 
+<script>
 
-<script type="text/javascript">
-    var test_name = "";
-    var trackingNumber = "";
+function setAbsoluteMaxBirthYear(){
+  let element = document.getElementById('touchscreenInput' + tstCurrentPage);
+  element.setAttribute("absoluteMax", (new Date().getFullYear()));
+  element.setAttribute("min", (new Date().getFullYear() - 100));
+  element.setAttribute("absoluteMin", (new Date().getFullYear() - 120));
+}
 
-    var tt_cancel_destination = "test_without_results.html";
-       
-    function validateEntry(){
-        var button = document.getElementById("nextButton");
-        button.setAttribute('onmousedown','createVLorder()');
-    }
+function validateMonth() {
+  let nextBtn = __$("nextButton");
+  nextBtn.setAttribute('onmousedown', "validateResultYearMonth();");
+  nextBtn.setAttribute('onclick', "");
+}
 
-   function createVLorder() {
-       var inputText = document.getElementById("touchscreenInput" + tstCurrentPage);
-       if (inputText.value.length <1)
-       {
-           showMessege("Enter Provider");
-           return;
-       }
-       
-       submiteResultEntrly();
-   }
-
-
-    function loadTestMeasures()
-    {
-      test_name = JSON.parse(sessionStorage.getItem("select_test_for_result"))[1];
-      trackingNumber = JSON.parse(sessionStorage.getItem("select_test_for_result"))[0];
-      var select = document.getElementById("test_measure");
-
-      var url = sessionStorage.apiProtocol + "://" + sessionStorage.apiURL + ":" + sessionStorage.apiPort + "/api/v1";
-      url += '/programs/1/lab_tests/measures?test_name=' + test_name;        
-
-          var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function () {
-                if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
-                    var obs = JSON.parse(this.responseText);    
-                          
-                    var select = document.getElementById("test_measure");
-                    obs.forEach(element => {                     
-                        var option = document.createElement("option");
-                        option.innerHTML = element;
-                        option.setAttribute("value",element);
-                        select.appendChild(option);
-                    });
-                }
-                else{
-                  console.log(this.readyState);
-                }
-            };
-            xhttp.open("GET", url, false);
-            xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
-            xhttp.setRequestHeader('Content-type', "application/json");
-            xhttp.send();
-
-
-    }
-  
-    loadTestMeasures();
-  
-    function submiteResultEntrly()
-    { var selected_data =  new Array;
-      var results = new Array;
-      var data = {};
-  
-      var values = {};
-      var rst = document.getElementById('results').value;
-      if (rst == "N/A"){
-          rst = document.getElementById("results2").value;            
+function validateResultYearMonth() {
+  let setYear = parseInt(document.getElementById('result_year').value);
+  if (setYear == (new Date().getFullYear())) {
+      let element = document.getElementById('touchscreenInput' + tstCurrentPage);
+      let selectedMonth = parseInt(element.getAttribute('tstValue'));
+      let currMonth = parseInt(new Date().getMonth() + 1);
+      if (selectedMonth > currMonth) {
+          showMessage("Selected month is greater than current month");
+          return;
       }
+  }
 
-      values[document.getElementById('test_measure').value]  = rst;   
-     
-        test_name = JSON.parse(sessionStorage.getItem("select_test_for_result"))[1];
-        trackingNumber = JSON.parse(sessionStorage.getItem("select_test_for_result"))[0];
-        testResults = values;
-        
-        data = {
-                "tracking_number" : trackingNumber,
-                "test_status": "verified",
-                "test_name": test_name,
-                "who_updated": {
-                    'id_number': '',
-                    'phone_number': '',
-                    'first_name': '',
-                    'last_name': ''
-                },
-                "results": testResults
-            }
+  gotoNextPage();
+}
 
-            data = JSON.stringify(data);
-            var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1";
-            url += '/programs/1/lab_tests/results';
+function validateResultDate(){
+  let nextBtn = __$("nextButton");
+  nextBtn.setAttribute('onmousedown', "validateSetResultDate();");
+  nextBtn.setAttribute('onclick', "");
+}
 
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function () {
-                if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
-                    var obs = JSON.parse(this.responseText);
-                   console.log(obs);
-                   window.location = "test_without_results.html";
-                }
-                else{
-                  console.log(this.status);
-                }
-            };
-            xhttp.open("POST", url, true);
-            xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
-            xhttp.setRequestHeader('Content-type', "application/json");
-            xhttp.send(data);
+function validateSetResultDate(){
+  let day = document.getElementById('touchscreenInput' + tstCurrentPage).value;
+  let year = document.getElementById('result_year').value;
+  let month = document.getElementById('result_month').value;
+  
+  if(moment(`${year}/${month}/${day}`) > moment()){
+    showMessage("Invalid date");
+  }else{
+    gotoNextPage();
+  }
+}
 
-            console.log(data);
+function updateKeyPad() {
+  let buttons = document.getElementsByClassName("keyboardButton");
+  let nextBtn = __$("nextButton");
+  nextBtn.innerHTML = "<span>Finish</span>";
+  nextBtn.setAttribute('onmousedown', "validateNumericResults();");
+  nextBtn.setAttribute('onclick', "");
+
+
+  for (i = 0; i < buttons.length; i++) {
+    if (buttons[i].id == "equals" || buttons[i].id == "greaterthan" 
+      || buttons[i].id == "lessthan" || buttons[i].id == 'decimal') {
+      buttons[i].style.display = "inline";
     }
-  
-  
-  </script>
+  }
+}
 
+function lastPage() {
+  let nextBtn = __$("nextButton");
+  nextBtn.innerHTML = "<span>Finish</span>";
+  nextBtn.setAttribute('onmousedown', "validateAlphaResult();");
+  nextBtn.setAttribute('onclick', "");
+}
+
+function validateAlphaResult(){
+  let result = document.getElementById('touchscreenInput' + tstCurrentPage).value;
+  if(result.length === 0 || !result.trim()){
+    showMessage("Result is empty. Please enter a valid result.");
+  }else{
+    createEncounter("=", result);
+  }
+}
+
+function validateNumericResults(){
+  let result = document.getElementById('touchscreenInput' + tstCurrentPage).value;
+  if(result.match(/^(>|<|=)([0-9.]+)$|Unknown/)){
+    let modifier = result.substring(0,1);
+    let numeric_result = result.substring(1,result.length);
+    createEncounter(modifier, numeric_result);
+  }else{
+    showMessage('You must enter a modifier plus numbers only (for example =90)');
+  }
+}
+
+function createEncounter(modifier, result){
+  var currentTime = moment().format(' HH:mm:ss');
+    var encounter_datetime = moment(sessionStorage.sessionDate).format('YYYY-MM-DD');
+    encounter_datetime += currentTime;
+
+    var encounter = {
+        encounter_type_name: 'LAB ORDERS',
+        encounter_type_id: 57,
+        patient_id: sessionStorage.patientID,
+        program_id: sessionStorage.programID,
+        encounter_datetime: encounter_datetime
+    }
+
+
+    let url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/encounters";
+    let parametersPassed = JSON.stringify(encounter);
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+            appendResult(JSON.parse(this.responseText), modifier, result)
+        }
+    };
+    xhttp.open("POST", url, true);
+    xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    xhttp.setRequestHeader('Content-type', "application/json");
+    xhttp.send(parametersPassed);
+}
+
+
+function appendResult(encounter, modifier, result){
+  let url = apiProtocol + "://" + apiURL + ":" + apiPort + `/api/v1/lab/tests/${obsID}/results`;
+  let year = __$('result_year').value;
+  let month = __$('result_month').value;
+  let day = __$('result_day').value;
+  let result_date = moment(`${year}/${month}/${day}`).format('YYYY-MM-DD');
+
+  let result_param = {
+    "encounter_id": encounter.encounter_id,
+    "provider_id": sessionStorage.userID,
+    "modifier": modifier,
+    "value": result,
+    "date": result_date
+  }
+  let parametersPassed = JSON.stringify(result_param);
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function () {
+      if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+          location = tt_cancel_destination;
+      }
+  };
+  xhttp.open("POST", url, true);
+  xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+  xhttp.setRequestHeader('Content-type', "application/json");
+  xhttp.send(parametersPassed);
+}
+
+
+
+
+
+
+
+
+function fetchObsID() {
+    let accession_number = window.location.href;
+    accession_number = new URL(accession_number);
+    let test_name = accession_number.searchParams.get("test_name");
+    accession_number = accession_number.searchParams.get("accession_number");
+    let url = sessionStorage.apiProtocol + "://" + sessionStorage.apiURL + ":";
+    url += sessionStorage.apiPort + "/api/v1/lab/tests";
+    url += "?accession_number=" + accession_number;
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+            var obs = JSON.parse(this.responseText);
+            for(let i = 0;  i < obs.length;i++){
+              if(obs[i].name == test_name)
+                obsID = obs[i].id;
+              
+            }
+        }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    xhttp.setRequestHeader('Content-type', "application/json");
+    xhttp.send();
+}
+
+var obsID
+fetchObsID();
+</script>
