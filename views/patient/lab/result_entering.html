@@ -24,6 +24,51 @@ var tt_cancel_destination = "/views/patient/lab/test_without_results.html";
     height: 100% !important;
   }
 
+.tt_controls_select_test_result_indicators #clearButton {
+  display: none;
+}
+
+#tt_page_select_test_result_indicators .inputFrameClass {
+  height: 90%;
+}
+
+.cells {
+  display: table-cell;
+  border-style: solid;
+  vertical-align: middle;
+  text-align: center;
+  border-width: 1px;
+}
+
+.check-box-tds {
+  width: 30px;
+}
+
+.concepts {
+  text-align: left;
+  padding-left: 20px;
+  border-top-right-radius: 9px; 
+  border-bottom-right-radius: 9px;
+  box-shadow: 0 2px 9px 1px rgba(0, 0, 0, 0.28);
+  font-family: "Nimbus Sans L","Arial Narrow",sans-serif;
+  font-size: 2.2em; 
+}
+
+#concept-table {
+  padding:0;
+  margin:1em;
+  display: table;
+  border-spacing:2px 8px;
+  padding:0;
+  position:relative;
+  width: 97%;
+}
+
+.selected {
+  background-color: lightblue;
+}
+
+
 </style>
 
 <body id="mateme">
@@ -66,8 +111,16 @@ var tt_cancel_destination = "/views/patient/lab/test_without_results.html";
             tt_onLoad="validateResultDate();getDayOfMonthPicker($('result_year').value, $('result_month').value);
               setUpPageForDateValidation();"/>
 
+
+            <input id="test_result_indicators" name="test_result_indicators" optional="true"
+               tt_onLoad="__$('keyboard').style.display = 'none'; loadResultIndicators();"
+               helpText="Select test result indicators"
+               tt_pageStyleClass="NoControls" type="text"/>
+
+
             <select type="text" name="result_type" id="result_type"
-            helpText="Result type" tt_pageStyleClass="NoKeyboard">
+            helpText="Result type" tt_pageStyleClass="NoKeyboard"
+            tt_onload="setIndicator();">
               <option value="Numeric (numbers only)">Numeric (numbers only)</option>
               <option value="Alphanumeric (text / text and numbers)">Alphanumeric (text / text and numbers)</option>
           </select>
@@ -76,14 +129,14 @@ var tt_cancel_destination = "/views/patient/lab/test_without_results.html";
           <input absoluteMin="0.0" condition="$('result_type').value == 'Numeric (numbers only)'" 
           field_type="number" helpText="Test Result" id="numeric_results" 
           name="numeric_results"
-          tt_onLoad="updateKeyPad();"
+          tt_onLoad="updateKeyPad();setHelpText();"
           tt_pageStyleClass="Numeric NumbersOnly" type="text" 
           validationMessage="You must enter a modifier plus numbers only (for example =90)"
           validationRule="^(>|<|=)([0-9.]+)$|Unknown$"/>
 
           <input type="text" name="alpha_results"
           id="alpha_results" field_type="alpha"
-          key="alpha_results" helpText="Test Result" tt_onLoad="lastPage();"
+          key="alpha_results" helpText="Test Result" tt_onLoad="lastPage();setHelpText();"
           condition="$('result_type').value == 'Alphanumeric (text / text and numbers)';"/>
 
 
@@ -146,7 +199,7 @@ function validateSetResultDate(){
 function updateKeyPad() {
   let buttons = document.getElementsByClassName("keyboardButton");
   let nextBtn = __$("nextButton");
-  nextBtn.innerHTML = "<span>Finish</span>";
+  nextBtn.innerHTML = "<span>Process</span>";
   nextBtn.setAttribute('onmousedown', "validateNumericResults();");
   nextBtn.setAttribute('onclick', "");
 
@@ -161,7 +214,7 @@ function updateKeyPad() {
 
 function lastPage() {
   let nextBtn = __$("nextButton");
-  nextBtn.innerHTML = "<span>Finish</span>";
+  nextBtn.innerHTML = "<span>Process</span>";
   nextBtn.setAttribute('onmousedown', "validateAlphaResult();");
   nextBtn.setAttribute('onclick', "");
 }
@@ -265,10 +318,11 @@ function fetchObsID() {
         if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
             var obs = JSON.parse(this.responseText);
             for(let i = 0;  i < obs.length;i++){
-              if(obs[i].name == test_name)
-                obsID = obs[i].id;
+              if(obs[i].name == test_name){}
+                obsID = obs[i].concept_id;
               
             }
+            getTestIndicators();
         }
     };
     xhttp.open("GET", url, true);
@@ -276,6 +330,117 @@ function fetchObsID() {
     xhttp.setRequestHeader('Content-type', "application/json");
     xhttp.send();
 }
+
+function getTestIndicators() {
+    let url = sessionStorage.apiProtocol + "://" + sessionStorage.apiURL + ":";
+    url += sessionStorage.apiPort + `/api/v1/lab/test_result_indicators?test_type_id=${obsID}`;
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+          test_result_indicators = JSON.parse(this.responseText);
+        }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    xhttp.setRequestHeader('Content-type', "application/json");
+    xhttp.send();
+}
+
+var test_result_indicators;
+var selectedIndicators = {};
+
+function loadResultIndicators(){
+  __$('nextButton').setAttribute("onmousedown","validateSelection();");
+  let el = __$('inputFrame' + tstCurrentPage);
+  let table = '<div id="concept-table">';
+
+  for(let i = 0; i < test_result_indicators.length; i++){
+      let data = test_result_indicators[i];
+      table += `<div style="display: table-row; border-collapse: collapse;">
+        <div selected="unselected" class="cells check-box-tds" onmousedown="selectIndicator(${data.concept_id});">
+          <img src="/public/touchscreentoolkit/lib/images/unticked.jpg" class="checks" id="checkbox-${data.concept_id}"/>
+        </div>
+        <div id="box-${data.concept_id}" onmousedown="selectIndicator(${data.concept_id});" selected="unselected" class="cells 
+          unselected concepts">${data.name}</div>
+      </div>
+      `;
+    }
+  el.innerHTML = table;
+  autoSelectSelection();
+}
+
+function selectIndicator(concept_id){
+  let boxRow = __$(`box-${concept_id}`);
+  let boxImg = __$(`checkbox-${concept_id}`);
+  let img_src;
+
+  if(boxImg.getAttribute("selected") == 'selected'){
+    img_src = '/public/touchscreentoolkit/lib/images/unticked.jpg';
+    boxImg.setAttribute("selected", "unselected");
+    boxRow.setAttribute("selected", "unselected");
+    boxRow.setAttribute("class" ,"cells unselected concepts");
+    removeSelectedIndicator(concept_id, boxRow);
+  }else{
+    img_src = '/public/touchscreentoolkit/lib/images/ticked.jpg';
+    boxImg.setAttribute("selected", "selected");
+    boxRow.setAttribute("selected", "selected");
+    boxRow.setAttribute("class" ,"cells selected concepts");
+    addSelectedIndicator(concept_id, boxRow);
+  }
+  boxImg.setAttribute("src", img_src);
+}
+
+function addSelectedIndicator(concept_id, el){
+  selectedIndicators[concept_id] = el.innerHTML;
+}
+
+function removeSelectedIndicator(concept_id, el){
+  let new_hash = {};
+  for(let concept in selectedIndicators){
+    if(parseInt(concept) == parseInt(concept_id))
+      continue;
+
+    new_hash[concept] = selectedIndicators[concept];
+  }
+  selectedIndicators = new_hash;
+}
+
+function validateSelection(){
+  if(hashIsEmpty(selectedIndicators)){
+    showMessage("Select indicator(s) to continue");
+    return;
+  }
+
+  gotoNextPage();
+}
+
+function hashIsEmpty(obj){
+  return Object.keys(obj).length === 0;
+}
+
+function autoSelectSelection(){
+  for(let concept_id in selectedIndicators){
+    selectIndicator(concept_id);
+  }
+}
+
+var indicators_processed = [];
+
+function setIndicator(){
+  for(concept_id in selectedIndicators){
+    indicators_processed.push(selectedIndicators[concept_id]);
+  }
+
+  let helpText = __$('helpText' + tstCurrentPage);
+  helpText.innerHTML += ` (${indicators_processed[(indicators_processed.length - 1)]})`;
+}
+
+function setHelpText(){
+  let helpText = __$('helpText' + tstCurrentPage);
+  helpText.innerHTML += ` (${indicators_processed[(indicators_processed.length - 1)]})`;
+}
+
 
 var obsID
 fetchObsID();
