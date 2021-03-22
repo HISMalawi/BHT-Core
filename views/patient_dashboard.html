@@ -249,6 +249,7 @@
                 <div class="tab">
                     <button class="tablinks" id="main-panel" onclick="openOrders(event, 'Open')">Open</button>
                     <button class="tablinks" onclick="openOrders(event, 'Drawn')">Drawn</button>
+                    <button class="tablinks" onclick="openOrders(event, 'Results')">Results</button>
                 </div>
 
 
@@ -258,6 +259,10 @@
                   
                 <div id="Drawn" class="tabcontent">
                     <object id="los-orders" width="98%" height="99%"></object> 
+                </div>
+
+                <div id="Results" class="tabcontent">
+                    <object id="los-results" width="98%" height="99%"></object> 
                 </div>
 
                 <!--<div id="Results" class="tabcontent">
@@ -1513,6 +1518,11 @@ if(parseInt(sessionStorage.programID) == 23) {
   losOrders = document.getElementById("los-open-orders");
   ordersApp = "/apps/" +  sessionStorage.applicationFolder;
   ordersApp += "/views/open_orders.html";
+  losOrders.setAttribute("data", ordersApp);
+
+  losOrders = document.getElementById("los-results");
+  ordersApp = "/apps/" +  sessionStorage.applicationFolder;
+  ordersApp += "/views/results.html";
   losOrders.setAttribute("data", ordersApp);
 }
 
