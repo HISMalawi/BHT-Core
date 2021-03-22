@@ -1510,25 +1510,30 @@ function openOrders(evt, tabName) {
 if(parseInt(sessionStorage.programID) == 23) {
   $("#main-panel").click();
 
-  let losOrders = document.getElementById("los-orders");
+  let losOrders = document.getElementById("los-open-orders");
   let ordersApp = "/apps/" +  sessionStorage.applicationFolder;
-  ordersApp += "/views/orders.html";
+  ordersApp += "/views/open_orders.html";
   losOrders.setAttribute("data", ordersApp);
 
-  losOrders = document.getElementById("los-open-orders");
+  losOrders = document.getElementById("los-orders");
   ordersApp = "/apps/" +  sessionStorage.applicationFolder;
-  ordersApp += "/views/open_orders.html";
+  ordersApp += "/views/orders.html";
   losOrders.setAttribute("data", ordersApp);
 
   losOrders = document.getElementById("los-results");
   ordersApp = "/apps/" +  sessionStorage.applicationFolder;
   ordersApp += "/views/results.html";
   losOrders.setAttribute("data", ordersApp);
+  
 }
 
 
 function fetchOrderData(setDate) {
     let LOSorders = document.getElementById('los-orders');
+    LOSorders.contentWindow.fetchLabOrders(setDate);
+
+
+    LOSorders = document.getElementById('los-open-orders');
     LOSorders.contentWindow.fetchLabOrders(setDate);
 }
 

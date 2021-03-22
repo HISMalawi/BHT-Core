@@ -133,9 +133,10 @@ function renderData(orders) {
       fixedHeader:    true,
       searching:      false,
       deferRender:    true,
-      scrollCollapse: false,
-      scroller:       false,
+      scroller:       true,
       lengthChange:   false,
+      scrollY:        '65vh',
+      scrollCollapse: true,
       paging:         false,
       columnDefs: [
         {"className": "accession-numbers-col", "targets": 0},
