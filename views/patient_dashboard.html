@@ -263,7 +263,7 @@
                 <div class="tab">
                     <button class="tablinks" id="main-panel" onclick="openOrders(event, 'Open')">Open</button>
                     <button class="tablinks" onclick="openOrders(event, 'Drawn')">Drawn</button>
-                    <button class="tablinks" onclick="openOrders(event, 'Results')">Results</button>
+                    <!--button class="tablinks" onclick="openOrders(event, 'Results')">Results</button-->
                 </div>
 
 
@@ -275,9 +275,9 @@
                     <object id="los-orders" width="98%" height="99%"></object> 
                 </div>
 
-                <div id="Results" class="tabcontent">
+                <!--div id="Results" class="tabcontent">
                     <object id="los-results" width="98%" height="99%"></object> 
-                </div>
+                </div-->
 
                 <!--<div id="Results" class="tabcontent">
                     <h3>Lab results</h3>
@@ -1534,10 +1534,10 @@ if(parseInt(sessionStorage.programID) == 23) {
   ordersApp += "/views/orders.html";
   losOrders.setAttribute("data", ordersApp);
 
-  losOrders = document.getElementById("los-results");
+  /*losOrders = document.getElementById("los-results");
   ordersApp = "/apps/" +  sessionStorage.applicationFolder;
   ordersApp += "/views/results.html";
-  losOrders.setAttribute("data", ordersApp);
+  losOrders.setAttribute("data", ordersApp);*/
   
 }
 
