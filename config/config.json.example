@@ -1,7 +1,7 @@
 {
 
 	"apiURL": "0.0.0.0",
-"apiPort": "3001",
+"apiPort": "3002",
 	"apiProtocol": "http",
 	"apps": [
 		{
