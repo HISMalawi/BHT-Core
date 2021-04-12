@@ -24,6 +24,88 @@ var tt_cancel_destination = "/views/patient/lab/test_without_results.html";
     height: 100% !important;
   }
 
+.tt_controls_select_test_result_indicators #clearButton {
+  display: none;
+}
+
+#tt_page_select_test_result_indicators .inputFrameClass {
+  height: 90%;
+}
+
+.cells {
+  display: table-cell;
+  border-style: solid;
+  vertical-align: middle;
+  text-align: center;
+  border-width: 1px;
+}
+
+.check-box-tds {
+  width: 30px;
+}
+
+.concepts {
+  text-align: left;
+  padding-left: 20px;
+  border-top-right-radius: 9px; 
+  border-bottom-right-radius: 9px;
+  box-shadow: 0 2px 9px 1px rgba(0, 0, 0, 0.28);
+  font-family: "Nimbus Sans L","Arial Narrow",sans-serif;
+  font-size: 2.2em; 
+}
+
+#concept-table {
+  padding:0;
+  margin:1em;
+  display: table;
+  border-spacing:2px 8px;
+  padding:0;
+  position:relative;
+  width: 97%;
+}
+
+.selected {
+  background-color: lightblue;
+}
+
+.summary-table {
+  width: 100%;
+  font-size: 26px;
+  border-collapse: collapse;
+}
+
+.summary-table th {
+  border-bottom-style: solid;
+  border-width: 15px;
+}
+
+.summary-table td {
+  border-bottom-style: solid;
+  border-width: 1px;
+  line-height: 60px;
+}
+
+.test-names {
+  text-align: left;
+  margin-left: 5px;
+  width: 65%;
+}
+
+.test-modifiers {
+  text-align: center;
+  width: 20px;
+}
+
+.test-values {
+  text-align: right;
+  margin-right: 5px;
+}
+
+#tt_page_confirm_entry .inputFrameClass {
+  height: 90%;
+}
+
+
 </style>
 
 <body id="mateme">
@@ -66,8 +148,16 @@ var tt_cancel_destination = "/views/patient/lab/test_without_results.html";
             tt_onLoad="validateResultDate();getDayOfMonthPicker($('result_year').value, $('result_month').value);
               setUpPageForDateValidation();"/>
 
+
+            <input id="test_result_indicators" name="test_result_indicators" optional="true"
+               tt_onLoad="__$('keyboard').style.display = 'none'; loadResultIndicators();"
+               helpText="Select test result indicators"
+               tt_pageStyleClass="NoControls" type="text"/>
+
+
             <select type="text" name="result_type" id="result_type"
-            helpText="Result type" tt_pageStyleClass="NoKeyboard">
+            helpText="Result type" tt_pageStyleClass="NoKeyboard"
+            tt_onload="setIndicator();">
               <option value="Numeric (numbers only)">Numeric (numbers only)</option>
               <option value="Alphanumeric (text / text and numbers)">Alphanumeric (text / text and numbers)</option>
           </select>
@@ -76,17 +166,21 @@ var tt_cancel_destination = "/views/patient/lab/test_without_results.html";
           <input absoluteMin="0.0" condition="$('result_type').value == 'Numeric (numbers only)'" 
           field_type="number" helpText="Test Result" id="numeric_results" 
           name="numeric_results"
-          tt_onLoad="updateKeyPad();"
+          tt_onLoad="updateKeyPad();setHelpText();"
           tt_pageStyleClass="Numeric NumbersOnly" type="text" 
           validationMessage="You must enter a modifier plus numbers only (for example =90)"
           validationRule="^(>|<|=)([0-9.]+)$|Unknown$"/>
 
           <input type="text" name="alpha_results"
           id="alpha_results" field_type="alpha"
-          key="alpha_results" helpText="Test Result" tt_onLoad="lastPage();"
+          key="alpha_results" helpText="Test Result" tt_onLoad="lastPage();setHelpText();"
           condition="$('result_type').value == 'Alphanumeric (text / text and numbers)';"/>
 
 
+          <input id="summary" name="summary" optional="true"
+               tt_onLoad="__$('keyboard').style.display = 'none'; loadConfirmation();"
+               helpText="Confirm entry"
+               tt_pageStyleClass="NoControls" type="text"/>
 
          </form>
 
@@ -146,7 +240,7 @@ function validateSetResultDate(){
 function updateKeyPad() {
   let buttons = document.getElementsByClassName("keyboardButton");
   let nextBtn = __$("nextButton");
-  nextBtn.innerHTML = "<span>Finish</span>";
+  nextBtn.innerHTML = "<span>Process</span>";
   nextBtn.setAttribute('onmousedown', "validateNumericResults();");
   nextBtn.setAttribute('onclick', "");
 
@@ -161,7 +255,7 @@ function updateKeyPad() {
 
 function lastPage() {
   let nextBtn = __$("nextButton");
-  nextBtn.innerHTML = "<span>Finish</span>";
+  nextBtn.innerHTML = "<span>Process</span>";
   nextBtn.setAttribute('onmousedown', "validateAlphaResult();");
   nextBtn.setAttribute('onclick', "");
 }
@@ -171,7 +265,7 @@ function validateAlphaResult(){
   if(result.length === 0 || !result.trim()){
     showMessage("Result is empty. Please enter a valid result.");
   }else{
-    createEncounter("=", result);
+    addToOrdersObj('=', result, 'text');
   }
 }
 
@@ -180,13 +274,13 @@ function validateNumericResults(){
   if(result.match(/^(>|<|=)([0-9.]+)$|Unknown/)){
     let modifier = result.substring(0,1);
     let numeric_result = result.substring(1,result.length);
-    createEncounter(modifier, numeric_result);
+    addToOrdersObj(modifier, numeric_result, 'numeric');
   }else{
     showMessage('You must enter a modifier plus numbers only (for example =90)');
   }
 }
 
-function createEncounter(modifier, result){
+function createEncounter(){
   var currentTime = moment().format(' HH:mm:ss');
     var encounter_datetime = moment(sessionStorage.sessionDate).format('YYYY-MM-DD');
     encounter_datetime += currentTime;
@@ -206,7 +300,7 @@ function createEncounter(modifier, result){
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
-            appendResult(JSON.parse(this.responseText), modifier, result)
+            appendResult(JSON.parse(this.responseText))
         }
     };
     xhttp.open("POST", url, true);
@@ -216,20 +310,31 @@ function createEncounter(modifier, result){
 }
 
 
-function appendResult(encounter, modifier, result){
-  let url = apiProtocol + "://" + apiURL + ":" + apiPort + `/api/v1/lab/tests/${obsID}/results`;
+function appendResult(encounter){
+  let url = apiProtocol + "://" + apiURL + ":" + apiPort + `/api/v1/lab/tests/${mainTestID}/results`;
   let year = __$('result_year').value;
   let month = __$('result_month').value;
   let day = __$('result_day').value;
   let result_date = moment(`${year}/${month}/${day}`).format('YYYY-MM-DD');
 
   let result_param = {
-    "encounter_id": encounter.encounter_id,
-    "provider_id": sessionStorage.userID,
-    "modifier": modifier,
-    "value": result,
-    "date": result_date
+    encounter_id: encounter.encounter_id,
+    provider_id: sessionStorage.userID,
+    date: result_date,
+    measures: []
   }
+
+  for(result_id in measuresHash){
+    result_param.measures.push({
+      indicator: {
+        concept_id: result_id
+      },
+      value: measuresHash[result_id].value,
+      value_modifier: measuresHash[result_id].value_modifier,
+      value_type: measuresHash[result_id].value_type
+    });
+  }
+
   let parametersPassed = JSON.stringify(result_param);
 
   var xhttp = new XMLHttpRequest();
@@ -265,10 +370,13 @@ function fetchObsID() {
         if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
             var obs = JSON.parse(this.responseText);
             for(let i = 0;  i < obs.length;i++){
-              if(obs[i].name == test_name)
-                obsID = obs[i].id;
+              if(obs[i].name == test_name){
+                obsID = obs[i].concept_id;
+                mainTestID = obs[i].id;
+              }
               
             }
+            getTestIndicators();
         }
     };
     xhttp.open("GET", url, true);
@@ -277,6 +385,171 @@ function fetchObsID() {
     xhttp.send();
 }
 
-var obsID
+function getTestIndicators() {
+    let url = sessionStorage.apiProtocol + "://" + sessionStorage.apiURL + ":";
+    url += sessionStorage.apiPort + `/api/v1/lab/test_result_indicators?test_type_id=${obsID}`;
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+          test_result_indicators = JSON.parse(this.responseText);
+        }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    xhttp.setRequestHeader('Content-type', "application/json");
+    xhttp.send();
+}
+
+var test_result_indicators;
+var selectedIndicators = {};
+
+function loadResultIndicators(){
+  __$('nextButton').setAttribute("onmousedown","validateSelection();");
+  let el = __$('inputFrame' + tstCurrentPage);
+  let table = '<div id="concept-table">';
+
+  for(let i = 0; i < test_result_indicators.length; i++){
+      let data = test_result_indicators[i];
+      table += `<div style="display: table-row; border-collapse: collapse;">
+        <div selected="unselected" class="cells check-box-tds" onmousedown="selectIndicator(${data.concept_id});">
+          <img src="/public/touchscreentoolkit/lib/images/unticked.jpg" class="checks" id="checkbox-${data.concept_id}"/>
+        </div>
+        <div id="box-${data.concept_id}" onmousedown="selectIndicator(${data.concept_id});" selected="unselected" class="cells 
+          unselected concepts">${data.name}</div>
+      </div>
+      `;
+    }
+  el.innerHTML = table;
+  el.style.overflow = 'auto';
+  autoSelectSelection();
+}
+
+function selectIndicator(concept_id){
+  let boxRow = __$(`box-${concept_id}`);
+  let boxImg = __$(`checkbox-${concept_id}`);
+  let img_src;
+
+  if(boxImg.getAttribute("selected") == 'selected'){
+    img_src = '/public/touchscreentoolkit/lib/images/unticked.jpg';
+    boxImg.setAttribute("selected", "unselected");
+    boxRow.setAttribute("selected", "unselected");
+    boxRow.setAttribute("class" ,"cells unselected concepts");
+    removeSelectedIndicator(concept_id, boxRow);
+  }else{
+    img_src = '/public/touchscreentoolkit/lib/images/ticked.jpg';
+    boxImg.setAttribute("selected", "selected");
+    boxRow.setAttribute("selected", "selected");
+    boxRow.setAttribute("class" ,"cells selected concepts");
+    addSelectedIndicator(concept_id, boxRow);
+  }
+  boxImg.setAttribute("src", img_src);
+}
+
+function addSelectedIndicator(concept_id, el){
+  selectedIndicators[concept_id] = el.innerHTML;
+}
+
+function removeSelectedIndicator(concept_id, el){
+  let new_hash = {};
+  for(let concept in selectedIndicators){
+    if(parseInt(concept) == parseInt(concept_id))
+      continue;
+
+    new_hash[concept] = selectedIndicators[concept];
+  }
+  selectedIndicators = new_hash;
+}
+
+function validateSelection(){
+  if(hashIsEmpty(selectedIndicators)){
+    showMessage("Select indicator(s) to continue");
+    return;
+  }
+
+  gotoNextPage();
+}
+
+function hashIsEmpty(obj){
+  return Object.keys(obj).length === 0;
+}
+
+function autoSelectSelection(){
+  for(let concept_id in selectedIndicators){
+    selectIndicator(concept_id);
+  }
+}
+
+var indicators_processed = [];
+
+function setIndicator(){
+  for(concept_id in selectedIndicators){
+    indicators_processed.push(selectedIndicators[concept_id]);
+  }
+
+  let helpText = __$('helpText' + tstCurrentPage);
+  helpText.innerHTML += ` (${indicators_processed[(indicators_processed.length - 1)]})`;
+}
+
+function setHelpText(){
+  let helpText = __$('helpText' + tstCurrentPage);
+  let indicator_text = indicators_processed[(indicators_processed.length - 1)];
+  helpText.innerHTML += ` (${indicator_text})`;
+
+  for(concept_id in selectedIndicators){
+    if(selectedIndicators[concept_id] == indicator_text)
+      testID = concept_id;
+
+  }
+}
+
+function addToOrdersObj(modifier, result, textNumeric){
+  measuresHash[testID] = {
+    indicator: {
+      concept_id: obsID
+    },
+    value: result,
+    value_modifier: modifier,
+    value_type: textNumeric,
+    test_name: selectedIndicators[testID]
+  };
+
+  removeSelectedIndicator(testID, {})
+
+  if(hashIsEmpty(selectedIndicators)){
+    gotoNextPage();
+  }else{
+    clearInput();
+    gotoPage(tstCurrentPage - 1);
+  }
+}
+
+function loadConfirmation(){
+  let backButton = __$('backButton');
+  backButton.setAttribute("onmousedown", "gotoPage(3);");
+  let table = `<table class='summary-table'>
+    <thead><tr>
+      <th class="test-names">Test</th>
+      <th class="test-modifiers">Modifier</th>
+      <th class="test-values">Result</th>
+    </tr></thead><tboady>`;
+
+  for(let test_id in measuresHash){
+    table += `<tr>
+      <td class="test-names">${measuresHash[test_id].test_name}</td>
+      <td class="test-modifiers">${measuresHash[test_id].value_modifier}</td>
+      <td class="test-values">${measuresHash[test_id].value}</td>
+    `;
+  }
+  __$('inputFrame' + tstCurrentPage).innerHTML = (table += '</tbody><table>');
+    let nextButton = __$('nextButton');
+    nextButton.setAttribute("onmousedown", "createEncounter();")
+}
+
+var obsID;
+var testID;
+var measuresHash = {};
+var mainTestID;
+
 fetchObsID();
 </script>

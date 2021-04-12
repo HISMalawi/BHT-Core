@@ -52,6 +52,20 @@
         color: white !important; 
     }*/
 
+    .list-group-item td {
+        margin: 0px 10px 0px 10px !important;
+    }
+
+    .table {
+        width: 93% !important;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .list-group a {
+        margin: 0px 10px 0px 10px !important;
+    }
+
     .badge {
         background-color: #007bff;
     }
@@ -249,6 +263,7 @@
                 <div class="tab">
                     <button class="tablinks" id="main-panel" onclick="openOrders(event, 'Open')">Open</button>
                     <button class="tablinks" onclick="openOrders(event, 'Drawn')">Drawn</button>
+                    <!--button class="tablinks" onclick="openOrders(event, 'Results')">Results</button-->
                 </div>
 
 
@@ -259,6 +274,10 @@
                 <div id="Drawn" class="tabcontent">
                     <object id="los-orders" width="98%" height="99%"></object> 
                 </div>
+
+                <!--div id="Results" class="tabcontent">
+                    <object id="los-results" width="98%" height="99%"></object> 
+                </div-->
 
                 <!--<div id="Results" class="tabcontent">
                     <h3>Lab results</h3>
@@ -1505,20 +1524,30 @@ function openOrders(evt, tabName) {
 if(parseInt(sessionStorage.programID) == 23) {
   $("#main-panel").click();
 
-  let losOrders = document.getElementById("los-orders");
+  let losOrders = document.getElementById("los-open-orders");
   let ordersApp = "/apps/" +  sessionStorage.applicationFolder;
+  ordersApp += "/views/open_orders.html";
+  losOrders.setAttribute("data", ordersApp);
+
+  losOrders = document.getElementById("los-orders");
+  ordersApp = "/apps/" +  sessionStorage.applicationFolder;
   ordersApp += "/views/orders.html";
   losOrders.setAttribute("data", ordersApp);
 
-  losOrders = document.getElementById("los-open-orders");
+  /*losOrders = document.getElementById("los-results");
   ordersApp = "/apps/" +  sessionStorage.applicationFolder;
-  ordersApp += "/views/open_orders.html";
-  losOrders.setAttribute("data", ordersApp);
+  ordersApp += "/views/results.html";
+  losOrders.setAttribute("data", ordersApp);*/
+  
 }
 
 
 function fetchOrderData(setDate) {
     let LOSorders = document.getElementById('los-orders');
+    LOSorders.contentWindow.fetchLabOrders(setDate);
+
+
+    LOSorders = document.getElementById('los-open-orders');
     LOSorders.contentWindow.fetchLabOrders(setDate);
 }
 
