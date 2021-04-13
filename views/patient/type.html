@@ -1,0 +1,126 @@
+<script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+
+<script type="text/javascript" src="/assets/js/post_parameters.js"></script>
+<script type="text/javascript" src="/assets/js/generic_ajaxrequest.js"></script>
+
+<script type="text/javascript" src="/assets/js/moment.js"></script>
+<script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
+<!--script type="text/javascript" src="/assets/js/does_connection_exist.js"></script-->
+
+<link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
+
+<script>
+      var tt_cancel_destination = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
+
+    function pullLastPatientType(){
+        let nextBTN = document.getElementById('nextButton');
+        nextBTN.setAttribute("onmousedown","submitSelection();");
+        fetchLastObs();
+    }
+
+    var current_type;
+
+    function fetchLastObs(){
+        let url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/";
+        url += 'observations?person_id=' + sessionStorage.patientID + '&concept_id=3289';
+        //url += '&start_date=1900-01-01&end_date=' + moment().format('YYYY-MM-DD');
+        url += '&page=0&page_size=1'
+
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+                let obs = JSON.parse(this.responseText);
+                let helpText = `<span style="font-size: 14px">&nbsp;(Current type:`;
+                if(obs) {
+                    current_type = (obs[0].value_coded == 7572 ? 'New patient' : 'External Consultation');
+                    helpText += ` <b>${current_type}</b>)</span>`
+                }else{
+                    helpText += ` <b>Not set</b>)</span>`
+                }
+                helpTextE = document.getElementById('helpText' + tstCurrentPage);
+                helpTextE.innerHTML += helpText;
+            }
+        };
+        xhttp.open("GET", url, true);
+        xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+        xhttp.setRequestHeader('Content-type', "application/json");
+        xhttp.send();
+    }
+
+    function submitSelection(){
+        let selected_option = document.getElementById('touchscreenInput' + tstCurrentPage).value;
+        let valid_input = (selected_option == 'External consultation' || selected_option == 'New patient');
+        if(!valid_input){
+            showMessage('Please select a valid option.');
+            return;
+        }
+
+        if(selected_option == current_type){
+            showMessage('Selected option can <b>NOT</b> be the current type.');
+            return;
+        }
+
+        var currentTime = moment().format(' HH:mm:ss');
+        var encounter_datetime = moment(sessionStorage.sessionDate).format('YYYY-MM-DD');
+        encounter_datetime += currentTime;
+
+        var encounter = {
+            encounter_type_id: 5,
+            patient_id: sessionStorage.patientID,
+            encounter_datetime: encounter_datetime
+        };
+
+        submitParameters(encounter, "/encounters", "postObs");
+    }
+
+    function postObs(encounter){
+        let selected_option = document.getElementById('touchscreenInput' + tstCurrentPage).value;
+        let patient_type = selected_option == 'New patient' ? 7572 : 9684
+        var currentTime = moment().format(' HH:mm:ss');
+        var obs_datetime = moment(sessionStorage.sessionDate).format('YYYY-MM-DD');
+
+        var obs = {
+            encounter_id: encounter.encounter_id,
+            observations: [{
+                concept_id: 3289, value_coded: patient_type,
+                obs_datetime: obs_datetime
+            }]
+        }
+        submitParameters(obs, "/observations", "nextPage")
+    }
+
+    function nextPage(obs){
+        location = tt_cancel_destination;
+    }
+</script>
+
+<style>
+    .inputFrameClass {
+        width: 95.5% !important;
+    }
+
+</style>
+<body id="mateme">
+    <div id="container">
+      <div id="content">
+  
+  
+        <form>
+  
+        <select allowFreeText="false" helpText="Type of patient"
+            name="patient_type"
+            id="patient_type"
+            tt_onLoad="pullLastPatientType();"
+            tt_onUnLoad=""
+            key="gender">
+                <option value=""></option>
+                <option value="New patient">New patient</option>
+                <option value="External consultation">External consultation</option>
+        </select>
+
+        </form>
+  
+     </div>
+   </div>
+  </body>

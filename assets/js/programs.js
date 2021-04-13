@@ -40,6 +40,7 @@ function addPrograms(programs) {
     td.setAttribute('class','program-names');
     td.setAttribute('id', programs[i].program.program_id);
     td.setAttribute('program-name', programs[i].program.name);
+    td.setAttribute('patient_program_id', programs[i].patient_program_id);
     td.setAttribute('onclick','showStates(this);');
     td.innerHTML = programs[i].program.name
     tr.appendChild(td);
@@ -112,6 +113,60 @@ function showStates(program){
 
   var root = document.getElementById('buttons');
   root.appendChild(btn);
+
+  buildVoidBTN(program);
+}
+
+function buildVoidBTN(el){
+  program_name =  el.getAttribute("program-name");
+  if(!program_name == "HIV PROGRAM")
+    return;
+
+  var patient_program_id = el.getAttribute("patient_program_id");
+  var root  = document.getElementById("buttons");
+  try {
+    var btn = document.getElementById("void-program");
+    root.removeChild(btn);
+    btn = document.createElement("button");
+  }catch(e){
+    var btn = document.createElement("button");
+  }
+
+  
+  btn.setAttribute("class","button navButton red");
+  btn.setAttribute("id","void-program");
+  btn.innerHTML = "<span>Void program</span>";
+  btn.setAttribute("onmousedown","voidProgram(" + patient_program_id + ");");
+  root.appendChild(btn);
+}
+
+function voidProgram(patient_program_id){
+  var modal = document.getElementById("myModal");
+  modal.style.display = "block";
+  document.getElementById("myModalLabel").innerHTML = "Are you sure you want to void this program?"
+  var yesBTN = document.getElementById("modal-btn-si");
+  yesBTN.setAttribute("onclick","voidSelectedProgram(" + patient_program_id + ");");
+}
+
+function voidSelectedProgram(patient_program_id){
+  var url = sessionStorage.apiProtocol+ '://' + apiURL + ':' + apiPort + '/api/v1/' 
+  url += "patient_programs/" + patient_program_id + "?reason=" + void_reason;
+  var req = new XMLHttpRequest();
+  req.onreadystatechange = function () {
+
+    if (this.readyState == 4) {
+      if (this.status == 204) {
+        window.location.reload();
+      }
+    }
+  };
+  try {
+    req.open('DELETE', url, true);
+    req.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
+    req.send();
+  } catch (e) {
+  }
+
 }
 
 function updateState(program_id) {
@@ -227,6 +282,7 @@ function createVoidLink (options = {}) {
         event: 'click',
         handler: (event) => {
           var modal = document.getElementById("myModal");
+          document.getElementById("myModalLabel").innerHTML = "Are you sure you want to void this state?"
           modal.style.display = "block";
           var btn = document.getElementById("modal-btn-si");
           btn.onclick = function() {

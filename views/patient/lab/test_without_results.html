@@ -1,163 +1,159 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-  <head>
-    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+<script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js"
+defer="true"></script>
+<!-- <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/standard.js" defer="true"></script> -->
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 
-    <script language="javascript" defer="true">
-      tstUsername = "";
-      tstUserKeyboardPref = "qwerty";
+<script type="text/javascript" src="/assets/js/generic_ajaxrequest.js"></script>
+<script type="text/javascript" src="/assets/js/moment.js"></script>
+<script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
+<!--script type="text/javascript" src="/assets/js/does_connection_exist.js"></script-->
 
-      var d = new Date();
-      d.toDateString();
+<link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
 
-      function getInput(){
-        key = $('touchscreenInput' + tstCurrentPage).getAttribute("key");
-         value = $('touchscreenInput' + tstCurrentPage).value;
-         value = value.charAt(0).toUpperCase() + value.slice(1);     
-         sessionStorage.setItem(key, value);
-         var d = new Date();
-         sessionStorage.setItem("date_created", d.toDateString());
-      }  
 
-      function enterResult(){
-          window.location = "result_entering.html";
-      }
+<link rel="stylesheet" href="/../../assets/css/datatables/jquery.dataTables.min.css" type="text/css">
 
-    </script>
+<script type="text/javascript" src="/../../assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="/../../assets/js/moment.js"></script>
+<script type="text/javascript" src="/../../assets/js/datatables/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/../../assets/js/datatables/dataTables.fixedHeader.min.js"></script>
 
-   
-    <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
-    <script type="text/javascript" src="/assets/js/core.js"></script>
-      <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
-      <script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
+<style>
+#cancelButton, #clearButton {
+    display: none;
+}
 
-      <link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
+#orders-table {
+    border-collapse:separate;
+}
 
-      <link rel="stylesheet" href="/assets/css/bootstrap/bootstrap.min.css">
-      <link rel="stylesheet" href="/assets/css/maindashboard/header.css">
-      <link rel="stylesheet" href="/assets/css/maindashboard/footer.css">
-      <link rel="stylesheet" href="/assets/css/custom.css">
-      <link rel="stylesheet" href="/assets/css/patientdashboard.css">
-      <link rel="stylesheet" href="/assets/css/demographics-header.css">
-      <script src="/assets/js/jquery.min.js"></script>
-      <script src="/assets/js/bootstrap/bootstrap.min.js"></script>
-      <script src="/assets/js/moment.js"></script>
-  
-      <!-- ...................... -->
-      <link rel="stylesheet" href="/assets/css/datatables/fixedHeader.dataTables.min.css" type="text/css">
-      <link rel="stylesheet" href="/assets/css/datatables/jquery.dataTables.min.css" type="text/css">
-  
-      <script type="text/javascript" src="/assets/js/datatables/jquery.dataTables.min.js"></script>
-      <script type="text/javascript" src="/assets/js/datatables/dataTables.fixedHeader.min.js"></script>
-      <script src="/assets/js/medication.history.js"></script>
-      <!-- ...................... -->
-  
-      <script src="/assets/js/lab.history.js"></script>
+#orders-table td {
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+    text-align: left;
+    padding-left: 20px;
+}
 
-  </head>
-  <body id="mateme">
-    <div id="container">
-            <div id="content">
+#orders-table th {
+    text-align: left;
+}
 
-                <div class="col-sm-6 col-lg-6 col-md-6 col-xs-6" style="border: solid 0px; width: 90%; margin-left: 5%;margin-top: 3%;">
-                            <div class="text-white mb-3 cards" style="width: 98%; height: 600px; overflow: hidden;border: thin solid black;"
-                            >
-                                <div class="card-header h4 btn-success" style="margin: 3%; padding: 1%;">Test Without Results</div>
-                                <div class="list-group" id="programs" style="height: 100%; overflow: hidden;">
-                                </div>
-                                    <table class="table" style="position: absolute;top:20%;width: 85%;margin-left: 5%;">
-                                        <thead >
-                                            <tr style="font-size:150%;">
-                                                <th>Test Name</th>
-                                                <th>Date & Time Sample Drawn</th>
-                                                <th>Tracking Number</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody  style="font-size:150%;" id="data">
-                                            
-                                        </tbody>
-                                    </table>
-                                <div class="card-footer" style="margin: 1%;">
-                                </div>
-                            </div>
-                </div>
+.btns-col {
+    text-align: center !important;
+}
 
-            </div>
+.date-col {
+    text-align: center !important;
+}
+</style>
+
+
+<body id="mateme">
+  <div id="container">
+      <div id="content">
+
+        <form>
+
+            <input type="text" name="summary"
+            tt_onLoad="__$('keyboard').style.display = 'none';buildTable();"
+            tt_pageStyleClass="NoControls" helpText="Test without results" optional="true"/>
+
+         </form>
+
     </div>
-
-    <footer class="footer">
-            <div class="container-footer">
-                <button class="btn btn-success buttons blue" style="margin-right: 5px;" data-toggle="modal"
-                        data-target="#appModal" onclick="window.location = 'order_and_enter_result.html'">
-                    <span>&nbsp;&nbsp; VL Order & Give Result &nbsp;&nbsp;</span>
-                </button>
-
-                <button class="btn btn-danger buttons red" style="margin-right: 5px;" data-toggle="modal"
-                        data-target="#appModal" onclick="cancel()">
-                    <span>&nbsp;&nbsp; Cancel &nbsp;&nbsp;</span>
-                </button>
-               
-            </div>
-    </footer>
+  </div>
+</body>
 
 <script>
+function buildTable(){
+    let inputFrame = document.getElementById("inputFrame" + tstCurrentPage);
+    inputFrame.style = 'width:95.5%; height:90%;';
+    let nextButton = document.getElementById("nextButton");
+    nextButton.setAttribute("onmousedown",`location='/views/patient_dashboard.html?patient_id=${sessionStorage.patientID}'`);
+    inputFrame.innerHTML = `<table id="orders-table" class="order-tables">
+      <thead>
+        <tr>
+          <th>Accession#</th>
+          <th>Specimen</th>
+          <th>Test</th>
+          <th>Order date</th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+    </table>`;
+    initDataTable();
+    fetchData();
+}
 
-    function loadData(){
-        var patientID = sessionStorage.getItem("patientID");
-        var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1";
-            url += '/programs/1/lab_tests/orders_without_results?patient_id=' + sessionStorage.patientID;
+function fetchData(){
+    let url = sessionStorage.apiProtocol+ '://' + sessionStorage.apiURL + ':' 
+    url += sessionStorage.apiPort + '/api/v1/lab/orders';
+    url += "?patient_id=" +  sessionStorage.patientID + "&status=drawn";
+    //url += "&date=" + setDate + "&status=drawn";
 
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function () {
-                if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
-                    var obs = JSON.parse(this.responseText);
-                    if(obs.length >0)
-                    {   var tr = document.getElementById("data");
-                        obs.forEach(element => {
-                            status = element["status"];
-                            createdAt = element["created_at"];
-                            trackingNumber = element["tracking_number"];
-                            testName = element["test_name"];
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+            var orders = JSON.parse(this.responseText);
+            renderData(orders);
+        }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    xhttp.setRequestHeader('Content-type', "application/json");
+    xhttp.send(); 
+}
 
-                            var row = tr.insertRow(0);                           
-                            var cel = row.insertCell(0);
-                                cel.innerHTML = testName;
-                                cel.style.fontSize = "100%";
+function renderData(orders) {
+    dataTable.clear();
 
-                            var cel = row.insertCell(1);
-                                cel.innerHTML = createdAt;
-                                cel.style.fontSize = "100%";
-                            
-                            var cel = row.insertCell(2);
-                                cel.innerHTML = trackingNumber;
-                                cel.style.fontSize = "100%";    
-                            row.onclick = function(){sessionStorage.setItem("select_test_for_result",JSON.stringify([trackingNumber,testName])); window.location="result_entering.html"};
-                        });                       
-                        
-                    }
-                    else{
-                        var tr = document.getElementById("data");
-                        var row = tr.insertRow(0);
-                        var cel = row.insertCell(0);
-                            cel.innerHTML = "no tests pending for results";
-                            cel.style.color = "red"
-                            cel.style.fontSize = "100%";
-                    }
-
-                }
-            };
-            xhttp.open("GET", url, true);
-            xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
-            xhttp.setRequestHeader('Content-type', "application/json");
-            xhttp.send();
-
-        
+    for(let i = 0; i < orders.length; i++){
+      let accession_number = orders[i].accession_number;
+      let order_date = moment(orders[i].order_date).format("DD/MMM/YYYY");
+      let specimen = orders[i].specimen.name;
+      let tests = orders[i].tests;
+      let order_id =  orders[i].order_id;
+      
+      for(let t = 0; t < tests.length; t++){
+        let result = tests[t].result;
+        if(result)
+            continue;
+            
+        dataTable.row.add([accession_number, specimen, 
+          tests[t].name, order_date, addEnterResultsBTN(accession_number, tests[t].name)]).draw();
+      }
     }
 
-    function cancel(){
-        window.location = "../../patient_dashboard.html?patient_id=" + sessionStorage.getItem("patientID");
-    }
+  }
 
-    loadData();
+  var dataTable;
+
+  function initDataTable(){
+    dataTable = jQuery('#orders-table').DataTable( {
+      fixedHeader:    true,
+      searching:      false,
+      deferRender:    true,
+      scroller:       true,
+      lengthChange:   false,
+      scrollY:        '65vh',
+      scrollCollapse: true,
+      paging:         false,
+      columnDefs: [
+        {"className": "accession-numbers-col", "targets": 0},
+        {"className": "specimen-col", "targets": 1},
+        {"className": "tests-col", "targets": 2},
+        {"className": "date-col", "targets": 3},
+        {"className": "btns-col", "targets": 4}
+      ]
+    });
+  }
+
+  function addEnterResultsBTN(accession_number, test_name){
+      return `<button class="button blue navButton"
+        onmousedown="selectTest('${accession_number}', '${test_name}');"><span>Select</span></button>`
+  }
+
+  function selectTest(accession_number, test_name){
+    location = `result_entering.html?accession_number=${accession_number}&test_name=${test_name}`;
+  }
 </script>

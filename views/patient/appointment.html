@@ -653,7 +653,7 @@ function selectDate(e) {
   } 
   
   if(clinic_holidays.indexOf(selected_date) >= 0){
-    showMessage(moment().format('DD/MMM/YYYY') + ' is a clinic holiday');
+    showMessage(moment(selected_date).format('DD/MMM/YYYY') + ' is a clinic holiday');
     return;
   } 
   
@@ -716,6 +716,11 @@ function getMonthInNum(str) {
 }
 
 function nextPage(obs){
+  if(sessionStorage.applicationFolder.match(/cxca/i)){
+    nextEncounter(patientID, programID);
+    return;
+  } 
+
   var url = "/programs/"+programID+"/patients/" + patientID + "/labels/visits?date=" + sessionStorage.sessionDate
   url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1" + url;
   document.location = url;

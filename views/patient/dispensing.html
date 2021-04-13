@@ -5,6 +5,8 @@
 
 <link rel="stylesheet" href="/assets/css/dispensing.css" type="text/css">
 <script type="text/javascript" src="/assets/js/dispensing.js"></script>
+<script type="text/javascript" src="/assets/js/GlobalProperty.js"></script>
+<script type="text/javascript" src="/assets/js/httpUtils.js"></script>
 
 <script type="text/javascript" src="/assets/js/post_parameters.js"></script>
 <script type="text/javascript" src="/assets/js/client-scan-barcode.js"></script>
@@ -42,6 +44,14 @@
 #cancelButton {
   display: none;
 }
+.dispensing-table{
+  width: 100%;
+  margin-bottom: 1%;
+}
+.dispensing-tds {
+  border: solid 1px black;
+  text-align: center;
+}
 </style>
 
 <script>
@@ -65,8 +75,12 @@ function changeNextButton() {
 }
 
 function doneDispensation() {
-  window.location = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID
-  //nextEncounter(sessionStorage.patientID, 1);
+  if(sessionStorage.userActivities.search(/Dispensations/ig) > 0) {
+    confirmCancelEntryWithMessage(null, "Are all dispensationsations complete?, continue to patient dashboard?", '/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID, true);
+  }else {
+    window.location = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID
+  }
+
 }
 var patient_id = sessionStorage.patientID;
 var tt_cancel_destination = "/views/patient_dashboard.html?patient_id=" + patient_id;

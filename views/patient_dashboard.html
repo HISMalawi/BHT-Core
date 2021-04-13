@@ -28,7 +28,6 @@
     <!-- ...................... -->
 
 
-
 </head>
 <body>
 <script src="/assets/js/generic_ajaxrequest.js">
@@ -52,6 +51,20 @@
         /*background-color: transparent !important;
         color: white !important; 
     }*/
+
+    .list-group-item td {
+        margin: 0px 10px 0px 10px !important;
+    }
+
+    .table {
+        width: 93% !important;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .list-group a {
+        margin: 0px 10px 0px 10px !important;
+    }
 
     .badge {
         background-color: #007bff;
@@ -181,14 +194,107 @@
     <!-- /visits div-->
 
     <!-- visit details div-->
+
+
+
     <div class="col-sm-10 col-lg-10 col-md-10 col-xs-10 cards"
          style="border: solid 2px;width: 80%; padding: 0; margin-left: 1%; height: 520px; margin-top: 1%;margin-right: 2%; width: 78%;"
          id="generic_tabs">
+
+
+
+
         <div class="row" style="display: flex;"><h4 class="headers" style="margin-left: 40px; ">Today&apos;s Date: <span
                 id="todaysDate"></span> | </h4>
-            <h4 class="headers"> Next Task: <span id="nextEncounter"></span> | </h4>
+            <h4 class="headers" id="nextEncounterHeader"> Next Task: <span id="nextEncounter"></span> | </h4>
             <h4 class="headers todays-date"> Set Date: <span id="selectedDate"></span></h4>
         </div>
+
+
+    <!-- For  lab data only -->
+    <style>
+        /* Style the tab */
+        .tab {
+          overflow: hidden;
+          border: 1px solid #ccc;
+          background-color: #f1f1f1;
+        }
+
+        /* Style the buttons inside the tab */
+        .tab button {
+          background-color: inherit;
+          float: left;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          padding: 14px 16px;
+          transition: 0.3s;
+          font-size: 17px;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+          background-color: #ddd;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+          background-color: #ccc;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+          display: none;
+          padding: 6px 12px;
+          border: 1px solid #ccc;
+          border-top: none;
+          height: 50vh;
+        }
+    </style>
+
+
+    <span id="lab-program">
+        <div class="row">
+            <div class="col-sm-12 col-lg-12 col-md-12 col-xs-12"
+                style="margin-left: 2%;border: solid 0px; width: 95%; margin-left: 3%;">
+                
+
+
+                <div class="tab">
+                    <button class="tablinks" id="main-panel" onclick="openOrders(event, 'Open')">Open</button>
+                    <button class="tablinks" onclick="openOrders(event, 'Drawn')">Drawn</button>
+                    <!--button class="tablinks" onclick="openOrders(event, 'Results')">Results</button-->
+                </div>
+
+
+                <div id="Open" class="tabcontent">
+                    <object id="los-open-orders" width="98%" height="99%"></object> 
+                </div>
+                  
+                <div id="Drawn" class="tabcontent">
+                    <object id="los-orders" width="98%" height="99%"></object> 
+                </div>
+
+                <!--div id="Results" class="tabcontent">
+                    <object id="los-results" width="98%" height="99%"></object> 
+                </div-->
+
+                <!--<div id="Results" class="tabcontent">
+                    <h3>Lab results</h3>
+                    <p>Lab results ...</p> 
+                </div> -->
+                  
+
+
+            </div>
+        </div>
+    </span>
+    <!-- For  lab data only -->
+    
+ 
+    <span id="all-programs">
+        
+        
         <div class="row">
             <div class="col-sm-6 col-lg-6 col-md-6 col-xs-6"
                  style="margin-left: 2%;border: solid 0px; width: 47%; margin-left: 3%;">
@@ -199,10 +305,6 @@
                     <div class="list-group" id="encounters" style="overflow-x: hidden;">
                     </div>
 
-                    <!--table class="table" style="border: 0;">
-                       <tbody id="encounters">
-                       </tbody>
-                    </table-->
 
 
                     <div class="card-footer" style="margin: 1%;">
@@ -249,6 +351,11 @@
                 </div>
             </div>
         </div>
+
+    </span>
+
+
+
     </div>
     <!-- /visit details div-->
 
@@ -312,7 +419,7 @@
                     <button type="button" class="button blue navButton" id="btn-confirm" style="visibility:hidden;">Void
                         Encounter
                     </button>
-                    <button onmousedown="location.reload()" type="button" class="button navButton red" data-dismiss="modal">&nbsp;&nbsp;&nbsp;&nbsp;Close&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                    <button onmousedown="reloadPage();" type="button" class="button navButton red" data-dismiss="modal">&nbsp;&nbsp;&nbsp;&nbsp;Close&nbsp;&nbsp;&nbsp;&nbsp;</button>
                 </div>
 
             </div>
@@ -572,6 +679,17 @@
 <script src="/assets/js/core.js "></script>
 
 <script>
+
+    if(sessionStorage.programID == '23'){
+        document.getElementById("all-programs").style = "display: none;";
+        document.getElementById("nextEncounterHeader").style = "visibility: hidden;";
+    }else if(sessionStorage.applicationFolder.match(/ccm/i)){
+        document.getElementById("lab-program").style = "display: none;";
+    }else{
+        document.getElementById("lab-program").style = "display: none;";
+        document.getElementById("nextEncounterHeader").style = "visibility: visible;";
+    }
+    
     var currentEncounter = null;
     var void_reason = null;
     // Defined in core.js
@@ -778,12 +896,28 @@
                         }
 
                     }
-                    div.innerHTML += '<button type="button" id="' + x + '" value="' + results[x] +
-                        '" class="application-btn btn btn-primary" style="width: 90%;  margin-left: 5%;margin-top: 6%; margin-bottom: 6%; border-radius: 0%; color:black;"  onclick="activateButton(this);changeDate(this);getValue(this.value,' + patient_id + ',&#034encounters&#034, &#034h4&#034, &#034table&#034); getMedication(' + patient_id + ',&#034table&#034, &#034medication&#034);">' +
-                        moment(results[x]).format("DD/MMM/YYYY");
-                    +'</button>';
+                    let defaultBTN = `getValue(this.value, ${patient_id}, &#034encounters&#034, 
+                            &#034h4&#034, &#034table&#034);getMedication(${patient_id},
+                            &#034table&#034, &#034medication&#034);"`;
+
+                    if (sessionStorage.programID == '23'){
+                        defaultBTN = `fetchOrderData('${moment(results[x]).format("YYYY-MM-DD")}');"`;
+                        //fetchOrderData(moment(results[x]).format("DD/MMM/YYYY"));
+                    }
+
+                    div.innerHTML += `<button type="button" id="${x}" value="${results[x]}"
+                        class="application-btn btn btn-primary" 
+                        style="width: 90%;  margin-left: 5%;margin-top: 6%;
+                        margin-bottom: 6%; border-radius: 0%; color:black;"  
+                        onclick="activateButton(this);changeDate(this);${defaultBTN}>
+                        ${moment(results[x]).format("DD/MMM/YYYY")}</button>`;
+
                     encDate = moment(results[0]).format("DD/MMM/YYYY");
-                    getMedication(patient_id, "table", "medication");
+                    
+                    
+                    if (sessionStorage.programID != '23')
+                        getMedication(patient_id, "table", "medication");
+
                     activateButton(document.getElementsByClassName("application-btn btn btn-primary")[0]);
                     // getMedication(patient_id ,"encounters", "h4"034, &#034table&#034);
                     if (counter == 4 || (results.length - (index + counter) == 1)) {
@@ -830,7 +964,7 @@
             encounters.innerHTML = "";
         } else {
         }
-        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/encounters?paginate=false&patient_id=' + id + '&date=' + value+'program_id='+sessionStorage.programID;
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/encounters?paginate=false&patient_id=' + id + '&date=' + value+'&program_id='+sessionStorage.programID;
         var req = new XMLHttpRequest();
         var counter = 0;
         req.onreadystatechange = function () {
@@ -1129,7 +1263,11 @@
     }
 
     function buildAlerts(patient_id) {
-        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/observations?person_id=' + patient_id + '&concept_id=7755';
+        var url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1'; ///observations?person_id=' + patient_id + '&concept_id=7755';
+        url += '/programs/1/patients/' + sessionStorage.patientID;
+        url += '/medication_side_effects?date=' + sessionStorage.sessionDate;
+
+
         var req = new XMLHttpRequest();
         var table = document.getElementById("alerts");
         table.setAttribute("class", "info-tables");
@@ -1139,16 +1277,13 @@
                     var results = JSON.parse(this.responseText);
                     var sideEffects = 0;
 
-                    if (results.length > 0) {
-                        for (var index = 0; index < results.length; index++) {
-                          try {
-                            if (results[index].children[0].value_coded == 1065) {
-                                sideEffects++;
-                            }
-                          }catch(q){
-                            continue;
+                    if (results) {
+                        for(obs_date in results) {
+                          var conditions = results[obs_date];
+                          for(concept_id in conditions){ 
+                            sideEffects++;
                           }
-                        }
+                         }
                         var tr = document.createElement("tr");
                         tr.setAttribute("class", "alerts");
                         var td = document.createElement("td");
@@ -1158,7 +1293,6 @@
                         td.setAttribute("colspan", 2);
                         tr.appendChild(td);
                         table.appendChild(tr);
-
                     }
                     if (sessionStorage.bmiResult !== "null") {
                         var tr = document.createElement("tr");
@@ -1327,9 +1461,13 @@
         }
         button.style.color = "white";
         button.style.backgroundColor = "#204d74";
+
     }
 
     function checkIfDueLabOrder () {
+      if(sessionStorage.programID != 2)
+        return;
+
         const patientId = sessionStorage.patientID
         const programId = sessionStorage.programID
 
@@ -1363,6 +1501,60 @@
     generateTasks();
     buildAlerts(sessionStorage.patientID);
     // loadAlerts();
+
+
+function openOrders(evt, tabName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(tabName).style.display = "block";
+  try {
+    evt.currentTarget.className += " active";
+  }catch(e){
+    document.getElementById("main-panel").setAttribute("class","tablinks active");
+  }
+}
+
+if(parseInt(sessionStorage.programID) == 23) {
+  $("#main-panel").click();
+
+  let losOrders = document.getElementById("los-open-orders");
+  let ordersApp = "/apps/" +  sessionStorage.applicationFolder;
+  ordersApp += "/views/open_orders.html";
+  losOrders.setAttribute("data", ordersApp);
+
+  losOrders = document.getElementById("los-orders");
+  ordersApp = "/apps/" +  sessionStorage.applicationFolder;
+  ordersApp += "/views/orders.html";
+  losOrders.setAttribute("data", ordersApp);
+
+  /*losOrders = document.getElementById("los-results");
+  ordersApp = "/apps/" +  sessionStorage.applicationFolder;
+  ordersApp += "/views/results.html";
+  losOrders.setAttribute("data", ordersApp);*/
+  
+}
+
+
+function fetchOrderData(setDate) {
+    let LOSorders = document.getElementById('los-orders');
+    LOSorders.contentWindow.fetchLabOrders(setDate);
+
+
+    LOSorders = document.getElementById('los-open-orders');
+    LOSorders.contentWindow.fetchLabOrders(setDate);
+}
+
+function reloadPage(){
+  location = window.url.href.replace("#","");
+}
+
 </script>
 
 <script src="/assets/js/show.lab.orders.js"></script> 

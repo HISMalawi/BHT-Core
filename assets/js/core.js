@@ -25,8 +25,10 @@ if(sessionStorage.userRoles && sessionStorage.userRoles.match(/Program Manager|S
   admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="view-user" onclick="redirect(this.id); "><img src="/assets/images/edit-user.png" class="btn-icons"/><span>View user</span></button>';
 
   admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="view-sys-settings" onclick="redirect(this.id); "><img src="/assets/images/sys-setting.png" class="btn-icons"/><span>System settings</span></button>';
-
-  admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="view-drug-management-settings" onclick="redirect(this.id); "><img src="/assets/images/drug.png" class="btn-icons"/><span>Drug management</span></button>';
+  if(parseInt(sessionStorage.programID) == 1){
+    admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="view-drug-management-settings" onclick="redirect(this.id); "><img src="/assets/images/drug.png" class="btn-icons"/><span>Drug management</span></button>';
+    admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="view-data-management-settings" onclick="redirect(this.id); "><img src="/assets/images/clean.jpg" class="btn-icons"/><span>Data management</span></button>';
+  }
 
   admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="enable-portal" onclick="redirect(this.id); "><img src="/assets/images/portal.png" class="btn-icons"/><span>Portal Settings</span></button>';
 }
@@ -175,13 +177,13 @@ function loadConfigurations() {
 
 function loadApplicationsIntoMenu(applications) {
     applications.forEach((application, idx) => {
-        const configFilePath = `/apps/${application.applicationFolder}/application.json`;
+        const configFilePath = `/apps/${application.applicationFolder.replace('/','')}/application.json`;
         $.getJSON(configFilePath)
             .done(() => {
                 createApplicationCard(application, idx)
             })
             .fail((error) => {
-                console.error(error)
+                //console.error(error)
             })
     })
 }
@@ -852,6 +854,15 @@ function redirect(id) {
         obj.setAttribute("style", "width: 97%; height: 430px; text-align: left;");
         dvTable.appendChild(obj);
     }
+    
+    if (id === "view-data-management-settings") {
+        var obj = document.createElement("object");
+        obj.setAttribute("data", "/apps/" + sessionStorage.applicationFolder + "/views/data_management_settings.html");
+        obj.setAttribute("type", "text/html");
+        obj.setAttribute("style", "width: 97%; height: 430px; text-align: left;");
+        dvTable.appendChild(obj);
+    }
+    
     if (id === "report-1") {
     }
     if (id === "registers") {
@@ -1299,6 +1310,7 @@ function fetchVersion() {
       if (this.status == 200) {
         var results = JSON.parse(this.responseText);
         system_version_api = results['System version'];
+        sessionStorage.apiVersion = system_version_api;
         fetchCoreVersion();
       }
     }
@@ -1309,7 +1321,7 @@ function fetchVersion() {
     req.setRequestHeader('Authorization',sessionStorage.getItem('authorization'));
     req.send();
   } catch (e) {
-    console.log(e);
+    //console.log(e);
   }
 
 }
@@ -1317,8 +1329,11 @@ function fetchVersion() {
 function fetchCoreVersion() {
   $.get("HEAD", function(data) {
    system_version_core = data;
+   sessionStorage.coreVersion = system_version_core;
    fetchModuleVersion();
   }, 'text').fail(function () {
+
+    system_version_core = "development";
     console.log("HEAD file missing in BHT-Core folder");
   });
 }
@@ -1328,6 +1343,7 @@ function fetchModuleVersion() {
    system_version_module = data;
    if(system_version_module != undefined)
     $("#module-version").html(system_version_module);  
+    sessionStorage[sessionStorage.applicationName + "Version"] = system_version_module;    
 
   }, 'text').fail(function () {
     console.log("HEAD is missing from /apps/" + sessionStorage.applicationName + " folder");

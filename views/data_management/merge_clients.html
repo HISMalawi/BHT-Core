@@ -76,6 +76,7 @@
 
 .result-table th {
   text-align: left;
+  width: 125px;
 }
 
 .reset-buttons {
@@ -261,17 +262,20 @@ function addResult(result, cell) {
   table.appendChild(tr);
 
   var th = document.createElement('th');
-  th.innerHTML = 'NPID';
+  th.innerHTML = 'ARV#';
   tr.appendChild(th);
 try {
-  
-} catch (error) {
-  
   var td = document.createElement('td');
-  td.innerHTML = (result.patient_identifiers.filter(id => id.identifier_type == 3))[0].identifier;
-  tr.appendChild(td);
-  /* ............................. */
+  var identifiers = result.patient_identifiers;
+  td.innerHTML = 'N/A';
+  for(var l = 0; l < identifiers.length; l++){
+    if(identifiers[l].identifier_type != 4)
+      continue;
 
+    td.innerHTML = identifiers[l].identifier;
+  }
+  tr.appendChild(td);
+} catch (error) {
 }
   var tr = document.createElement('tr');
   table.appendChild(tr);
