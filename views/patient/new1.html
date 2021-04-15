@@ -89,7 +89,7 @@
                 } else if (title.match(/Landmark/i)) {
                     parametersPassed.landmark = data;
                 } else if (title.match(/Malawi National Id/i)) {
-                    parametersPassed.malawi_national_id = data;
+                    parametersPassed.malawi_national_id = data
                 } else if (title.match(/Cell phone/i)) {
                     parametersPassed.cell_phone_number = data;
                 } else if (title.match(/Occupation/i)) {
@@ -1133,9 +1133,7 @@
                 condition='$("national_id_available").value == "Yes";' 
                 helpText="Enter National ID" tt_onLoad="endEncounter('national_id');"/>
 
-            <!-- <input type="hidden" name="malawiNationalId" id="malawiNationalId" value= "N/A" textCase="upper"
-                condition='$("national_id_available").value == "No";' 
-                helpText="Enter National ID" tt_onLoad="endEncounter('national_id');"/> -->
+        
             
             <input type="text" name="cellphone" id="cellphone"
                    helpText="Cell phone number1"
@@ -1458,6 +1456,8 @@
     }
 
     function postClientParamaters(parametersPassed, attributes = null) {
+        if (parametersPassed.malawi_national_id == "")
+            parametersPassed.malawi_national_id = "N/A";
         var MNID = parametersPassed.malawi_national_id;
         var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/people';
         if (parametersPassed.birthdate_estimated === "Yes") {
