@@ -252,7 +252,7 @@
   z-index: 991;
 }
 
-#address-confirmation-cover {
+#a4dress-confirmation-cover {
   display: none;
   position: absolute;
   background-color: black;
@@ -444,6 +444,15 @@
   color: black;
 }
 
+#deceasesed-message {
+  z-index: 1000;
+  margin: auto;
+  display: inline; 
+  height: 30%; 
+  width: 50%; 
+  left: 30%;
+  top: 10%;
+}
 </style>
 
 <script>
@@ -555,7 +564,7 @@ var global_property = GlobalProperty({
           } else if (locals.length == 1) {
             populatePatient(locals[0], locals[0]);
           } else {
-            noPatient();
+            noPatient(patient_id);
           }
         }else {
           var obj = JSON.parse(this.responseText)[0];
@@ -565,7 +574,7 @@ var global_property = GlobalProperty({
           } else if (JSON.parse(this.responseText).length == 1) {
             populatePatient(obj, obj_2);
           } else {
-            noPatient();
+            noPatient(patient_id);
           }     
         }
         
@@ -882,6 +891,9 @@ var global_property = GlobalProperty({
               : "No Outcome Available";buildInfoBoxes
           var table = document.createElement("table");
           table.setAttribute("class", "info-tables");
+
+          if(identifiersHash['Current Outcome'].match(/died/i))
+            patientDead = true;
 
           for (identifier in identifiersHash) {
             var tr = document.createElement("tr");
@@ -1333,7 +1345,7 @@ var global_property = GlobalProperty({
 </div>
 
 <div class="info-table"></div>
-<div
+<!--div
   class="modal fade"
   tabindex="-1"
   role="dialog"
@@ -1377,7 +1389,7 @@ var global_property = GlobalProperty({
       </div>
     </div>
   </div>
-</div>
+</div-->
 
 <div
   class="modal fade"
@@ -1482,6 +1494,39 @@ var global_property = GlobalProperty({
   }
   buildInfoBoxes();
 
+  function popUpDeceasedMessage(){
+    var tstMessageBar = document.createElement('div');
+    var p = document.createElement('p');
+    p.setAttribute('style','text-align: center;font-size: 35px;');
+    p.innerHTML = "<p>Deceased client. Do you want to continue?</p>";
+    tstMessageBar.appendChild(p);
+    
+    var noBTN = document.createElement('button');
+    noBTN.innerHTML = "<span>No</span>";
+    noBTN.setAttribute('class', 'button blue navButton filing-number-btn');
+    noBTN.setAttribute('onmousedown','document.location="/";');
+    tstMessageBar.appendChild(noBTN);
+
+    var yesBTN = document.createElement('button');
+    yesBTN.innerHTML = "<span>Yes</span>";
+    yesBTN.setAttribute('class', 'button red navButton filing-number-btn');
+    yesBTN.style = 'right: 140px;'; 
+    yesBTN.setAttribute('onmousedown','nextEncounter(' + sessionStorage.patientID + ',' + sessionStorage.programID + ');');
+    tstMessageBar.appendChild(yesBTN);
+    tstMessageBar.setAttribute('id', 'address-confirmation');
+
+    var cover = document.createElement('div');
+    cover.setAttribute('id','address-confirmation-cover');
+    var bdy = document.getElementsByTagName('body')[0];
+    bdy.appendChild(cover);
+    bdy.appendChild(tstMessageBar);
+    tstMessageBar.style = 'z-index: 1000;display: inline; height: 30%; width: 50%; left: 25%;top: 10%;';
+    cover.style = 'display: inline;';
+
+    let coverPage = document.getElementById('page-cover');
+    coverPage.style = 'display: inline;';
+  }
+
   function finish(id) {
     sessionStorage.patientID = id;
     if(sessionStorage.programID != '1'){
@@ -1496,7 +1541,9 @@ var global_property = GlobalProperty({
     }*/
 
     if (patientDead == true) {
-      $("#mi-modal").modal("show");
+      popUpDeceasedMessage();
+      return;
+      /*$("#mi-modal").modal("show");
       var modalConfirm = function(callback) {
         $("#continue").on("click", function() {
           $("#mi-modal").modal("show");
@@ -1522,7 +1569,7 @@ var global_property = GlobalProperty({
 
           window.location.href = "/";
         }
-      });
+      });*/
     } else {
 
       /* .......... filing ............... */
@@ -1575,29 +1622,33 @@ var global_property = GlobalProperty({
     }
   }
 
-  function noPatient() {
-    $("#mi-modal-2").modal("show");
-    var modalConfirm = function(callback) {
-      $("#continue").on("click", function() {
-        $("#mi-modal-2").modal("show");
-      });
+  function noPatient(identifier) {
+    var tstMessageBar = document.createElement('div');
+    var p = document.createElement('p');
+    p.setAttribute('style','text-align: center;font-size: 35px;');
+    p.innerHTML = `<p>Client with ID "${identifier}" <b>NOT</b> found.</p>`;
+    tstMessageBar.appendChild(p);
+   
+    console.log(p.innerHTML);
 
-      $("#modal-btn-si-2").on("click", function() {
-        callback(true);
-        $("#mi-modal-2").modal("hide");
-      });
+    var noBTN = document.createElement('button');
+    noBTN.innerHTML = "<span>OK</span>";
+    noBTN.setAttribute('class', 'button blue navButton filing-number-btn');
+    noBTN.setAttribute('onmousedown','document.location="/";');
+    tstMessageBar.appendChild(noBTN);
 
-      $("#modal-btn-no-2").on("click", function() {
-        callback(false);
-        $("#mi-modal-2").modal("hide");
-      });
-    };
+    tstMessageBar.setAttribute('id', 'address-confirmation');
 
-    modalConfirm(function(confirm) {
-      if (confirm) {
-        window.location.href = "/";
-      }
-    });
+    var cover = document.createElement('div');
+    cover.setAttribute('id','address-confirmation-cover');
+    var bdy = document.getElementsByTagName('body')[0];
+    bdy.appendChild(cover);
+    bdy.appendChild(tstMessageBar);
+    tstMessageBar.style = 'z-index: 1000;display: inline; height: 30%; width: 50%; left: 25%;top: 10%;';
+    cover.style = 'display: inline;';
+
+    let coverPage = document.getElementById('page-cover');
+    coverPage.style = 'display: inline;';
   }
 
   function formatIdentifier(identifier) {
