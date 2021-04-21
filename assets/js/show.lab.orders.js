@@ -30,7 +30,7 @@ function updateOrdersTable(orders) {
             var test_name = tests[i].name;
             var test_values = tests[i].result ? tests[i].result : [];
             if(test_name.match(/viral load/i) && test_values.length > 0) {
-                VLdates.push(new Date(moment(test_values[0].date).format('YYYY-MM-DD')));
+                VLdates.push(moment(test_values[0].date).format('YYYY-MM-DD'));
             }
         }
     }
