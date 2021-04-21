@@ -45,7 +45,10 @@ function updateOrdersTable(orders) {
             if(vlCount == 2)
                 break;
 
-            var tdate = moment(orders[x].date_ordered).format('DD/MMM/YYYY')
+            let tdate;
+            if(orders[x].tests[0].result)
+                tdate = moment(orders[x].tests[0].result[0].date).format('DD/MMM/YYYY');
+
             if(tdate !== moment(VLdates[j]).format('DD/MMM/YYYY'))
                 continue;
 
@@ -119,7 +122,7 @@ function formatResults(results) {
             value_modifier = value.replace('<', '&lt;');
             value_modifier = value.replace('>', '&gt;');
           }
-          ((validateVL(`${value_modifier}${result_value}`) === "low" ? vl_alert_level = "" : vl_alert_level = " ( HIGH )"));
+          ((validateVL(`${value_modifier}${result_value}`) === "low" ? vl_alert_level = "" : vl_alert_level = " (<b style='color:red;'>HIGH</b>)"));
           parameters.push(test_name + ": " + result_value + vl_alert_level);
           parametersVL.results = `${value_modifier}${result_value}`;
         }
@@ -148,8 +151,6 @@ function formatResults(results) {
     return parameters.join('<br />');
 }
 
-showOrders();
-
 function validateVL(results) {
     if(results.match(/=/)){
       var res = parseFloat(results.replace('=',''));
@@ -175,9 +176,56 @@ function alertHighVL() {
   if(latestVLresultDate != undefined) {
     var result = vlParameters[latestVLresultDate];
     var resultValidated = validateVL(result);
-    if(resultValidated == 'high')
-      $("#confirm-VL").modal();
+    if(resultValidated == 'high' && document.URL.match(/confirm/i))
+      confirmVLwarning();
       
 
   }
+}
+
+if(document.URL.match(/patient_dashboard/i))
+    showOrders();
+
+
+function confirmVLwarning(){
+    var tstMessageBar = document.createElement('div');
+    var p = document.createElement('p');
+    p.setAttribute('style','text-align: center;font-size: 35px;');
+    p.innerHTML = "<p style='color: black;'>Patient has a high viral load,  Please take immediate action!</p>";
+    tstMessageBar.appendChild(p);
+
+    /*var noBTN = document.createElement('button');
+    noBTN.innerHTML = "<span>No</span>";
+    noBTN.setAttribute('class', 'button blue navButton filing-number-btn');
+    noBTN.setAttribute('onmousedown','document.location="/";');
+    tstMessageBar.appendChild(noBTN);*/
+
+    var yesBTN = document.createElement('button');
+    yesBTN.innerHTML = "<span>OK</span>";
+    yesBTN.setAttribute('class', 'button red navButton filing-number-btn');
+    yesBTN.style = 'right: 140px;'; 
+    yesBTN.setAttribute('onmousedown','closeHighVLwarning();');
+    yesBTN.setAttribute('style','right: 5px; position: absolute;');
+    tstMessageBar.appendChild(yesBTN);
+    tstMessageBar.setAttribute('id', 'address-confirmation');
+
+    var cover = document.createElement('div');
+    cover.setAttribute('id','address-confirmation-cover');
+    var bdy = document.getElementsByTagName('body')[0];
+    bdy.appendChild(cover);
+    bdy.appendChild(tstMessageBar);
+    tstMessageBar.style = 'z-index: 1000;display: inline; height: 30%; width: 50%; left: 25%;top: 10%;';
+    cover.style = 'display: inline;';
+
+    let coverPage = document.getElementById('page-cover');
+    coverPage.style = 'display: inline;';
+}
+
+function closeHighVLwarning(){
+   let bdy = document.getElementsByTagName('body')[0];
+   let e = document.getElementById('address-confirmation');
+   bdy.removeChild(e)
+
+   let coverPage = document.getElementById('page-cover');
+   coverPage.style = 'display: none;';
 }
