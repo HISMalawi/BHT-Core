@@ -790,6 +790,10 @@ var global_property = GlobalProperty({
         identifiersHash["Archived filing#"] = formatIdentifier(
           identifiers[i]["identifier"]
         );
+      } else if (identifiers[i]["identifier_type"] == 28) {
+        identifiersHash["MNID"] = formatIdentifier(
+          identifiers[i]["identifier"]
+        );
       }
     }
 
@@ -833,7 +837,15 @@ var global_property = GlobalProperty({
               //window.location = "/views/patient/find_by_menu.html";
               assignNHID(patient_id);
           })
-      } 
+      }
+    
+    else if (!Object.keys(identifiersHash).includes("MNID")) {
+        alertify
+          .alert("Missing Malawi National ID", "Is Malawi National ID present? <a href=\"/views/patient/edit_demographics/set_malawi_national_id.html\">       YES</a> <br /> <br /> ", function () {
+              //window.location = "/views/patient/find_by_menu.html";
+              
+          })
+      }  
     var container = document.getElementById("section-body-0");
     container.appendChild(table);
   }

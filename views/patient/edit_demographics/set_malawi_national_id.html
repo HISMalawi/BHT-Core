@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+
+  <script language="javascript" defer="true">
+    tstUsername = "";
+    tstUserKeyboardPref = "qwerty";
+
+  </script>
+
+  <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
+  <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/assets/js/data.js"></script>
+  <script type="text/javascript" src="/assets/js/core.js"></script>
+
+</head>
+
+<body id="mateme">
+  <div id="container">
+    <div id="content">
+      <style>
+  .tt_controls_malawi_national_id #qwerty { display:none; }
+  .tt_controls_ground_phone_number #qwerty { display:none; }
+  .tt_controls_office_phone_number #qwerty { display:none; }
+
+  .tt_controls_ground_phone_number #Unknown { display:block; }
+
+  .tt_controls_malawi_national_id #num , #plus, #apostrophe, #star, #char, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+
+  .tt_controls_guardian_malawi_national_id #num , #plus, #apostrophe, #star, #char, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+
+  .tt_controls_home_phone_number #num , #plus, #apostrophe, #star, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+
+  .tt_controls_office_phone_number #num , #plus, #apostrophe, #star, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+
+  #space {display:inline;}
+
+  .nota #na {
+    display: block;
+  }
+
+  #num{ display:block; }
+  #char{ display:none; }
+  #apostrophe { display:inline; }
+
+
+  .azButton .numericKeyboard #char {
+    display: block;
+  }
+      </style>
+
+      <form method='PUT'>
+        <input type="text" name="malawiNationalId" id="malawiNationalId" textCase="upper" key="malawiNationalId"
+          helpText="Malawi National ID"
+          tt_pageStyleClass="nota"
+          validationRule="^(?=[a-z0-9]*$)(?=\d+[a-z]|[a-z]+\d)([a-z\d]){8}$"
+          validationMessage="Not a valid MAlawi National ID" 
+          tt_onUnLoad="getInput();"
+          tt_onLoad="prepNextButton();" />
+      </form>
+      <div id="footer">
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+<script type="text/javascript">
+  function prepNextButton () {
+    document.getElementById('nextButton').setAttribute('onmousedown', 'validateInput()');
+  }
+
+  var tt_cancel_destination = "/views/patient/edit_demographics.html?patient_id=" + sessionStorage.patientID;
+  var url = new URL(url);
+  var apiURL = sessionStorage.getItem("apiURL");
+  var apiPort = sessionStorage.getItem("apiPort");
+  var apiProtocol = sessionStorage.getItem("apiProtocol");
+  var patient_id = sessionStorage.patientID;
+
+  function editMalawiNatioanlId() {
+    __$("nextButton").removeAttribute("onmousedown");
+    document.getElementById('touchscreenInput1').removeEventListener('keyup', checkKey, false);
+    document.getElementById('touchscreenInput1').addEventListener('keyup', function (event) {
+      event.preventDefault();
+      if (event.keyCode === 13) {
+        postMalawiNatioanlId();
+      }
+    });
+    __$("nextButton").onmousedown = function () {
+      postMalawiNatioanlId();
+    }
+
+  }
+
+  function validateInput(){
+    var mnid = value = $('touchscreenInput' + tstCurrentPage).value;
+    var regex = /^(?=[a-z0-9]*$)(?=\d+[a-z]|[a-z]+\d)([a-z\d]){8}$/;
+    var isValid = regex.test(mnid);
+
+    if (!isValid) {
+      showMessage("Not a valid MAlawi National ID");
+    } else {
+      postMalawiNatioanlId();
+    }
+    
+  }
+
+  function postMalawiNatioanlId() {
+    // getInput();
+    mnid = value = $('touchscreenInput' + tstCurrentPage).value;;
+    var identifier_type = 28;
+
+    var http = new XMLHttpRequest();
+    var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patient_identifiers/';
+    
+    if(sessionStorage.dde_enabled === 'true') {
+      var params = {
+        identifier: mnid.toUpperCase(),
+        identifier_type: identifier_type,
+        patient_id: sessionStorage.patientID
+      };
+    }else{
+      var params = {
+        identifier: mnid.toUpperCase(),
+        identifier_type: identifier_type,
+        patient_id: sessionStorage.patientID
+      };
+    }
+    params = JSON.stringify(params);
+
+    http.open('POST', url, true);
+    //Send the proper header information along with the request
+    http.setRequestHeader('Content-type', 'application/json');
+    http.onreadystatechange = function () { //Call a function when the state changes.
+      if (http.readyState == 4) {
+
+        if (http.status == 201) {
+          document.location = '/views/confirm.html?person_id=' + sessionStorage.patientID;
+        } else if (http.status == 400) {
+          showMessage("Bad Request");
+        } else {
+          showMessage("error" + http.status);
+          console.log(http.responseText)
+        }
+      }
+    }
+    http.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    http.send(params);
+
+  }
+
+</script>

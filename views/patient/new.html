@@ -1130,7 +1130,9 @@
                 </select>
 
             <input type="text" name="malawiNationalId" id="malawiNationalId" textCase="upper"
-                condition='$("national_id_available").value == "Yes";' 
+                condition='$("national_id_available").value == "Yes";'
+                validationRule="^(?=[a-z0-9]*$)(?=\d+[a-z]|[a-z]+\d)([a-z\d]){8}$"
+                validationMessage="Not a valid MAlawi National ID"
                 helpText="Enter National ID" tt_onLoad="endEncounter('national_id');"/>
 
             <!-- <input type="hidden" name="malawiNationalId" id="malawiNationalId" value= "N/A" textCase="upper"
@@ -1138,7 +1140,7 @@
                 helpText="Enter National ID" tt_onLoad="endEncounter('national_id');"/> -->
             
             <input type="text" name="cellphone" id="cellphone"
-                   helpText="Cell phone number1"
+                   helpText="Cell phone number"
                    field_type="number"
                    tt_pageStyleClass="nota"
                    validationRule="^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|Unknown|Not Available|N\/A"
