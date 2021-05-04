@@ -9,21 +9,6 @@
     tstUsername = "";
     tstUserKeyboardPref = "qwerty";
 
-    var d = new Date();
-    d.toDateString();
-
-    function getInput() {
-      key = $('touchscreenInput' + tstCurrentPage).getAttribute("key");
-      value = $('touchscreenInput' + tstCurrentPage).value;
-      sessionStorage.setItem(key, value);
-      var d = new Date();
-      sessionStorage.setItem("date_created", d.toDateString())
-    }
-
-    function addInput(field_name) {
-      __$("touchscreenInput" + tstCurrentPage).value = sessionStorage.getItem(field_name);
-    }
-
   </script>
 
   <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
@@ -95,7 +80,6 @@
   var apiPort = sessionStorage.getItem("apiPort");
   var apiProtocol = sessionStorage.getItem("apiProtocol");
   var patient_id = sessionStorage.patientID;
-  getName(id, sessionStorage.getItem("apiURL"), sessionStorage.getItem("apiPort"), sessionStorage.getItem("apiProtocol"));
 
   function editCellphone() {
     __$("nextButton").removeAttribute("onmousedown");
@@ -113,32 +97,30 @@
   }
 
   function validateInput(){
-    __$("nextButton").removeAttribute("onmousedown")
-    __$("nextButton").onmousedown = function(){
-
     value = $('touchscreenInput' + tstCurrentPage).value;
      if (value.length  > 0) {
                postCellphone();
      }else{
        showMessage("You must enter a value to continue");
      }
-    }
   }
 
   function postCellphone() {
-    getInput();
-    cell_phone_number = sessionStorage.getItem("cellphone")
+    // getInput();
+    cell_phone_number = value = $('touchscreenInput' + tstCurrentPage).value;;
+
     var http = new XMLHttpRequest();
     var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/people/' + sessionStorage.patientID;
     
     if(sessionStorage.dde_enabled === 'true') {
       var params = {
-        cell_phone_number: sessionStorage.getItem("cellphone"),
+        cell_phone_number: cell_phone_number,
         program_id: sessionStorage.programID
       };
     }else{
       var params = {
-        cell_phone_number: sessionStorage.getItem("cellphone")
+        cell_phone_number: cell_phone_number,
+        program_id: sessionStorage.programID
       };
     }
     params = JSON.stringify(params);

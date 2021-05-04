@@ -9,16 +9,17 @@ var id = url.searchParams.get("user_id");
 
 
 function checkIfEncounterCaptured(encounter_name, id, redirect) {
-  var applicationName = sessionStorage.getItem("applicationName");
-  var url = '/apps/' + applicationName + '/application.json';
+  var applicationName = sessionStorage.applicationFolder;
+  let setUrl = '/apps/' + applicationName + '/application.json';
   var req = new XMLHttpRequest();
   req.onreadystatechange = function () {
     if (this.readyState == 4) {
       if (this.status == 200) {
         var results = JSON.parse(this.responseText);
         try {
-          var available = results.encounters[encounter_name].available;
-          var url = results.encounters[encounter_name].url;
+          let available = results.encounters[encounter_name].available;
+          let url = results.encounters[encounter_name].url;
+
           if (available == false) {
 
           } else if (available == true) {
@@ -64,7 +65,7 @@ function checkIfEncounterCaptured(encounter_name, id, redirect) {
     }
   };
   try {
-    req.open('GET', url, true);
+    req.open('GET', setUrl, true);
     req.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
     req.send(null);
   } catch (e) { }
@@ -88,11 +89,15 @@ function confirmCancelEntryWithMessage(save, message = "Are you sure you want to
 }
 
 function nextEncounter(patient_id, program_id, redirect) {
-  var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/workflows";
+  let url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/workflows";
+  url += "/" + program_id + "/" + patient_id + "?date=" + sessionStorage.sessionDate;
 
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function () {
+
+
     if (this.readyState == 4) {
+
       if (this.status == 200) {
         var obj = JSON.parse(this.responseText);
         checkIfEncounterCaptured(obj["name"].toLowerCase(), patient_id, redirect);
@@ -120,7 +125,7 @@ function nextEncounter(patient_id, program_id, redirect) {
 
     }
   };
-  xhttp.open("GET", (url + "/" + program_id + "/" + patient_id + "?date=" + sessionStorage.sessionDate), true);
+  xhttp.open("GET", url, true);
   xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
   xhttp.setRequestHeader('Content-type', "application/json");
   xhttp.send();

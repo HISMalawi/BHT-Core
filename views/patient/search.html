@@ -95,6 +95,13 @@ function validateName(element) {
 
 }
 
+function allFemaleApp(){
+  if(sessionStorage.programID == "24"){
+    $('nextButton').innerHTML = "<span>Finish</span>";
+    nextButton.setAttribute("onmousedown","submitSearchResults();");
+  }
+}
+
 </script>
 
 
@@ -103,9 +110,15 @@ function validateName(element) {
      helpText="First name"  key="given_name" 
     allowFreeText="true" ajaxURL="/search/given_name?search_string=" />
 
-    <input type="text" name="family_name" id="family_name" field_type="alpha"  tt_onLoad='validateName();' ajaxURL="/search/family_name?search_string=" helpText="Last name" key="family_name" allowFreeText="true" tt_onUnload="getInput();"/>
+    <input type="text" name="family_name" id="family_name" 
+      field_type="alpha"  tt_onLoad='validateName();allFemaleApp();' 
+      ajaxURL="/search/family_name?search_string=" 
+      helpText="Last name" key="family_name" 
+      allowFreeText="true" tt_onUnload="getInput();"/>
 
-    <select allowFreeText="false" helpText="Gender" id="gender" tt_onUnLoad="getInput();" name="person[gender]" tt_onLoad="changeNextButton();" key="gender" ><option value=""></option>
+    <select allowFreeText="false" helpText="Gender" id="gender" 
+    tt_onUnLoad="getInput();" name="person[gender]"
+     tt_onLoad="changeNextButton();" key="gender" ><option value=""></option>
       <option value="F">Female</option>
       <option value="M">Male</option>
     </select>
@@ -121,7 +134,7 @@ function validateName(element) {
 <script type="text/javascript">
 
   function  submitSearchResults(){
-    if(sessionStorage.programID === "12"){
+    if(sessionStorage.programID === "12" || sessionStorage.programID == "24"){
       getInput();
       var gender = "F";
     }else if(sessionStorage.programID === "21"){

@@ -3,7 +3,7 @@ function showOrders() {
         return;
 
     var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1";
-    url += "/programs/"+sessionStorage.programID+"/lab_tests/orders?patient_id=" + sessionStorage.patientID;
+    url += "/lab/orders?patient_id=" + sessionStorage.patientID;
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -27,10 +27,10 @@ function updateOrdersTable(orders) {
         var tests = orders[x].tests;
 
         for (var i = 0; i < tests.length; i++) {
-            var test_name = tests[i].test_type;
-            var test_values = tests[i].test_values;
+            var test_name = tests[i].name;
+            var test_values = tests[i].result ? tests[i].result : [];
             if(test_name.match(/viral load/i) && test_values.length > 0) {
-                VLdates.push(new Date(moment(orders[x].date_ordered).format('YYYY-MM-DD')));
+                VLdates.push(moment(test_values[0].date).format('YYYY-MM-DD'));
             }
         }
     }
@@ -45,7 +45,10 @@ function updateOrdersTable(orders) {
             if(vlCount == 2)
                 break;
 
-            var tdate = moment(orders[x].date_ordered).format('DD/MMM/YYYY')
+            let tdate;
+            if(orders[x].tests[0].result)
+                tdate = moment(orders[x].tests[0].result[0].date).format('DD/MMM/YYYY');
+
             if(tdate !== moment(VLdates[j]).format('DD/MMM/YYYY'))
                 continue;
 
@@ -63,14 +66,14 @@ function updateOrdersTable(orders) {
 
 function addVLorders(order, test) {
     var orders_tbody = document.getElementById('vl-orders');
-    var accession_number = order.accession_number;
-    var test_name = test.test_type;
-    var test_status = test.test_status.toUpperCase();
-    var test_values = test.test_values
-    var date_ordered = moment(order.date_ordered).format('DD/MMM/YYYY');
+    //var accession_number = order.accession_number;
+    var test_name = test.name;
+    //var test_status = test.test_status.toUpperCase();
+    var test_values = test.result ? test.result : [];
+    //var date_ordered = moment(order.date_ordered).format('DD/MMM/YYYY');
 
     if(test_name.match(/viral load/i) && test_values.length > 0) {
-        var r = (formatResults(test_values));
+        var r = formatResults(test_values);
         var div = document.createElement('div');
         div.setAttribute('class','list-group')
         orders_tbody.appendChild(div);
@@ -80,6 +83,7 @@ function addVLorders(order, test) {
         class_test += ' align-items-center list-group-item-action ';
         class_test += 'list-group-item- primary list-group-links';
         a.setAttribute('class', class_test);
+        a.setAttribute('style', "margin: 0px 32px 0px 2px !important;");
         a.setAttribute('href','#');
         a.innerHTML = r;
         /*if (a.innerHTML.match(/HIGH/g)) {
@@ -105,28 +109,35 @@ function formatResults(results) {
 
     var vl_alert_level = "";
     for (var i = 0; i < results.length; i++) {
-        var indicator = results[i].indicator;
-        var value = results[i].value;
-        if(indicator == 'Viral Load') {
-          if(value.match(/>|</)){
-            value = value.replace('<', '&lt;');
-            value = value.replace('>', '&gt;');
+
+        var indicator = results[i].value_indicator;
+        var result_value = results[i].value;
+        let test_name = results[i].indicator.name;
+        let value_modifier = results[i].value_indicator ? results[i].value_modifier : '=';
+
+        let result_date = results[i].date ? results[i].date : null;
+
+        if(test_name.match(/Viral Load/i)){
+          if(value_modifier.match(/>|</)){
+            value_modifier = value.replace('<', '&lt;');
+            value_modifier = value.replace('>', '&gt;');
           }
-          ((validateVL(results[i].value) === "low" ? vl_alert_level = "" : vl_alert_level = " ( HIGH )"));
-          parameters.push(indicator + ": " + value + vl_alert_level);
-          parametersVL.results = value;
+          ((validateVL(`${value_modifier}${result_value}`) === "low" ? vl_alert_level = "" : vl_alert_level = " (<b style='color:red;'>HIGH</b>)"));
+          parameters.push(test_name + ": " + result_value + vl_alert_level);
+          parametersVL.results = `${value_modifier}${result_value}`;
         }
-        if (indicator == 'result_date') {
+        //if (indicator == 'result_date') {
+        if (result_date) {
           indicator = 'Result date'
-          parametersVL.date = moment(results[i].value).format('DD/MMM/YYYY');
-          value = "(" + moment(results[i].value).format('DD/MMM/YYYY') + ")";
+          parametersVL.date = moment(result_date).format('DD/MMM/YYYY');
+          let value = "(" + moment(result_date).format('DD/MMM/YYYY') + ")";
           parameters.push(indicator + ": " + value);
           if(latestVLresultDate == undefined)
-            latestVLresultDate = moment(results[i].value).format('DD/MMM/YYYY');
+            latestVLresultDate = moment(result_date).format('DD/MMM/YYYY');
 
 
-          if((new Date(moment(results[i].value).format('YYYY-MM-DD'))) > (new Date(moment(latestVLresultDate).format('YYYY-MM-DD'))))
-            latestVLresultDate = moment(results[i].value).format('DD/MMM/YYYY');
+          if((new Date(moment(result_date).format('YYYY-MM-DD'))) > (new Date(moment(latestVLresultDate).format('YYYY-MM-DD'))))
+            latestVLresultDate = moment(result_date).format('DD/MMM/YYYY');
   
 
         }
@@ -139,8 +150,6 @@ function formatResults(results) {
     }
     return parameters.join('<br />');
 }
-
-showOrders();
 
 function validateVL(results) {
     if(results.match(/=/)){
@@ -167,9 +176,56 @@ function alertHighVL() {
   if(latestVLresultDate != undefined) {
     var result = vlParameters[latestVLresultDate];
     var resultValidated = validateVL(result);
-    if(resultValidated == 'high')
-      $("#confirm-VL").modal();
+    if(resultValidated == 'high' && document.URL.match(/confirm/i))
+      confirmVLwarning();
       
 
   }
+}
+
+if(document.URL.match(/patient_dashboard/i))
+    showOrders();
+
+
+function confirmVLwarning(){
+    var tstMessageBar = document.createElement('div');
+    var p = document.createElement('p');
+    p.setAttribute('style','text-align: center;font-size: 35px;');
+    p.innerHTML = "<p style='color: black;'>Patient has a high viral load,  Please take immediate action!</p>";
+    tstMessageBar.appendChild(p);
+
+    /*var noBTN = document.createElement('button');
+    noBTN.innerHTML = "<span>No</span>";
+    noBTN.setAttribute('class', 'button blue navButton filing-number-btn');
+    noBTN.setAttribute('onmousedown','document.location="/";');
+    tstMessageBar.appendChild(noBTN);*/
+
+    var yesBTN = document.createElement('button');
+    yesBTN.innerHTML = "<span>OK</span>";
+    yesBTN.setAttribute('class', 'button red navButton filing-number-btn');
+    yesBTN.style = 'right: 140px;'; 
+    yesBTN.setAttribute('onmousedown','closeHighVLwarning();');
+    yesBTN.setAttribute('style','right: 5px; position: absolute;');
+    tstMessageBar.appendChild(yesBTN);
+    tstMessageBar.setAttribute('id', 'address-confirmation');
+
+    var cover = document.createElement('div');
+    cover.setAttribute('id','address-confirmation-cover');
+    var bdy = document.getElementsByTagName('body')[0];
+    bdy.appendChild(cover);
+    bdy.appendChild(tstMessageBar);
+    tstMessageBar.style = 'z-index: 1000;display: inline; height: 30%; width: 50%; left: 25%;top: 10%;';
+    cover.style = 'display: inline;';
+
+    let coverPage = document.getElementById('page-cover');
+    coverPage.style = 'display: inline;';
+}
+
+function closeHighVLwarning(){
+   let bdy = document.getElementsByTagName('body')[0];
+   let e = document.getElementById('address-confirmation');
+   bdy.removeChild(e)
+
+   let coverPage = document.getElementById('page-cover');
+   coverPage.style = 'display: none;';
 }

@@ -8,7 +8,7 @@
 <script type="text/javascript" src="/assets/js/httpUtils.js"></script>
 <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
 <script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
-
+<script type="text/javascript" src="/assets/js/post_parameters.js"></script>
 <link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
 
 <style>
@@ -81,6 +81,34 @@ function validateOutcomeDate() {
     submitOutcome();
   }
 }
+function submitTO() {
+        var currentTime = moment().format(' HH:mm:ss');
+        var encounter_datetime = moment(sessionStorage.sessionDate).format('YYYY-MM-DD');
+        encounter_datetime += currentTime;
+
+        var encounter = {
+            encounter_type_id: 119,
+            patient_id: sessionStorage.patientID,
+            encounter_datetime: encounter_datetime
+        }
+
+        submitParameters(encounter, "/encounters", "postTransferOutObs");
+  }
+
+  function postTransferOutObs(encounter) {
+      var transfer_location = document.getElementById('facility_name');
+
+        var obs = {
+            encounter_id: encounter["encounter_id"],
+            observations: [{
+                  value_text: transfer_location.options[transfer_location.selectedIndex].innerText,
+                  value_coded: transfer_location.value,
+                  concept_id: 3003,
+            }]
+        };
+
+        submitParameters(obs, "/observations", null);
+    }
 
 function setOutcomeDate() {
   try {
@@ -198,7 +226,10 @@ function submitOutcome() {
       return;
     } 
   }
-
+  var tro = parseInt(document.getElementById('states').value) === 2;
+  if(tro) {
+    submitTO();
+  }
   var outcome_date = getOutcomeDate();
 
   if(transferring_out == true) {
@@ -227,7 +258,6 @@ function getOutcomeDate() {
 
 function setProgramStates() {
   var programID = fetchStatesUrl();
-  console.log(programID)
   // var elem = document.getElementById("touchscreenInput" + tstCurrentPage);
   $('touchscreenInput' + tstCurrentPage).setAttribute('ajaxURL', programID);
   listSuggestions(tstCurrentPage); 
@@ -249,10 +279,11 @@ function postState(state) {
     },
     state,
     function (data) {
-      showMessage('The patient\'s state was updated successfully.')
+      /*showMessage('The patient\'s state was updated successfully.')
       setTimeout(function() {
        document.location = '/views/patient/programs.html'
-      }, 3000)
+      }, 3000)*/
+      document.location = '/views/patient/programs.html'
     },
     function (error) {
       console.error(error)
@@ -334,7 +365,7 @@ function fetchStatesUrl () {
         <input type="text" name="states" id="states" 
           field_type="alpha" helpText="State" 
           setvalue="" tt_pageStyleClass="NoKeyboard"
-          ajaxURL="/programs/1/workflows" 
+          ajaxURL="" 
           tt_onLoad="setProgramStates();" objectType="states" />
 
         <select objectType="location" ajaxURL="/locations?name=" 
@@ -344,7 +375,7 @@ function fetchStatesUrl () {
           helpText="Please select facility name" 
           id="facility_name" 
           tt_onUnload="transferring_out = true"
-          tt_onLoad="setCurrentLocation();"
+          tt_onLoad=""
           name="facility_name"></select>
 
         <input type="text" name="state_year" id="outcome_year" helpText="Outcome year" field_type="number" absoluteMin="1900"
