@@ -7,8 +7,20 @@ function closeDisPopUp(){
 
 function fancyPopUP(order){
     let selected_row = document.getElementById(order.order_id);
-    let amount_needed = parseFloat(selected_row.getElementsByTagName('td')[2].innerHTML.replace("<p>","").replace("</p>",""));
-    let amount_dispensed = parseFloat(selected_row.getElementsByTagName('td')[3].innerHTML.replace("<p>","").replace("</p>",""));
+    let amount_dispensed;
+    let amount_needed;
+    let available_pills = 0;
+
+    if(drug_management_activated) {
+        amount_needed = parseFloat(selected_row.getElementsByTagName('td')[3].innerHTML.replace("<p>","").replace("</p>",""));
+        amount_dispensed = parseFloat(selected_row.getElementsByTagName('td')[4].innerHTML.replace("<p>","").replace("</p>",""));
+        available_pills = parseFloat(selected_row.getElementsByTagName('td')[2].innerHTML.replace("<p>","").replace("</p>",""));
+    }else{
+        amount_needed = parseFloat(selected_row.getElementsByTagName('td')[2].innerHTML.replace("<p>","").replace("</p>",""));
+        amount_dispensed = parseFloat(selected_row.getElementsByTagName('td')[3].innerHTML.replace("<p>","").replace("</p>",""));
+    }
+
+
     if(amount_needed <= 0){
         showMessage("Already dispensed enough for this medication.");
         return;
@@ -45,13 +57,13 @@ function fancyPopUP(order){
     </table>`;
     //prescription_content.innerHTML = prescription_table;
     div.innerHTML = prescription_table;
-    buildAvailableStocks(packs);
+    buildAvailableStocks(packs, available_pills);
     buildDispensedSection(packs,amount_dispensed);
     buildDispenstionBtns(packs);
     addFooter(prescription_content, order);
 }
 
-function buildAvailableStocks(packs){
+function buildAvailableStocks(packs, available_pills){
 
     let available_stocks = document.getElementById('available-stocks');
     let available_stock_table = `<table class="inner-tables">
@@ -60,9 +72,13 @@ function buildAvailableStocks(packs){
             <th>Packs</th>
         </tr>`;
     for(let i = 0; i < packs.length; i++){
+        let available_packs = 'N/A';
+        if(available_pills >= 0)
+            available_packs = (available_pills / packs[i]);
+
         available_stock_table += `<tr>
         <td class="pack-sizes">${packs[i]}</td>
-        <td class="available-pack-sizes" id="available-pack-size-${packs[i]}">0</td>
+        <td class="available-pack-sizes" id="available-pack-size-${packs[i]}">${available_packs}</td>
        </tr>`;
     }
     available_stock_table += '</table>';
@@ -285,3 +301,25 @@ function continueDispense(order_id){
     continue_to_dispensed = true;
     dispMeds(order_id);
 }
+
+var drug_management_activated = false;
+
+function getGProperties() {
+    let url = apiProtocol + "://" + apiURL + ":" + apiPort;
+    url += "/api/v1/global_properties?property=activate.drug.management";
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            var obj = JSON.parse(this.responseText);
+            drug_management_activated = (obj["activate.drug.management"] == "true" ? true : false);
+        }
+    };
+
+    xhttp.open("GET", url, true);
+    xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    xhttp.setRequestHeader('Content-type', "application/json");
+    xhttp.send();
+}
+
+getGProperties();
