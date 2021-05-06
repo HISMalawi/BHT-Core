@@ -143,7 +143,8 @@ function beautifyPop() {
 
 function displayKeyPad(order_id) {
     if(sessionStorage.programID === "1") {
-        cTable(order_id);
+       // cTable(order_id);
+       fancyPopUP(order_id);
     }else {
         showLegacyKeypad(order_id.order_id);
     }
@@ -911,13 +912,12 @@ function addValue(order_id, value, clickable) {
         // // });
         // btn.setAttribute("onmousedown", triggerKBD
         // );
-        btn.setAttribute("onmousedown", `triggerKBD(${order_id.order_id}, ${order_id.drug_id});`);
+        btn.setAttribute("onmousedown", `triggerKBD(${order_id.order_id}, ${order_id.drug_id}, '${value}');`);
     }
     return span.innerHTML;
 }
-function triggerKBD(event, event2) {
-    console.log(event, event2);
-    displayKeyPad({order_id: event, drug_id: event2});
+function triggerKBD(event, event2, event3) {
+    displayKeyPad({order_id: event, drug_id: event2, drug_name: event3});
     // displayKeyPad(order_id);
 }
 function deleteOrder(row) {

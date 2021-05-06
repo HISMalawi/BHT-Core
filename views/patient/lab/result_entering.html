@@ -233,7 +233,11 @@ function validateSetResultDate(){
   if(moment(`${year}/${month}/${day}`) > moment()){
     showMessage("Invalid date");
   }else{
-    gotoNextPage();
+    if(moment(`${year}/${month}/${day}`) < moment(orderDate)){
+      showMessage("Result date is less than Order date");
+    }else{
+      gotoNextPage();
+    }
   }
 }
 
@@ -353,13 +357,14 @@ function appendResult(encounter){
 
 
 
-
+var orderDate;
 
 
 function fetchObsID() {
     let accession_number = window.location.href;
     accession_number = new URL(accession_number);
     let test_name = accession_number.searchParams.get("test_name");
+    orderDate = accession_number.searchParams.get("order_date");
     accession_number = accession_number.searchParams.get("accession_number");
     let url = sessionStorage.apiProtocol + "://" + sessionStorage.apiURL + ":";
     url += sessionStorage.apiPort + "/api/v1/lab/tests";
