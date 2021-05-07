@@ -56,7 +56,7 @@
         <input type="text" name="malawiNationalId" id="malawiNationalId" textCase="upper" key="malawiNationalId"
           helpText="Malawi National ID"
           tt_pageStyleClass="nota"
-          validationRule="^(?=[a-z0-9]*$)(?=\d+[a-z]|[a-z]+\d)([a-z\d]){8}$"
+          validationRule="^(?=[a-zA-Z0-9]*$)(?=\d+[a-zA-Z]|[a-zA-Z]+\d)([a-zA-Z\d]){8}$"
           validationMessage="Not a valid MAlawi National ID" 
           tt_onUnLoad="getInput();"
           tt_onLoad="prepNextButton();" />
@@ -73,7 +73,7 @@
     document.getElementById('nextButton').setAttribute('onmousedown', 'validateInput()');
   }
 
-  var tt_cancel_destination = "/views/patient/edit_demographics.html?patient_id=" + sessionStorage.patientID;
+  var tt_cancel_destination = "/views/confirm.html?person_id=" + sessionStorage.patientID;
   var url = new URL(url);
   var apiURL = sessionStorage.getItem("apiURL");
   var apiPort = sessionStorage.getItem("apiPort");
@@ -97,7 +97,7 @@
 
   function validateInput(){
     var mnid = value = $('touchscreenInput' + tstCurrentPage).value;
-    var regex = /^(?=[a-zA-Z0-9]*$)(?=\d+[a-zA-Z]|[a-zA-Z]+\d)([a-zA-Z\d]){8}$/;
+    var regex = /^(?=[a-z0-9]*$)(?=\d+[a-z]|[a-z]+\d)([a-z\d]){8}$/;
     var isValid = regex.test(mnid);
 
     if (!isValid) {
