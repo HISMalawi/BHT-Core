@@ -113,17 +113,17 @@ function formatResults(results) {
         var indicator = results[i].value_indicator;
         var result_value = results[i].value;
         let test_name = results[i].indicator.name;
-        let value_modifier = results[i].value_indicator ? results[i].value_modifier : '=';
+        let value_modifier = results[i].value_modifier ? results[i].value_modifier : '=';
 
         let result_date = results[i].date ? results[i].date : null;
 
         if(test_name.match(/Viral Load/i)){
           if(value_modifier.match(/>|</)){
-            value_modifier = value.replace('<', '&lt;');
-            value_modifier = value.replace('>', '&gt;');
+            value_modifier = value_modifier.replace('<', '&lt;');
+            value_modifier = value_modifier.replace('>', '&gt;');
           }
           ((validateVL(`${value_modifier}${result_value}`) === "low" ? vl_alert_level = "" : vl_alert_level = " (<b style='color:red;'>HIGH</b>)"));
-          parameters.push(test_name + ": " + result_value + vl_alert_level);
+          parameters.push(test_name + `: ${value_modifier}` + result_value + vl_alert_level);
           parametersVL.results = `${value_modifier}${result_value}`;
         }
         //if (indicator == 'result_date') {
@@ -157,12 +157,12 @@ function validateVL(results) {
       if(res >= 1000) 
         return 'high';
 
-    }else if(results.match(/>/)){
+    }else if(results.match(/>/) || results.match(/&gt;/)){
       var res = parseFloat(results.replace('>',''));
       if(res >= 1000) 
         return 'high';
 
-    }else if(results.match(/</)){
+    }else if(results.match(/</) || results.match(/&lt;/)){
       var res = parseFloat(results.replace('<',''));
       if(res > 1000) 
         return 'high';

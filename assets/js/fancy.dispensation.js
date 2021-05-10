@@ -40,7 +40,7 @@ function fancyPopUP(order){
         <thead>
            <tr><th colspan="4">${order.drug_name}</th><tr>
            <tr>
-              <th style="width:145px;">Total tab(s) prescribed</th>
+              <th style="width:145px;">Total tab(s) needed</th>
               <th>Available stock</th>
               <th>Dispensed</th>
               <th>&nbsp;</th>
@@ -201,7 +201,7 @@ function packSizes(order) {
         '1044': [ 30],
         '1056': [ 24 ]
     }
-    return packs[drug_id]
+    return (!packs[drug_id] ? [ 30 ] : packs[drug_id]);
 
 }
 
