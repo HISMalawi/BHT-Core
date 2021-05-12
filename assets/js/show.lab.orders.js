@@ -158,12 +158,12 @@ function validateVL(results) {
         return 'high';
 
     }else if(results.match(/>/) || results.match(/&gt;/)){
-      var res = parseFloat(results.replace('>',''));
+      let res = results.match(/>/) ? parseFloat(results.replace('>','')) : parseFloat(results.replace('&gt;',''));
       if(res >= 1000) 
         return 'high';
 
     }else if(results.match(/</) || results.match(/&lt;/)){
-      var res = parseFloat(results.replace('<',''));
+      let res = results.match(/</) ? parseFloat(results.replace('<','')) : parseFloat(results.replace('&lt;',''));
       if(res > 1000) 
         return 'high';
 
