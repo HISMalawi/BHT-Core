@@ -162,6 +162,9 @@ function validateVL(results) {
       if(res >= 1000) 
         return 'high';
 
+      if(results.replace('>',"").replace("&gt;","").toUpperCase().replace(/\s+/g, '') == 'LDL') 
+        return 'high';
+
     }else if(results.match(/</) || results.match(/&lt;/)){
       let res = results.match(/</) ? parseFloat(results.replace('<','')) : parseFloat(results.replace('&lt;',''));
       if(res > 1000) 
