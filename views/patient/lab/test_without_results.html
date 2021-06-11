@@ -120,7 +120,8 @@ function renderData(orders) {
             continue;
             
         dataTable.row.add([accession_number, specimen, 
-          tests[t].name, order_date, addEnterResultsBTN(accession_number, tests[t].name)]).draw();
+          tests[t].name, order_date, addEnterResultsBTN(accession_number, 
+            tests[t].name, moment(order_date).format("YYYY-MM-DD"))]).draw();
       }
     }
 
@@ -148,12 +149,12 @@ function renderData(orders) {
     });
   }
 
-  function addEnterResultsBTN(accession_number, test_name){
+  function addEnterResultsBTN(accession_number, test_name, order_date){
       return `<button class="button blue navButton"
-        onmousedown="selectTest('${accession_number}', '${test_name}');"><span>Select</span></button>`
+        onmousedown="selectTest('${accession_number}', '${test_name}', '${order_date}');"><span>Select</span></button>`
   }
 
-  function selectTest(accession_number, test_name){
-    location = `result_entering.html?accession_number=${accession_number}&test_name=${test_name}`;
+  function selectTest(accession_number, test_name, order_date){
+    location = `result_entering.html?accession_number=${accession_number}&test_name=${test_name}&order_date=${order_date}`;
   }
 </script>
