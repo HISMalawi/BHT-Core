@@ -223,6 +223,60 @@
             transform: rotate(360deg);
         }
     }
+    #cpt-popup-div, #lab-popup-div, #ipt-rfp-popup-div{
+            display: block;
+            background-color: #F4F4F4;
+            border: 2px solid #E0E0E0;
+            border-radius: 15px;
+            padding: 5px;
+            position: absolute;
+            margin-top: 100px;
+            width: 600px;
+            margin-left: 18%;
+            z-index: 991;
+        }
+        #regimen-change-popup-header, #lab-popup-header {
+            border-bottom: 2px solid #7D9EC0;
+            margin-left: -5px;
+            width: 101.5%;
+            background-color: #FFFFFF;
+            margin-top: -5px;
+            padding-top: 5px;
+            border-radius: 15px 15px 0 0;
+            font-size: 14pt;
+            font-weight: bolder;
+        }
+       .lab_order_button {
+            -moz-user-select: none;
+            background-image: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+            font-size: 16px;
+            font-weight: bolder;
+            line-height: 2.29;
+            margin-bottom: 0;
+            padding: 6px 50px;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+            background-color: #337ab7;
+            border-color: #2e6da4;
+            color: #fff;
+            margin-top: -5px;
+        }
+        #lab-order-cover {
+            display: block;
+            position: absolute;
+            background-color: black;
+            width: 100%;
+            height: 102%;
+            left: 0%;
+            top: 0%;
+            z-index: 990;
+            opacity: 0.65;
+        }
 </style>
 <script type="text/javascript">
     var patientID = sessionStorage.getItem("patientID");
@@ -1088,13 +1142,61 @@
         jQuery(".loader").hide();
 
     }
+  
+    function gotoLabOrder()
+   {
+    jQuery("#lab-popup-div").hide();
+    jQuery("#lab-order-cover").hide();
+    var nextButton = document.getElementById('nextButton');
+    var nextButtonAttribute = nextButton.getAttribute('onmousedown');
+    nextButton.setAttribute('onmousedown', "redirectTo();" + nextButtonAttribute);
+   }
+   function hideLabOrderPopup() 
+   {
+      jQuery("#lab-popup-div").hide();
+      jQuery("#lab-order-cover").hide();
+      setOPDActivities();
+    }
+
+   
+    function setOPDActivities() 
+    { 
+      values = sessionStorage.OPD_activities.replace('Vitals,','');
+      sessionStorage.OPD_activities   = values;
+      var parameters = {property: "OPD_activities", property_value: values}
+      submitParameters(parameters, "/user_properties", "redirectTo");
+    }
+    function redirectTo()
+    {
+      nextEncounter(sessionStorage.patientID, sessionStorage.programID);
+    }
 
 </script>
 
 <body id="mateme">
+<div id="lab-order-cover"></div>
 <div id="container">
     <div id="content">
-
+        <div id="lab-popup-div">
+            <div id="lab-popup-header">
+                <center id='weight_readings_header'> Vitals</center>
+            </div>
+            <br/>
+            <div>
+                        <span style="font-size: 16pt;">
+                            <center>
+                                <br/>
+                                    Do you want to take Vitals?
+                                <br/>
+                            </center>
+                        </span>
+                <div style="padding-top: 65px;">
+                    <span id="lab-order-yes" onclick="gotoLabOrder();" class="lab_order_button">Register now</span>
+                    <span id="lab-order-no" onclick="hideLabOrderPopup();" class="lab_order_button"
+                          style="float: right; margin-right: 10px;">NOT now</span>
+                </div>
+            </div>
+        </div>
 
         <form onsubmit="submitEncounter();">
             <input type="text" name="vitals"
@@ -1233,6 +1335,12 @@
         xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
         xhttp.setRequestHeader('Content-type', "application/json");
         xhttp.send();
+    }
+    if(sessionStorage.OPD_workflow_popup == 'false')
+    {
+        jQuery("#lab-popup-div").hide();
+        jQuery("#lab-order-cover").hide();
+        sessionStorage.OPD_activities ="";
     }
 </script>
 </body>

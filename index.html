@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="./assets/css/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="./assets/css/maindashboard/header.css">
     <link rel="stylesheet" href="./assets/css/maindashboard/footer.css">
+    <script type="text/javascript" src="/assets/js/post_parameters.js"></script>
     <link rel="stylesheet" href="./assets/css/custom.css">
     <script src="./assets/js/jquery.min.js"></script>
     <script src="./assets/js/moment.js"></script>
@@ -367,6 +368,31 @@
   }
 
   disableNoneART();
+
+sessionStorage.setItem("OPD_workflow_popup", 'true');
+if(sessionStorage.applicationName == "OPD")
+{ 
+    var OPD_activities ='Patient registration';
+    if(sessionStorage.userRoles.match(/Program Manager|Superuser|System Developer/i))
+      OPD_activities ="Patient registration,Vitals,Presenting complaints,Lab orders,Radiology examination,Outpatient diagnosis,prescription";
+    else  
+    if(sessionStorage.userRoles.match(/Clinician/i))
+        OPD_activities ="Presenting complaints,Lab orders,Radiology examination,Outpatient diagnosis,prescription";
+    else
+    if(sessionStorage.userRoles.match(/Registration Clerk/i))
+        OPD_activities ="Patient registration,Vitals";
+       
+    sessionStorage.setItem("OPD_activities", OPD_activities);
+    setOPDActivities(OPD_activities)
+    function setOPDActivities(OPD_activities) 
+    {
+      values = OPD_activities;
+      var parameters = {property: "OPD_activities", property_value: values}
+      submitParameters(parameters, "/user_properties", "");
+      jQuery("#submit-cover").hide();
+    }
+
+}
 </script>
 
 <script type="text/javascript" src="/assets/js/current_time.js"></script>
