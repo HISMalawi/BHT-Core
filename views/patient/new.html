@@ -186,7 +186,7 @@
                 ["Given name", parameter.given_name],
                 ["Family name", parameter.family_name],
                 ["Gender", parameter.gender],
-                ["Birthdate", parameter.birthdate],
+                ["Birthdate", moment(parameter.birthdate).format('DD/MMM/YYYY')],
                 ["Birthdate Estimated", parameter.birthdate_estimated],
                 ["Home District", parameter.home_district],
                 ["Home TA", parameter.home_traditional_authority],
