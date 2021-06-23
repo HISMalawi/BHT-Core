@@ -53,23 +53,23 @@ function populateMedicationHistory() {
   border-style: solid;\
   border-width: 1px;\
 }\
-.date-columns {\
-  text-align: center;\
+.td-quantity {\
+  text-align: right !important;\
   width: 50px;\
+  padding-right: 5px !important;\
 }\
-.quantity-columns {\
-  text-align: right;\
-  width: 50px;\
-  padding-right: 5px;\
-}\
-.medication-columns {\
+.td-names {\
   text-align: left;\
-  width: 25%; !important\
-  padding-left: 5px;\
+  width: 50% !important;\
+  padding-left: 5px !important;\
 }\
 #medication-history-tbody td {\
   border-style: solid;\
-  border-width: 0px 0px 1px 0px;\
+  border-width: 1px; /*0px 0px 1px 0px;*/\
+}\
+.td-dates {\
+  text-align: center !important;\
+  width: 12% !important;\
 }\
 </style>";
   
@@ -125,14 +125,14 @@ function addMedTable(container) {
     th.innerHTML = cells[i];
     tr.appendChild(th);
 
-    if(i == 1 || i == 2)
+    /*if(i == 1 || i == 2)
       th.setAttribute('class','date-columns');
     
     if(i == 3)
       th.setAttribute('class','quantity-columns');
 
     if(i == 0)
-      th.setAttribute('class','medication-columns');
+      th.setAttribute('class','medication-columns');*/
 
   }
 
@@ -140,21 +140,28 @@ function addMedTable(container) {
   tbody.setAttribute('id','medication-history-tbody');
   table.appendChild(tbody);
 
-  initiateDataTable();
+  //initiateDataTable();
   fetchMedicationOrders();
 }
             
 var ordersTable;            
-function initiateDataTable() {
+function initiateDataTable(data) {
   ordersTable = jQuery('#med-history-table').DataTable( {
     fixedHeader: true,
+    data: data,
     searching: false,
     paging: false,
     scrollY: 555,
     scroller: {
       loadingIndicator: true
     },
-    order: [[2, 'desc']]
+    order: [[1, 'desc']],
+    columnDefs: [
+      {"className": "td-names","targets": 0},
+      {"className": "td-dates", type: 'date', "targets": 1},
+      {"className": "td-dates", type: 'date', "targets": 2},
+      {"className": "td-quantity", "targets": 3}
+    ]
   } );
 }
 
@@ -185,6 +192,8 @@ function fetchMedicationOrders() {
 }
 
 function addOrders(data) {
+  let  medication_rows = [];
+
   for(var i = 0 ; i < data.length ; i++){
     var order_id      = data[i].order_id;
     var drug_id       = data[i].drug_inventory_id;
@@ -193,14 +202,15 @@ function addOrders(data) {
     var end_date      = moment(data[i].order.auto_expire_date).format('DD/MMM/YYYY');
     var quantity      = data[i].quantity;
 
-    ordersTable.row.add([medication, start_date, end_date,  quantity, '&nbsp;']).node().id = order_id;
+    medication_rows.push([medication, start_date, end_date,  quantity, '&nbsp;']);
+    /*ordersTable.row.add([medication, start_date, end_date,  quantity, '&nbsp;']).node().id = order_id;
     ordersTable.draw();
     addClasses(order_id);
 
     $(".dataTables_scrollHeadInner").css({"width":"100%"});
-    $(".table ").css({"width":"100%"});
+    $(".table ").css({"width":"100%"});*/
   }
-
+  initiateDataTable(medication_rows);
 }
 
 function addClasses(order_id) {

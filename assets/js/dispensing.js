@@ -16,7 +16,12 @@ function getDataTable() {
       scrollY: 330,
       scroller: {
         loadingIndicator: true
-      }
+      },
+      order: [[1, 'desc']],
+      columnDefs: [
+        {"className": "td-dates", type: 'date', "targets": 1},
+        {"className": "td-quantity", "targets": 2}
+      ]
     });
 
     return dataTable;
