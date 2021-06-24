@@ -151,11 +151,7 @@
 
 #barcode-container {
   position:fixed;
-<<<<<<< HEAD
-  bottom: 26%;
-=======
   bottom: 27%;
->>>>>>> 0dc6eaf7dcde1c767cf73033b47ee4fbc740840a
   height: 30px;
   width: 80%;
 }

@@ -648,7 +648,7 @@ function buildDashboardButtons(tasks, container) {
                 infoTable.appendChild(tr);
 
                 var td = document.createElement("td");
-                td.setAttribute("style", "width: 52px;");
+                td.setAttribute("style", "width: 15%;");
                 var img = document.createElement("img");
                 img.setAttribute("src", tasks[i][1]);
                 img.setAttribute("style", "width: 50px; height: 50px;");
@@ -656,7 +656,7 @@ function buildDashboardButtons(tasks, container) {
                 tr.appendChild(td);
 
                 td = document.createElement("td");
-                td.setAttribute("style", "color: #fff; font-weight: bold; width: 80%; text-align: left;");
+                td.setAttribute("style", "color: #fff; font-weight: bold; padding-left: 10px; width: 80%; text-align: left;");
                 td.setAttribute("id", "task-button-" + (i + 1));
                 td.innerHTML = tasks[i][0].toUpperCase();
                 tr.appendChild(td);

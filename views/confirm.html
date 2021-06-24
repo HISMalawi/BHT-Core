@@ -1753,12 +1753,9 @@ function calculateMonthsOnART(art_start_date) {
 }            
 
 function dateDiffInMonths(d2, d1) {
-  var d1Y = d1.getFullYear();
-  var d2Y = d2.getFullYear();
-  var d1M = d1.getMonth();
-  var d2M = d2.getMonth();
-
-  return (d2M+12*d2Y)-(d1M+12*d1Y);
+  let a = moment(d1);
+  let b = moment(d2);
+  return b.diff(a, 'months');
 }
 
 var current_person_addresses;

@@ -105,6 +105,9 @@ var tt_cancel_destination = "/views/patient/lab/test_without_results.html";
   height: 90%;
 }
 
+.tt_controls_test_result #date {
+  display: none;
+}
 
 </style>
 
@@ -166,14 +169,14 @@ var tt_cancel_destination = "/views/patient/lab/test_without_results.html";
           <input absoluteMin="0.0" condition="$('result_type').value == 'Numeric (numbers only)'" 
           field_type="number" helpText="Test Result" id="numeric_results" 
           name="numeric_results"
-          tt_onLoad="updateKeyPad();setHelpText();"
+          tt_onLoad="updateKeyPad('validateNumericResults');setHelpText();"
           tt_pageStyleClass="Numeric NumbersOnly" type="text" 
           validationMessage="You must enter a modifier plus numbers only (for example =90)"
           validationRule="^(>|<|=)([0-9.]+)$|Unknown$"/>
 
           <input type="text" name="alpha_results"
           id="alpha_results" field_type="alpha"
-          key="alpha_results" helpText="Test Result" tt_onLoad="lastPage();setHelpText();"
+          key="alpha_results" helpText="Test Result" tt_onLoad="lastPage();setHelpText();addExtraNum();"
           condition="$('result_type').value == 'Alphanumeric (text / text and numbers)';"/>
 
 
@@ -233,15 +236,19 @@ function validateSetResultDate(){
   if(moment(`${year}/${month}/${day}`) > moment()){
     showMessage("Invalid date");
   }else{
-    gotoNextPage();
+    if(moment(`${year}/${month}/${day}`) < moment(orderDate)){
+      showMessage("Result date is less than Order date");
+    }else{
+      gotoNextPage();
+    }
   }
 }
 
-function updateKeyPad() {
+function updateKeyPad(onmousedown) {
   let buttons = document.getElementsByClassName("keyboardButton");
   let nextBtn = __$("nextButton");
   nextBtn.innerHTML = "<span>Process</span>";
-  nextBtn.setAttribute('onmousedown', "validateNumericResults();");
+  nextBtn.setAttribute('onmousedown', `${onmousedown}();`);
   nextBtn.setAttribute('onclick', "");
 
 
@@ -262,10 +269,14 @@ function lastPage() {
 
 function validateAlphaResult(){
   let result = document.getElementById('touchscreenInput' + tstCurrentPage).value;
+  let processed_result = result.match(/^(>|<|=)(.*)/);
+
   if(result.length === 0 || !result.trim()){
     showMessage("Result is empty. Please enter a valid result.");
+  }else if(processed_result == null){
+    showMessage('You must enter a modifier plus result (for example =LDL)');
   }else{
-    addToOrdersObj('=', result, 'text');
+    addToOrdersObj(result.match(/>|<|=/)[0], result.substring(1,result.length), 'text');
   }
 }
 
@@ -353,13 +364,14 @@ function appendResult(encounter){
 
 
 
-
+var orderDate;
 
 
 function fetchObsID() {
     let accession_number = window.location.href;
     accession_number = new URL(accession_number);
     let test_name = accession_number.searchParams.get("test_name");
+    orderDate = accession_number.searchParams.get("order_date");
     accession_number = accession_number.searchParams.get("accession_number");
     let url = sessionStorage.apiProtocol + "://" + sessionStorage.apiURL + ":";
     url += sessionStorage.apiPort + "/api/v1/lab/tests";
@@ -544,6 +556,25 @@ function loadConfirmation(){
   __$('inputFrame' + tstCurrentPage).innerHTML = (table += '</tbody><table>');
     let nextButton = __$('nextButton');
     nextButton.setAttribute("onmousedown", "createEncounter();")
+}
+
+function addExtraNum(){
+  let num = document.getElementById('num');
+  num.setAttribute("onmousedown", "press(this.id);updateKeyPad('validateAlphaResult');updateChar();");
+  let qwerty = document.getElementById('qwerty');
+  qwerty.setAttribute("onmousedown", "press(this.id);updateQWERTYnum();");
+}
+
+function updateQWERTYnum(){
+  let num = document.getElementById('num');
+  num.setAttribute("onmousedown", "press(this.id);updateKeyPad('validateAlphaResult');updateChar();");
+  let abc = document.getElementById('abc');
+  abc.setAttribute("onmousedown", "press(this.id);addExtraNum();updateChar();");
+}
+
+function updateChar() {
+  let char = document.getElementById('char');
+  char.setAttribute("onmousedown", "press(this.id);addExtraNum();");
 }
 
 var obsID;

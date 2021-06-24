@@ -1,0 +1,117 @@
+#prescription-table, .inner-tables {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#prescription-table th, #prescription-table td {
+    border-width: 1px;
+    border-style: solid;
+}
+
+#prescribed-pills {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.inner-tables td, .inner-tables th{
+    text-align: right;
+    padding-right: 5px;
+}
+
+.inner-tables td {
+    line-height: 134px;
+}
+
+#dispensation-buttons {
+    vertical-align: top;
+    width: 10%;
+}
+
+.button-tables {
+    border-style: none !important;
+}
+
+.button-tables th, .button-tables td {
+    border-style: none !important;
+    text-align: center;
+}
+
+.dispensation-main {
+    background-color: #333333;
+    display: block;
+    height: 80px;
+    position: absolute;
+    top: 592px;
+    width: 78.7%;
+    padding-right: 20px;
+    z-index: 10;
+}
+
+#main-prescription-content {
+    background: whitesmoke;
+    height: 87%;
+    overflow: auto;
+}
+
+/*.inner-tables button {
+    min-height: 60px !important;
+    min-width: 60px !important;
+}*/
+
+.dispensation-btns {
+    margin: 10px !important;
+}
+
+#lose-btn {
+    float: left;
+}
+
+#dispensation-error-msg {
+    display: none;
+    top: 10%;
+    margin: auto;
+    height: 30%;
+    width: 40%;
+    z-index: 8004;
+    position: absolute;
+    left: 30%;
+    background-color: white;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 9px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.message-ctrls {
+    top: 50% !important;
+    position: absolute;
+    right: 10px;
+}
+
+.message-text {
+    top: 10% !important;
+    position: absolute;
+    margin-left: 20%;
+    width: 65%;
+    font-size: 23px;
+}
+
+.amount-dispensed-tabs, .amount-dispensed-packs, .available-pack-sizes {
+    border-right-style: none !important;
+    border-bottom-style: none !important;
+}
+
+.amount-dispensed-tabs {
+    border-left-style: none !important;
+}
+
+.pack-sizes {
+    border-bottom-style: none !important;
+    border-left-style: none !important;
+}
+
+.button-tables td, .button-tables th {
+    border-style: none !important;
+    border-top-style: solid !important;
+}
