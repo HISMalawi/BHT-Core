@@ -8,6 +8,8 @@
   background-color: teal;
   color: white;
   text-align: center;
+  border-bottom-width: 5px;
+  border-bottom-style: solid;
 }
 
 #orders-box {
@@ -117,8 +119,8 @@
 }
 
 .date-columns {
-  text-align: center;
-  width: 75px;
+  text-align: center !important;
+  width: 75px !important;
 }
 
 .results-columns {
@@ -139,4 +141,17 @@
 .tt_controls_lab_orders #messageBar {
   background-color: green;
   border-color: lightgreen;
+}
+
+.date-col {
+  text-align: center !important;
+  width: 75px !important;
+}
+
+.accession-numbers-col {
+  width: 15% !important;
+}
+
+.results-col {
+  width: 20% !important;
 }
