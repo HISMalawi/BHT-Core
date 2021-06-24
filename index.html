@@ -370,28 +370,48 @@
   disableNoneART();
 
 sessionStorage.setItem("OPD_workflow_popup", 'true');
-if(sessionStorage.applicationName == "OPD")
-{ 
-    var OPD_activities ='Patient registration';
-    if(sessionStorage.userRoles.match(/Program Manager|Superuser|System Developer/i))
-      OPD_activities ="Patient registration,Vitals,Presenting complaints,Lab orders,Radiology examination,Outpatient diagnosis,prescription";
-    else  
+if(parseInt(sessionStorage.programID) == 14 )
+{  
     if(sessionStorage.userRoles.match(/Clinician/i))
-        OPD_activities ="Presenting complaints,Lab orders,Radiology examination,Outpatient diagnosis,prescription";
+        OPD_activities ="presenting complaints,lab orders,radiology examination,outpatient diagnosis,prescription";
     else
-    if(sessionStorage.userRoles.match(/Registration Clerk/i))
-        OPD_activities ="Patient registration,Vitals";
-       
+    OPD_activities = sessionStorage.OPD_task;
+
+    OPD_activities = "patient registration,"+OPD_activities;
+    getOPDTask();
     sessionStorage.setItem("OPD_activities", OPD_activities);
     setOPDActivities(OPD_activities)
-    function setOPDActivities(OPD_activities) 
-    {
-      values = OPD_activities;
-      var parameters = {property: "OPD_activities", property_value: values}
-      submitParameters(parameters, "/user_properties", "");
-      jQuery("#submit-cover").hide();
-    }
+}
+function getOPDTask()
+{
+    $.getJSON("/apps/" + sessionStorage.applicationName + "/application.json")
+    .done(function (data, status) {
 
+        removeUnavailableTask(data);
+
+    })
+    .fail(function () {
+        console.log("application.json is missing from /apps/ART folder");
+    });
+}
+function removeUnavailableTask(encountersData)
+{
+    var j = Object.keys(encountersData.encounters);
+    j.forEach(function (j) {
+        var values = encountersData.encounters[j]
+        var available = values.available;
+
+        if (!available)
+        sessionStorage.OPD_activities = sessionStorage.OPD_activities.replace(j+',','').replace(j,'');
+
+    });
+}
+function setOPDActivities(OPD_activities) 
+{
+    values = OPD_activities;
+    var parameters = {property: "OPD_activities", property_value: values}
+    submitParameters(parameters, "/user_properties", "");
+    jQuery("#submit-cover").hide();
 }
 </script>
 

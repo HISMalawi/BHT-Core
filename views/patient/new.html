@@ -108,7 +108,9 @@
                     parametersPassed.facility_name = data;
                 }
             }
-            sessionStorage.birthdate = parametersPassed.birthdate
+            sessionStorage.patientAge = Math.round(moment().diff(parametersPassed.birthdate, 'years', true));
+            sessionStorage.patientGender = parametersPassed.gender;
+            sessionStorage.birthdate = parametersPassed.birthdate;
              postClientParamaters(parametersPassed, patientAttributes); 
         }
 
@@ -925,7 +927,6 @@
                     xhttp.send();
                 }
                 // getNames(__$('home_district').value, "District", "/districts?paginate=false&region_id=" + document.getElementById('current_region').value);
-
         </script>
 
         <form action="/views/patient_dashboard.html" method="POST">
@@ -1120,18 +1121,11 @@
                    validationMessage="Not a valid phone number"
                    tt_onLoad="$(nextButton).style.display = block;"/> -->
 
-            <select allowFreeText="false" helpText="National ID available"
-                   name="outcome" id="national_id_available" key="outcome"
-                    tt_onLoad="endEncounter('national_id_available');"> 
-                    <option value=""></option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                    <option value="Unknown">Unknown</option>
-                </select>
+         
 
             <input type="text" name="malawiNationalId" id="malawiNationalId" textCase="upper"
-                condition='$("national_id_available").value == "Yes";'
-                validationRule="^(?=[a-zA-Z0-9]*$)(?=\d+[a-zA-Z]|[a-zA-Z]+\d)([a-zA-Z\d]){8}$"
+                field_type="number"
+                validationRule="^(?=[a-zA-Z0-9]*$)(?=\d+[a-zA-Z]|[a-zA-Z]+\d)([a-zA-Z\d]){8}$|Unknown|Not Available|N\/A"
                 validationMessage="Not a valid MAlawi National ID"
                 helpText="Enter National ID" tt_onLoad="endEncounter('national_id');"/>
 
