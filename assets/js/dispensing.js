@@ -1,4 +1,3 @@
-
 var fetchedPrescriptions;
 var ordersToPost;
 var totalDispensed;
@@ -17,7 +16,12 @@ function getDataTable() {
       scrollY: 330,
       scroller: {
         loadingIndicator: true
-      }
+      },
+      order: [[1, 'desc']],
+      columnDefs: [
+        {"className": "td-dates", type: 'date', "targets": 1},
+        {"className": "td-quantity", "targets": 2}
+      ]
     });
 
     return dataTable;
@@ -292,7 +296,7 @@ function enterKeypadValue(e, order_id) {
             inputBox.value = null;
         } else if (e.innerHTML.match(/Dispense/i)) {
             var amount_dispensed = document.getElementById("prescription-input").value;
-            manualDispensation(order_id, amount_dispensed);
+            manualDispensation2(order_id, amount_dispensed);
             document.getElementById("prescription-modal").style = "display: none;";
         } else if (e.innerHTML.match(/Close/i)) {
             document.getElementById("prescription-modal").style = "display: none;";
@@ -344,10 +348,29 @@ function buildMainControllers() {
     buildDispensingPage();
 }
 
-function manualDispensation(order_id, amount_dispensed) {
+function manualDispensation(order_id) {
+    var drug_order = {dispensations: []};
+    dispen[order_id].forEach((element) => {
+        drug_order.dispensations.push({
+            date: sessionStorage.sessionDate, 
+            drug_order_id: order_id, 
+            quantity: element
+        });
+    });
+    if(providerID != null) {
+        drug_order.provider_id = providerID;
+    }
+    submitParameters(drug_order, "/dispensations", "doneDispensing");
+    dispen[order_id] = [];
+    try {
+        var cover = document.getElementById('submit-cover');
+        cover.style = 'display: none;';
+    } catch (e) {
+    }
+}
+function manualDispensation2(order_id, amount_dispensed) {
     postDispensation(order_id, amount_dispensed);
 }
-
 function scannedMedicationBarcode(barcode) {
     var drug_id = barcode.split("-")[0];
     var quantity = barcode.split("-")[1];
@@ -743,7 +766,10 @@ function gotoAppointmentEncounterType() {
     document.location = "/views/patient/appointment.html?patient_id=" + sessionStorage.patientID;
   } else if (parseInt(sessionStorage.programID) === 2) {
     nextEncounter(sessionStorage.patientID, sessionStorage.programID, true)
-  } else{
+  } 
+  else if(sessionStorage.userRoles == 'Pharmacist' && parseInt(sessionStorage.programID) == 14)
+    window.location = "/";
+    else{
     document.location = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
   }
 }

@@ -45,13 +45,6 @@ function inserBarcodeScan() {
 
 function searchID(e) {
 
-  var sca_ = "03~I<MWIS1A3KDXH<5<<<<<<<<<<<<<<<~8604068M2204064MWI<<<<<<<<<<<0~MANDA<<JUSTINROBIN<<<<<<<<<<<<~MANDA~S1A3KDXH~JUSTIN, ROBIN~~Male~06 Apr 1986~19 Sep 2017~";
-      sca_ =sca_.split('<');
-      sca_ = sca_['1'];
-     // console.log(sca_.slice(3));
-
-  var input_id = e.value;
-
   if(e.value.length == 16 ) {
     var lastChar = e.value.substr(e.value.length - 1); 
     if(lastChar == '$') {

@@ -5,6 +5,8 @@
 
 <link rel="stylesheet" href="/assets/css/dispensing.css" type="text/css">
 <script type="text/javascript" src="/assets/js/dispensing.js"></script>
+<script type="text/javascript" src="/assets/js/GlobalProperty.js"></script>
+<script type="text/javascript" src="/assets/js/httpUtils.js"></script>
 
 <script type="text/javascript" src="/assets/js/post_parameters.js"></script>
 <script type="text/javascript" src="/assets/js/client-scan-barcode.js"></script>
@@ -88,15 +90,29 @@ function changeNextButton() {
   bnt.setAttribute("onmousedown", "doneDispensation();")
 }
 
-function doneDispensation() {
-  if(sessionStorage.userRoles == 'Pharmacist')
-    window.location = "/"
-  else
-    window.location = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID
-  //nextEncounter(sessionStorage.patientID, 1);
-}
 var patient_id = sessionStorage.patientID;
 var tt_cancel_destination = "/views/patient_dashboard.html?patient_id=" + patient_id;
+
+function doneDispensation() {
+  if(parseInt(sessionStorage.programID) == 14)
+  {  
+    if(sessionStorage.userRoles == 'Pharmacist')
+      confirmCancelEntryWithMessage(null, "Are all dispensationsations complete?, continue to Main dashboard?", '/', true);
+    else
+      confirmCancelEntryWithMessage(null, "Are all dispensationsations complete?, continue to patient dashboard?", tt_cancel_destination, true);
+   
+  }
+  else
+  {
+    if(sessionStorage.userActivities.search(/Dispensations/ig) > 0) {
+      confirmCancelEntryWithMessage(null, "Are all dispensationsations complete?, continue to patient dashboard?", '/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID, true);
+    }else {
+      window.location = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID
+    }
+  }
+
+}
+
 </script>
 
 
