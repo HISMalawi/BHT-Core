@@ -140,3 +140,19 @@
   background-color: green;
   border-color: lightgreen;
 }
+#virtual-keyboard {
+  left: 200px !important;
+  top: 61px !important;
+}
+#search_content {
+  position: fixed;
+  top: 22px;
+  margin-left: 10px;
+}
+#search_filed {
+  width: 36vw;
+  height: 30px;
+}
+#tests-left {
+  margin-top: 34px;
+}

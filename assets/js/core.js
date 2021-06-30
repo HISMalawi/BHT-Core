@@ -387,8 +387,15 @@ function getTasks(encountersData) {
             var show = values.show;
             var available = values.available;
 
-          
-            if ((show || show == undefined) && available) tasks.push([j, icon, url]);
+          if(parseInt(sessionStorage.programID) == 14)
+          {
+            if ((show || show == undefined) && available ) 
+                tasks.push([j, icon, url]);
+                
+            return
+          }
+
+            if (show || show == undefined) tasks.push([j, icon, url]);
         });
     }
 
