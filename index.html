@@ -16,6 +16,10 @@
         if (top.location != location) {
         top.location.href = document.location.href ;
         }
+
+
+      
+
     </script>          
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="./assets/css/bootstrap/bootstrap.min.css">
@@ -108,6 +112,17 @@
         body {
             overflow: hidden;
         }
+        .under-development {
+        position: absolute;
+        background-color: black;
+        width: 80%;
+        height: 55%;
+        left: 10%;
+        top: 7%;
+        z-index: 2000;
+        opacity: .99;
+        border-radius: 14px 14px;
+    }
     </style>
 </head>
 
@@ -221,6 +236,15 @@
                 <button type="button" class="button red" id="modal-btn-no" style="width: 100px;">No</button>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="modal fade under-development" style="display: none;" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  aria-hidden="true" id="mo-modal"
+    style="width: 60%; margin-left:20%;margin-right: 20%; margin-top: 0;">
+    <div class="modal-dialog modal-sm">
+       <div style="height: 10%; margin-left: 40%;"><img src="/apps/OPD/assets/images/udimg.png" height="320"></div>
+       <div style="margin-left: 7%; margin-top: 3%; color:whitesmoke; font-style: normal;"><h1>Report is under development!</h1></div>
+       <button id="ud-id" onmousedown="CloseButton()" style="width: 15%; height: 15%; font-size: 34px; float: right; margin-top: -4%; margin-right: 4%;">Close</button>
     </div>
 </div>
 
@@ -413,6 +437,20 @@ function setOPDActivities(OPD_activities)
     submitParameters(parameters, "/user_properties", "");
     jQuery("#submit-cover").hide();
 }
+
+$('document').ready(function(){
+    var vn = document.getElementById("generic_tabs");
+    console.log("in index: "+vn);
+    vn.addEventListener("click", function(){ console.log("in index2: "+vn);});
+});
+
+function CloseButton() { //for closing under-dev modal
+    document.getElementById("mo-modal").style = "display: none;";
+    window.document.body.removeAttribute("class");
+    var elem = document.getElementById("modal-backdrop");
+    elem.parentNode.removeChild(elem);
+}
+
 </script>
 
 <script type="text/javascript" src="/assets/js/current_time.js"></script>
