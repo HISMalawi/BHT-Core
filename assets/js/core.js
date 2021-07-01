@@ -700,6 +700,28 @@ function buildDashboardButtons(tasks, container) {
 
           }
 
+          if(sessionStorage.programID == '14') {
+
+            var url = `${apiProtocol}://${apiURL}:${apiPort}/api/v1/encounters?patient_id=${sessionStorage.patientID}&${sessionStorage.programID}&paginate=false`;
+            var headers = {
+              'Authorization': sessionStorage.authorization,
+              'Content-Type': 'application/json'
+            };
+            fetch(url, {
+              'headers': headers
+            }).then(function (response) {
+              response.json().then(function (encounters) {
+                encounters.forEach(function (encounter) {
+                  var type = encounter.type.name;
+                  var taskButton = document.querySelector("[data-name='".concat(type, "']"));
+                  if (!taskButton) return;
+                  taskButton.setAttribute('class', 'tasks-table-cell-grayed');
+                });
+              });
+            });
+
+          }
+
 
         }
     };

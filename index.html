@@ -438,12 +438,6 @@ function setOPDActivities(OPD_activities)
     jQuery("#submit-cover").hide();
 }
 
-$('document').ready(function(){
-    var vn = document.getElementById("generic_tabs");
-    console.log("in index: "+vn);
-    vn.addEventListener("click", function(){ console.log("in index2: "+vn);});
-});
-
 function CloseButton() { //for closing under-dev modal
     document.getElementById("mo-modal").style = "display: none;";
     window.document.body.removeAttribute("class");
