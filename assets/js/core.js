@@ -391,7 +391,6 @@ function getTasks(encountersData) {
           {
             if ((show || show == undefined) && available ) 
                 tasks.push([j, icon, url]);
-                
             return
           }
 

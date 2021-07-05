@@ -767,7 +767,7 @@ function gotoAppointmentEncounterType() {
   } else if (parseInt(sessionStorage.programID) === 2) {
     nextEncounter(sessionStorage.patientID, sessionStorage.programID, true)
   } 
-  else if(sessionStorage.userRoles == 'Pharmacist' && parseInt(sessionStorage.programID) == 14)
+  else if(sessionStorage.userRoles.match(/Pharmacist/i) && parseInt(sessionStorage.programID) == 14)
     window.location = "/";
     else{
     document.location = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
