@@ -54,8 +54,16 @@
   display: table;
 }
 
+.td-dates {
+  text-align: center !important;
+  width: 12% !important;
+}
 
-
+.td-quantity {
+  text-align: right !important;
+  width: 20% !important;
+  padding-right: 30px !important;
+}
 
 
 
