@@ -714,8 +714,11 @@ function buildDashboardButtons(tasks, container) {
                 encounters.forEach(function (encounter) {
                   var type = encounter.type.name;
                   var taskButton = document.querySelector("[data-name='".concat(type, "']"));
+                  var enc_date = encounter.date_created.split('T');
+
                   if (!taskButton) return;
-                  taskButton.setAttribute('class', 'tasks-table-cell-grayed');
+                  if(sessionStorage.sessionDate == enc_date[0])
+                    taskButton.setAttribute('class', 'tasks-table-cell-grayed');
                 });
               });
             });

@@ -57,7 +57,6 @@ function searchID(e) {
 
      var sca =e.value.split('<');
       sca = sca['1'];
-      console.log(sca.slice(3));
 
       var malawi_national_id = sca.slice(3);
       postMNID(sca.slice(3));
