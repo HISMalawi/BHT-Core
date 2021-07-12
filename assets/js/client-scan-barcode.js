@@ -44,10 +44,30 @@ function inserBarcodeScan() {
 }
 
 function searchID(e) {
-  var lastChar = e.value.substr(e.value.length - 1); 
-  if(lastChar == '$') {
-    returnToFunction(e.value.slice(0, -1));
-    e.value = null;
+
+  if(e.value.length == 16 ) {
+    var lastChar = e.value.substr(e.value.length - 1); 
+    if(lastChar == '$') {
+      returnToFunction(e.value.slice(0, -1));
+      e.value = null;
+    }
+  }
+
+  else if(e.value.length > 30) {
+
+     var sca =e.value.split('<');
+      sca = sca['1'];
+
+      var malawi_national_id = sca.slice(3);
+      postMNID(sca.slice(3));
+  } 
+
+  else {
+    var lastChar = e.value.substr(e.value.length - 1); 
+    if(lastChar == '$') {
+      returnToFunction(e.value.slice(0, -1));
+      e.value = null;
+    }
   }
 }
 
@@ -76,7 +96,26 @@ function postID(identifier) {
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       // document.location = "/confirm/" + this.responseText;
-      document.location = patient_index_url + "?patient_id="+identifier;
+       document.location = patient_index_url + "?patient_id="+identifier;
+      // callbackFunction(this.responseText);
+    }
+  };
+  xhttp.open("GET", patient_index_url + "?identifier=" + identifier, true);
+  xhttp.send();
+}
+
+function postMNID(identifier) {
+  if(sessionStorage.programID == undefined)
+    return;
+
+  if(sessionStorage.programID.length < 1)
+    return;
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      // document.location = "/confirm/" + this.responseText;
+       document.location = patient_index_url + "?person_mnid="+identifier;
       // callbackFunction(this.responseText);
     }
   };

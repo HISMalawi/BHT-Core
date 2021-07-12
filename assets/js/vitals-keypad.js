@@ -120,6 +120,7 @@ function buildTable() {
     fd.innerHTML = vitalsAssigned[i][2];
     tr.appendChild(fd);
 
+    
   
   }
   table.innerHTML += "<tr><th>Age<td id='age'>"+sessionStorage.patientAge+"</td><td> years old</td></th></tr>";

@@ -385,6 +385,14 @@ function getTasks(encountersData) {
             var url = values.url;
             var icon = values.activitiesIcon;
             var show = values.show;
+            var available = values.available;
+
+          if(parseInt(sessionStorage.programID) == 14)
+          {
+            if ((show || show == undefined) && available ) 
+                tasks.push([j, icon, url]);
+            return
+          }
 
             if (show || show == undefined) tasks.push([j, icon, url]);
         });
@@ -685,6 +693,31 @@ function buildDashboardButtons(tasks, container) {
                   var taskButton = document.querySelector("[data-name='".concat(type, "']"));
                   if (!taskButton) return;
                   taskButton.setAttribute('class', 'tasks-table-cell-grayed');
+                });
+              });
+            });
+
+          }
+
+          if(sessionStorage.programID == '14') {
+
+            var url = `${apiProtocol}://${apiURL}:${apiPort}/api/v1/encounters?patient_id=${sessionStorage.patientID}&${sessionStorage.programID}&paginate=false`;
+            var headers = {
+              'Authorization': sessionStorage.authorization,
+              'Content-Type': 'application/json'
+            };
+            fetch(url, {
+              'headers': headers
+            }).then(function (response) {
+              response.json().then(function (encounters) {
+                encounters.forEach(function (encounter) {
+                  var type = encounter.type.name;
+                  var taskButton = document.querySelector("[data-name='".concat(type, "']"));
+                  var enc_date = encounter.date_created.split('T');
+
+                  if (!taskButton) return;
+                  if(sessionStorage.sessionDate == enc_date[0])
+                    taskButton.setAttribute('class', 'tasks-table-cell-grayed');
                 });
               });
             });
@@ -1124,6 +1157,7 @@ function getAPI() {
                         apiPort = data.apiPort;
                         sessionStorage.setItem("apiProtocol", data.apiProtocol);
                         apiProtocol = data.apiProtocol;
+
                     } catch (e) {
                         console.log("invalid json formatting");
                     }

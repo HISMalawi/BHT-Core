@@ -95,12 +95,13 @@ function keyPressed(e) {
     }else{
       inputBox.value += value_string;
     }
- 
     try {
       $('input[type="search"]').val(inputBox.value).keyup();
+    }catch(z) {}
+    try {
+      search_results();
     }catch(z) {}
   }catch(x) { }
 
 }
-
 
