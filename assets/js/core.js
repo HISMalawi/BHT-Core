@@ -716,8 +716,6 @@ function buildDashboardButtons(tasks, container) {
                   var taskButton = document.querySelector("[data-name='".concat(type, "']"));
                   var enc_date = encounter.date_created.split('T');
 
-                  console.log(encounter);
-
                   if (!taskButton) return;
                   if(sessionStorage.sessionDate == enc_date[0])
                     taskButton.setAttribute('class', 'tasks-table-cell-grayed');
