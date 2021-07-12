@@ -368,33 +368,12 @@ var orderDate;
 
 
 function fetchObsID() {
-    let accession_number = window.location.href;
-    accession_number = new URL(accession_number);
-    let test_name = accession_number.searchParams.get("test_name");
-    orderDate = accession_number.searchParams.get("order_date");
-    accession_number = accession_number.searchParams.get("accession_number");
-    let url = sessionStorage.apiProtocol + "://" + sessionStorage.apiURL + ":";
-    url += sessionStorage.apiPort + "/api/v1/lab/tests";
-    url += "?accession_number=" + accession_number;
-
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
-            var obs = JSON.parse(this.responseText);
-            for(let i = 0;  i < obs.length;i++){
-              if(obs[i].name == test_name){
-                obsID = obs[i].concept_id;
-                mainTestID = obs[i].id;
-              }
-              
-            }
-            getTestIndicators();
-        }
-    };
-    xhttp.open("GET", url, true);
-    xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
-    xhttp.setRequestHeader('Content-type', "application/json");
-    xhttp.send();
+    let paramsPassed = new URL(window.location.href);
+    let test_name = paramsPassed.searchParams.get("test_name");
+    orderDate = paramsPassed.searchParams.get("order_date");
+    obsID = paramsPassed.searchParams.get("test_type_id");
+    mainTestID = paramsPassed.searchParams.get("test_id");
+    getTestIndicators();
 }
 
 function getTestIndicators() {

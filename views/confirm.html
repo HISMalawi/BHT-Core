@@ -1586,7 +1586,7 @@ var global_property = GlobalProperty({
   function finish(id) {
     sessionStorage.patientID = id;
 
-    if(sessionStorage.userRoles == 'Pharmacist')
+    if(sessionStorage.userRoles.match(/Pharmacist/i))
       window.location = '/views/patient/dispensing.html';
 
     if(sessionStorage.programID != '1'){
