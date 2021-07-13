@@ -243,11 +243,11 @@
     style="width: 60%; margin-left:20%;margin-right: 20%; margin-top: 0;">
     <div class="modal-dialog modal-sm">
        <div style="text-align: center;"><img src="/apps/OPD/assets/images/under-construction-icon-png-26.png" height="320">
-        <div style="margin-top: %; font-style: normal; text-align: center;"><h1>Report is under development!</h1></div>
+        <!-- <div style="margin-top: %; font-style: normal; text-align: center;"><h1>Report is under development!</h1></div> -->
        </div>
        <div class="flex" style="width: fit-content;"><button id="ud-id" onmousedown="CloseButton()" class="btn btn-danger buttons red" style="width: 15%; height: 15%; float: right; margin-top: -3%;">Close</button></div>
-       
-    </div>
+    
+    </div>   
 </div>
 
 
@@ -404,33 +404,43 @@ if(parseInt(sessionStorage.programID) == 14 )
     OPD_activities = sessionStorage.OPD_task;
 
     OPD_activities = "patient registration,"+OPD_activities;
-    getOPDTask();
+    getRadiologyActivationStatus();
     sessionStorage.setItem("OPD_activities", OPD_activities);
     setOPDActivities(OPD_activities)
 }
-function getOPDTask()
+
+function getRadiologyActivationStatus() 
 {
-    $.getJSON("/apps/" + sessionStorage.applicationName + "/application.json")
-    .done(function (data, status) {
+    var radiology_property_url = apiProtocol + "://" + apiURL + ":" + apiPort;
+    radiology_property_url += "/api/v1/global_properties?property=activate.radiology";
 
-        removeUnavailableTask(data);
+    var xhttp1 = new XMLHttpRequest();
+    xhttp1.onreadystatechange = function () {
+        if (this.readyState == 4 && (this.status == 201 || this.status == 200 || this.status == 404)) {
+            try {
+                var activate_radiology_property = JSON.parse(this.responseText);
+                if (activate_radiology_property["activate.radiology"] == "true") 
+                    sessionStorage.setItem("radiology_status", true);
+                else
+                    sessionStorage.setItem("radiology_status", false);
+                    
+            } catch (e) {
 
-    })
-    .fail(function () {
-        console.log("application.json is missing from /apps/ART folder");
-    });
+            }
+       removeUnavailableTask();
+        }
+    };
+    xhttp1.open("GET", radiology_property_url, true);
+    xhttp1.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    xhttp1.setRequestHeader('Content-type', "application/json");
+    xhttp1.send();
 }
-function removeUnavailableTask(encountersData)
+
+function removeUnavailableTask()
 {
-    var j = Object.keys(encountersData.encounters);
-    j.forEach(function (j) {
-        var values = encountersData.encounters[j]
-        var available = values.available;
+    if(sessionStorage.radiology_status == "false")
+    sessionStorage.OPD_activities = OPD_activities.replace('radiology examination,','').replace('radiology examination','');
 
-        if (!available)
-        sessionStorage.OPD_activities = sessionStorage.OPD_activities.replace(j+',','').replace(j,'');
-
-    });
 }
 function setOPDActivities(OPD_activities) 
 {

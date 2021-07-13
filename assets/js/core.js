@@ -387,12 +387,9 @@ function getTasks(encountersData) {
             var show = values.show;
             var available = values.available;
 
-          if(parseInt(sessionStorage.programID) == 14)
-          {
-            if ((show || show == undefined) && available ) 
-                tasks.push([j, icon, url]);
-            return
-          }
+      
+            if((j == "radiology examination" || j == "view radiology results") && (sessionStorage.radiology_status == "false" && parseInt(sessionStorage.programID) == 14))
+                return
 
             if (show || show == undefined) tasks.push([j, icon, url]);
         });
