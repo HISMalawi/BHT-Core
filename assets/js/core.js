@@ -712,12 +712,16 @@ function buildDashboardButtons(tasks, container) {
               response.json().then(function (encounters) {
                 encounters.forEach(function (encounter) {
                   var type = encounter.type.name;
+                  var nw = 'PRESCRIPTION';
                   var taskButton = document.querySelector("[data-name='".concat(type, "']"));
+                  var TreatmentTaskButton = document.querySelector("[data-name='".concat(nw, "']"));
                   var enc_date = encounter.date_created.split('T');
 
+                  if (TreatmentTaskButton && type == "TREATMENT" && sessionStorage.sessionDate == enc_date[0])
+                    TreatmentTaskButton.setAttribute('class', 'tasks-table-cell-grayed');
                   if (!taskButton) return;
-                  if(sessionStorage.sessionDate == enc_date[0])
-                    taskButton.setAttribute('class', 'tasks-table-cell-grayed');
+                  if (sessionStorage.sessionDate == enc_date[0])
+                    taskButton.setAttribute('class', 'tasks-table-cell-grayed');                     
                 });
               });
             });

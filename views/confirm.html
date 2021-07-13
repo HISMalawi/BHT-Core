@@ -868,6 +868,9 @@ var global_property = GlobalProperty({
           identifiers[i]["identifier"]
         );
       }
+
+      if(identifiers[i]["identifier"] == "UNKNOWN")
+         malawiNationalIdAlert();
     }
 
     var table = document.createElement("table");
@@ -913,22 +916,20 @@ var global_property = GlobalProperty({
       }
 
      
-      else if (!Object.keys(identifiersHash).includes("MNID")) {
-        document.getElementById('malawi-national-id-message').style = "display: inline;";
-        document.getElementById('page-cover').style = "display: inline;";
-      }
-    // else if (!Object.keys(identifiersHash).includes("MNID")) {
-    //     alertify
-    //       .confirm("Missing Malawi National ID", "Is Malawi National ID present?",
-    //       function(){
-    //          window.location.href = "/views/patient/edit_demographics/set_malawi_national_id.html";
-    //       },
-    //       function(){
-            
-    //       })
-    //   }
-    
+      else if (!Object.keys(identifiersHash).includes("MNID"))
+               malawiNationalIdAlert();
     /* else if (!Object.keys(identifiersHash).includes("MNID")) {
+        alertify
+          .confirm("Missing Malawi National ID", "Is Malawi National ID present?",
+          function(){
+             window.location.href = "/views/patient/edit_demographics/set_malawi_national_id.html";
+          },
+          function(){
+            
+          })
+      }
+    
+     else if (!Object.keys(identifiersHash).includes("MNID")) {
         alertify
           .alert("Missing Malawi National ID", "Is Malawi National ID present? <a href=\"/views/patient/edit_demographics/set_malawi_national_id.html\">       YES</a> <br /> <br /> ", function () {
               //window.location = "/views/patient/find_by_menu.html";
@@ -938,6 +939,12 @@ var global_property = GlobalProperty({
     var container = document.getElementById("section-body-0");
     container.appendChild(table);
   }
+
+  function malawiNationalIdAlert() {
+    document.getElementById('malawi-national-id-message').style = "display: inline;";
+        document.getElementById('page-cover').style = "display: inline;";
+  }
+
   function assignNHID(person_id) {
           var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/patients/" + person_id + "/npid";
           var xhttp = new XMLHttpRequest();
@@ -2314,11 +2321,7 @@ function selectReason(reason, e){
   <div class="modal-title">
     <h1>Missing Malawi National ID</h1>
   </div>
-  
   <p> Is Malawi National ID present?</p>
-
-
-
   <style>
     .national_id_btn
     {
