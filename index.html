@@ -427,7 +427,6 @@ function getRadiologyActivationStatus()
             } catch (e) {
 
             }
-       removeUnavailableTask();
         }
     };
     xhttp1.open("GET", radiology_property_url, true);
@@ -436,12 +435,6 @@ function getRadiologyActivationStatus()
     xhttp1.send();
 }
 
-function removeUnavailableTask()
-{
-    if(sessionStorage.radiology_status == "false")
-    sessionStorage.OPD_activities = OPD_activities.replace('radiology examination,','').replace('radiology examination','');
-
-}
 function setOPDActivities(OPD_activities) 
 {
     values = OPD_activities;
