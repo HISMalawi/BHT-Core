@@ -90,7 +90,18 @@
     }
     send_barcode_data();
     function red() {
+        let data_value = sessionStorage.getItem('lab_is_set');
+        let data_value_two = sessionStorage.getItem('radiology_is_set');
         var patientID = sessionStorage.getItem("patientID");
+        if(data_value != 'false') {
+            sessionStorage.setItem('lab_is_set', 'false');
+            window.location= "/../apps/OPD/views/encounters/malaria/lab_orders.html";
+        }
+        else if (data_value_two != 'false'){
+            sessionStorage.setItem('radiology_is_set', 'false');
+            history.go(-2); 
+        }
+        else
         finishRedirect("/views/patient_dashboard.html?patient_id=" + patientID);
     }
 
