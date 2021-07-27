@@ -22,21 +22,17 @@
   <div id="container">
     <div id="content">
       <style>
-  .tt_controls_malawi_national_id #qwerty { display:none; }
-  .tt_controls_ground_phone_number #qwerty { display:none; }
-  .tt_controls_office_phone_number #qwerty { display:none; }
+  #Unknown, #whitespace{ display:none; }
 
-  .tt_controls_ground_phone_number #Unknown { display:block; }
+/* .tt_controls_malawi_national_id #num , #plus, #apostrophe, #star, #char, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; } */
 
-  .tt_controls_malawi_national_id #num , #plus, #apostrophe, #star, #char, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+.tt_controls_guardian_malawi_national_id #num , #plus, #apostrophe, #star, #char, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
 
-  .tt_controls_guardian_malawi_national_id #num , #plus, #apostrophe, #star, #char, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+.tt_controls_home_phone_number #num , #plus, #apostrophe, #star, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
 
-  .tt_controls_home_phone_number #num , #plus, #apostrophe, #star, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+.tt_controls_office_phone_number #num , #plus, #apostrophe, #star, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
 
-  .tt_controls_office_phone_number #num , #plus, #apostrophe, #star, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
-
-  #space {display:inline;}
+#space {display:inline;}
 
   .nota #na {
     display: block;
@@ -55,9 +51,10 @@
       <form method='PUT'>
         <input type="text" name="malawiNationalId" id="malawiNationalId" textCase="upper" key="malawiNationalId"
           helpText="Malawi National ID"
-          tt_pageStyleClass="nota"
+          field_type="number"
           validationRule="^(?=[a-z0-9]*$)(?=\d+[a-z]|[a-z]+\d)([a-z\d]){8}$"
-          validationMessage="Not a valid MAlawi National ID" 
+          validationMessage="Not a valid MAlawi National ID"
+          tt_onUnLoad="getInput();" 
           tt_onLoad="prepNextButton();" />
       </form>
       <div id="footer">
