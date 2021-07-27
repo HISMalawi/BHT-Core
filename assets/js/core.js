@@ -385,11 +385,6 @@ function getTasks(encountersData) {
             var url = values.url;
             var icon = values.activitiesIcon;
             var show = values.show;
-            var available = values.available;
-
-      
-            if((j == "radiology examination" || j == "view radiology results") && (sessionStorage.radiology_status == "false" && parseInt(sessionStorage.programID) == 14))
-                return
 
             if (show || show == undefined) tasks.push([j, icon, url]);
         });
@@ -1035,6 +1030,8 @@ function buildPrintOutandOthers(data) {
         var icon = values.activitiesIcon;
         var url = values.url;
         url = (url == undefined ? '#' : url);
+        if((name == "radiology examination" || name == "view radiology results") && (sessionStorage.radiology_status == "false" && parseInt(sessionStorage.programID) == 14))
+            return
         if(sessionStorage.filingNumnerAvailable == "false"){
           if(name != 'Filing Number (Print)' && name != 'Archive client'){
             tasks.push([name, icon, url]);
