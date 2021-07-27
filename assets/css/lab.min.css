@@ -140,8 +140,11 @@
   border-color: lightgreen;
 }
 #virtual-keyboard {
-  left: 200px !important;
-  top: 61px !important;
+  left: 18.4px !important;
+  top: unset !important;
+  height: 270px !important;
+  width: 95.6% !important;
+  bottom: 13%;
 }
 #search_content {
   position: fixed;
