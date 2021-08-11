@@ -818,19 +818,26 @@
             return;
 
         if(show_bp_only == false) {
-          if (document.getElementById("td-Weight").innerHTML.length < 1) {
+          if (document.getElementById("td-Weight").innerHTML.length < 1 && sessionStorage.programID != 14) {
               showMessage("Weight can not be empty");
               return;
           }
-          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.patientAge < 18) {
+          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.patientAge < 18 && sessionStorage.programID != 14) {
               showMessage("Height can not be empty");
               return;
           }
-          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.currentHeight == 0) {
+          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.currentHeight == 0 && sessionStorage.programID != 14) {
               showMessage("Height can not be empty");
               return;
           }
         }
+
+        if(document.getElementById("td-Weight").innerHTML.length < 1 && sessionStorage.programID == 14 && document.getElementById("td-Height").innerHTML.length < 1) {
+            nextPage();
+        }
+        
+        else 
+        if (validationANS == true)
         submitVitals();
     }
 
