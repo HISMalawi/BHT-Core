@@ -868,8 +868,8 @@ var global_property = GlobalProperty({
           identifiers[i]["identifier"]
         );
       }
-
-      if(identifiers[i]["identifier"] == "UNKNOWN")
+     
+      if(identifiers[i]["identifier"] == "UNKNOWN" && sessionStorage.programID == 14)
          malawiNationalIdAlert();
     }
 
@@ -916,26 +916,9 @@ var global_property = GlobalProperty({
       }
 
      
-      else if (!Object.keys(identifiersHash).includes("MNID"))
+       if (!Object.keys(identifiersHash).includes("MNID") && sessionStorage.programID == 14)
                malawiNationalIdAlert();
-    /* else if (!Object.keys(identifiersHash).includes("MNID")) {
-        alertify
-          .confirm("Missing Malawi National ID", "Is Malawi National ID present?",
-          function(){
-             window.location.href = "/views/patient/edit_demographics/set_malawi_national_id.html";
-          },
-          function(){
-            
-          })
-      }
-    
-     else if (!Object.keys(identifiersHash).includes("MNID")) {
-        alertify
-          .alert("Missing Malawi National ID", "Is Malawi National ID present? <a href=\"/views/patient/edit_demographics/set_malawi_national_id.html\">       YES</a> <br /> <br /> ", function () {
-              //window.location = "/views/patient/find_by_menu.html";
-              
-          })
-      } */ 
+               
     var container = document.getElementById("section-body-0");
     container.appendChild(table);
   }
