@@ -691,34 +691,34 @@ function buildDashboardButtons(tasks, container) {
 
           }
 
-          if(sessionStorage.programID == '14') {
+        //   if(sessionStorage.programID == '14') {
 
-            var url = `${apiProtocol}://${apiURL}:${apiPort}/api/v1/encounters?patient_id=${sessionStorage.patientID}&${sessionStorage.programID}&paginate=false`;
-            var headers = {
-              'Authorization': sessionStorage.authorization,
-              'Content-Type': 'application/json'
-            };
-            fetch(url, {
-              'headers': headers
-            }).then(function (response) {
-              response.json().then(function (encounters) {
-                encounters.forEach(function (encounter) {
-                  var type = encounter.type.name;
-                  var nw = 'PRESCRIPTION';
-                  var taskButton = document.querySelector("[data-name='".concat(type, "']"));
-                  var TreatmentTaskButton = document.querySelector("[data-name='".concat(nw, "']"));
-                  var enc_date = encounter.date_created.split('T');
+        //     var url = `${apiProtocol}://${apiURL}:${apiPort}/api/v1/encounters?patient_id=${sessionStorage.patientID}&${sessionStorage.programID}&paginate=false`;
+        //     var headers = {
+        //       'Authorization': sessionStorage.authorization,
+        //       'Content-Type': 'application/json'
+        //     };
+        //     fetch(url, {
+        //       'headers': headers
+        //     }).then(function (response) {
+        //       response.json().then(function (encounters) {
+        //         encounters.forEach(function (encounter) {
+        //           var type = encounter.type.name;
+        //           var nw = 'PRESCRIPTION';
+        //           var taskButton = document.querySelector("[data-name='".concat(type, "']"));
+        //           var TreatmentTaskButton = document.querySelector("[data-name='".concat(nw, "']"));
+        //           var enc_date = encounter.date_created.split('T');
 
-                  if (TreatmentTaskButton && type == "TREATMENT" && sessionStorage.sessionDate == enc_date[0])
-                    TreatmentTaskButton.setAttribute('class', 'tasks-table-cell-grayed');
-                  if (!taskButton) return;
-                  if (sessionStorage.sessionDate == enc_date[0])
-                    taskButton.setAttribute('class', 'tasks-table-cell-grayed');                     
-                });
-              });
-            });
+        //           if (TreatmentTaskButton && type == "TREATMENT" && sessionStorage.sessionDate == enc_date[0])
+        //             TreatmentTaskButton.setAttribute('class', 'tasks-table-cell-grayed');
+        //           if (!taskButton) return;
+        //           if (sessionStorage.sessionDate == enc_date[0])
+        //             taskButton.setAttribute('class', 'tasks-table-cell-grayed');                     
+        //         });
+        //       });
+        //     });
 
-          }
+        //   }
 
 
         }
