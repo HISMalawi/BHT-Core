@@ -8,7 +8,6 @@
         var apiProtocol = sessionStorage.apiProtocol;
         var apiURL = sessionStorage.apiURL;
         var apiPort = sessionStorage.apiPort;
-
         if (sessionStorage.getItem("authorization") == null) {
             //alert("not logged in");
             window.location = "/views/login.html";
@@ -16,10 +15,6 @@
         if (top.location != location) {
         top.location.href = document.location.href ;
         }
-
-
-      
-
     </script>          
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="./assets/css/bootstrap/bootstrap.min.css">
@@ -406,7 +401,7 @@
 if(parseInt(sessionStorage.programID) == 14 )
 {  
     if(sessionStorage.userRoles.match(/Clinician/i))
-        OPD_activities ="presenting complaints,lab orders,radiology examination,outpatient diagnosis,prescription";
+        OPD_activities ="presenting complaints,outpatient diagnosis,prescription";
     else
     OPD_activities = sessionStorage.OPD_task;
 
