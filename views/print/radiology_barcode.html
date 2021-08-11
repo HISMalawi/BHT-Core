@@ -95,19 +95,43 @@
         let data_value_two = sessionStorage.getItem('radiology_is_set');
         var patientID = sessionStorage.getItem("patientID");
         if(data_value == 'true') {
-            sessionStorage.setItem('radiology_is_set', 'false');
-            sessionStorage.setItem('radiology_order_done', 'true');
+            // sessionStorage.setItem('radiology_is_set', 'false');
+            // sessionStorage.setItem('radiology_order_done', 'true');
             window.location= "/../views/patient/labs.html";
+            // var labIframe = window.parent.document.getElementById('labIframe');
+            // console.log(labIframe);
+             //labIframe.setAttribute('src','./radiology/radiology_orders.html');
         }
         else if (data_value_two == 'true'){
-            sessionStorage.setItem('radiology_is_set', 'false');
-            sessionStorage.setItem('radiology_order_done', 'true');
-            nextEncounter(sessionStorage.patientID, sessionStorage.programID);
+            // sessionStorage.setItem('radiology_is_set', 'false');
+            // sessionStorage.setItem('radiology_order_done', 'true');
+            closeOrdersPopupModal();
+            // nextEncounter(sessionStorage.patientID, sessionStorage.programID);
             //history.go(-2);
         }
-        else
-        nextEncounter(sessionStorage.patientID, sessionStorage.programID);
+        //else
+        //nextEncounter(sessionStorage.patientID, sessionStorage.programID);
         //finishRedirect("/views/patient_dashboard.html?patient_id=" + patientID);
+    }
+
+    function closeOrdersPopupModal() {
+    let page_cover = window.parent.document.getElementById("page-cover");
+    page_cover.style = "display: none;";
+  
+    let submit_cover = window.parent.document.getElementById("page-cover");
+    submit_cover.style = "display: none;";
+  
+    var parent = window.parent.document.getElementById('mateme');
+    parent.setAttribute('class','');
+    
+    //var main_container = window.parent.document.getElementsByTagName('body')[0].lastElementChild;
+    var main_container = window.parent.document.getElementById('ordersModal');
+    main_container.setAttribute('class','modal fade');
+    main_container.setAttribute('style','display: none');
+    window.parent.document.getElementsByTagName('body')[0].removeChild(main_container);
+  
+    var someIframe = window.parent.document.getElementById('labIframe');
+    someIframe.parentNode.removeChild(someIframe);
     }
 
     setTimeout('red()', radiology_orders.length * 3000);
