@@ -187,24 +187,47 @@
 
             var table = document.createElement('table');
             table.setAttribute('class', 'summary-table');
-            var attributes = [
-                ["Given name", parameter.given_name],
-                ["Family name", parameter.family_name],
-                ["Gender", parameter.gender],
-                ["Birthdate", moment(parameter.birthdate).format('DD/MMM/YYYY')],
-                ["Birthdate Estimated", parameter.birthdate_estimated],
-                ["Home District", parameter.home_district],
-                ["Home TA", parameter.home_traditional_authority],
-                ["Home Village", parameter.home_village],
-                ["Current District", parameter.current_district],
-                ["Current TA", parameter.current_traditional_authority],
-                ["Current Village", parameter.current_village],
-                ["Landmark", parameter.landmark],
-                ["Malawi National Id", parameter.malawi_national_id],
-                ["Cell phone", parameter.cell_phone_number],
-                ["Patient Type", parameter.patient_type],
-                ["Register Guardian", parameter.relationship]
-            ];
+            var attributes = attributesConstructor();
+
+            function attributesConstructor() {
+                if (sessionStorage.programID == 14) {
+                    return [
+                        ["Given name", parameter.given_name],
+                        ["Family name", parameter.family_name],
+                        ["Gender", parameter.gender],
+                        ["Birthdate", moment(parameter.birthdate).format('DD/MMM/YYYY')],
+                        ["Birthdate Estimated", parameter.birthdate_estimated],
+                        ["Home District", parameter.home_district],
+                        ["Home TA", parameter.home_traditional_authority],
+                        ["Home Village", parameter.home_village],
+                        ["Current District", parameter.current_district],
+                        ["Current TA", parameter.current_traditional_authority],
+                        ["Current Village", parameter.current_village],
+                        ["Landmark", parameter.landmark],
+                        ["Malawi National Id", parameter.malawi_national_id],
+                        ["Cell phone", parameter.cell_phone_number],
+                        ["Patient Type", parameter.patient_type],
+                        ["Register Guardian", parameter.relationship]
+                    ];
+                } else 
+                return [
+                    ["Given name", parameter.given_name],
+                    ["Family name", parameter.family_name],
+                    ["Gender", parameter.gender],
+                    ["Birthdate", moment(parameter.birthdate).format('DD/MMM/YYYY')],
+                    ["Birthdate Estimated", parameter.birthdate_estimated],
+                    ["Home District", parameter.home_district],
+                    ["Home TA", parameter.home_traditional_authority],
+                    ["Home Village", parameter.home_village],
+                    ["Current District", parameter.current_district],
+                    ["Current TA", parameter.current_traditional_authority],
+                    ["Current Village", parameter.current_village],
+                    ["Landmark", parameter.landmark],
+                    ["Cell phone", parameter.cell_phone_number],
+                    ["Patient Type", parameter.patient_type],
+                    ["Register Guardian", parameter.relationship]
+                ];
+            }
 
             if (military_site) {
                 attributes = attributes.concat([
@@ -1124,6 +1147,7 @@
          
 
             <input type="text" name="malawiNationalId" id="malawiNationalId" textCase="upper"
+                condition="isProgramOPD() == true;"
                 field_type="number"
                 helpText="Malawi National ID"
                 validationRule="^(?=[a-zA-Z0-9]*$)(?=\d+[a-zA-Z]|[a-zA-Z]+\d)([a-zA-Z\d]){8}$|Unknown|Not Available|N\/A"
@@ -1574,5 +1598,12 @@
 
   function showTypeOfPatient() {
     return sessionStorage.programID == '1' ? true : false;
+  }
+  function isProgramOPD() {
+      if (sessionStorage.programID == 14) {
+        return true;   
+      }
+      else 
+      return false;
   }
 </script>

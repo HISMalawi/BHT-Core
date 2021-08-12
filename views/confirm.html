@@ -863,7 +863,7 @@ var global_property = GlobalProperty({
         identifiersHash["Archived filing#"] = formatIdentifier(
           identifiers[i]["identifier"]
         );
-      } else if (identifiers[i]["identifier_type"] == 28) {
+      } else if (identifiers[i]["identifier_type"] == 28 && sessionStorage.programID == 14) {
         identifiersHash["MNID"] = formatIdentifier(
           identifiers[i]["identifier"]
         );

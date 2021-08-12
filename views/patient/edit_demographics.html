@@ -682,8 +682,14 @@
 
     ajaxRequest();
     
-    if(sessionStorage.national_id == 'null')
+    //if(sessionStorage.national_id == null && sessionStorage.national_id == 'UNKWON' &&sessionStorage.programID != 14)
+    if(sessionStorage.programID != 14 ) {
       document.getElementById('malawi_NID').setAttribute('style','display:none');
+    } else {
+      if (sessionStorage.national_id == 'null' || sessionStorage.national_id == 'UNKNOWN') {
+        document.getElementById('malawi_NID').setAttribute('style','display:none'); 
+      }
+    }
 
     </script>
     
