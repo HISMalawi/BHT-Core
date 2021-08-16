@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Baobab Health Trust</title>
+    <meta charset="utf-8">
+    <script>
+        var apiProtocol = sessionStorage.apiProtocol;
+        var apiURL = sessionStorage.apiURL;
+        var apiPort = sessionStorage.apiPort;
+        if (sessionStorage.getItem("authorization") == null) {
+            //alert("not logged in");
+            window.location = "/views/login.html";
+        }
+        if (top.location != location) {
+        top.location.href = document.location.href ;
+        }
+    </script>          
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./assets/css/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/css/maindashboard/header.css">
+    <link rel="stylesheet" href="./assets/css/maindashboard/footer.css">
+    <script type="text/javascript" src="/assets/js/post_parameters.js"></script>
+    <link rel="stylesheet" href="./assets/css/custom.css">
+    <script src="./assets/js/jquery.min.js"></script>
+    <script src="./assets/js/moment.js"></script>
+    <script src="./assets/js/bootstrap/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
+    <script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
+
+    <link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (sessionStorage.getItem("applicationName") === null) {
+                $("#myModal").modal('show');
+            }
+        });
+
+        function resetPatientStorage() {
+          sessionStorage.backupPatientID = null;
+          sessionStorage.bmiColor = null;
+          sessionStorage.bmiResult = null;
+          sessionStorage.currentHeight = null;
+          sessionStorage.date_created = null;
+          sessionStorage.family_name = null;
+          sessionStorage.gender = null;
+          sessionStorage.given_name = null;
+          sessionStorage.patientAge = null;
+          sessionStorage.patientDOB = null;
+          sessionStorage.patientGender = null;
+          sessionStorage.patientID = null;
+          sessionStorage.patient_type = null;
+          sessionStorage.previousWeight = null;
+          sessionStorage.national_id = null;
+          
+          if (parseInt(sessionStorage.programID) === 12){
+            sessionStorage.ancVisitNumbers = null;
+            sessionStorage.subsequentVisit = false;
+            sessionStorage.pregnancyTestDone = false;
+            sessionStorage.previousHIVTestResult = "";
+            sessionStorage.patientHIVStatus = null;
+            sessionStorage.patientOnART = null;
+            sessionStorage.patientARVNumber = null;
+            sessionStorage.patientARVStartDate = null;
+            sessionStorage.dateOfLMP = "";
+            sessionStorage.fundusByLMP = "";
+            sessionStorage.gestation = "";
+            sessionStorage.totalANCVisits = "";
+            sessionStorage.currentOutcome =  "";
+            sessionStorage.referToUrineTest = false;
+          }
+        }
+
+        function setSessionDate(){
+            var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/current_time';
+            var req = new XMLHttpRequest();
+            req.onreadystatechange = function(){
+
+                if (this.readyState == 4) {
+                    if (this.status == 200) {
+                        var results = JSON.parse(this.responseText);
+                            sessionStorage.sessionDate = moment(results.date).format('YYYY-MM-DD');
+                    }
+                }
+            };
+            try {
+                req.open('GET', url, true);
+                req.setRequestHeader('Authorization',sessionStorage.getItem('authorization'));
+                req.send(null);
+            } catch (e) {
+            }
+        }
+
+        try {
+          if(sessionStorage.sessionDate == undefined) {
+              setSessionDate();
+          }
+        }catch(i){
+          setSessionDate();
+        }
+
+        try {
+          if(sessionStorage.orderFlowStatus == undefined) {
+            sessionStorage.orderFlowStatus = false;
+          }
+        }catch(i){
+            sessionStorage.orderFlowStatus = false;
+        }
+
+
+
+        resetPatientStorage();
+    </script>
+    <style>
+        body {
+            overflow: hidden;
+        }
+        .under-development {
+        position: absolute;
+        background-color: whitesmoke;
+        width: 80%;
+        height: 60%;
+        left: 10%;
+        top: 7%;
+        z-index: 2000;
+        opacity: .99;
+        border-radius: 14px 14px;
+    }
+    </style>
+</head>
+
+<body>
+              
+    <div class="table-div">
+        <div class="table-div-row" id="header">
+            <div class="table-div-cell app-icon" style="width: 21.4%; ">&nbsp;
+                <img src="/assets/images/BaobabHealth.png" id="application-icon" style="height: 80%; border:solid 1px;border-radius: 50%; margin-top: 2%;;margin-left: 1%; width: 30%; float: left; box-shadow: 0 10px 14px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);">
+            <h3 style="text-align: center" id="application-name"> ART</h4>
+            <h5 style="text-align: center" id="module-version">&nbsp;</h5>
+            </div>
+            <!-- <template id="barcode"> -->
+                    <div class="table-div-cell app-details " style="padding: 1%; width: 50%" id="details">
+                            <table class="table-sm table-hover" >
+                                <tr>
+                                    <th class="h4">Facility name:</th>
+                                    <td class="h4 text-muted" id="facility-name"></td>
+                                    <!-- <th align="right">Application Name:</th>
+                                    <td id="application-name">BHT Core </td> -->
+                                </tr>
+                                <tr>
+                                    <th class="h4" class="text-muted">Location:</th>
+                                    <td class="h4 text-muted" id="location-name">&nbsp;</td>
+                                    <!-- <th align="right">App version:</th>
+                                    <td id="application-version">v1.0.0</td> -->
+                                </tr>
+                                <tr>
+                                    <th class="h4">Date:</th>
+                                    <td id="app-date" class="h4 text-muted">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <th class="h4">User:</th>
+                                    <td class="h4 text-muted" id="client-name">&nbsp;</td>
+                                </tr>
+                            </table>
+                        </div>
+            
+                <div class="table-div-cell app-details" style="float: left; width: 27%; margin-left: 1%;" id="barCodeInner">
+                <div class="barcode" url="/views/confirm.html" functionName="postID"></div>
+            </div>
+            <script src="./assets/js/client-scan-barcode.js"></script>
+            <!-- </template> -->
+           
+        </div>
+    </div>
+</div>
+<div class="container-fluid" style="margin-left: 2%; margin-right:1%;width: 97%;">
+    <div class="row">
+        <div class="col-sm-12" id="tabs-column">
+            <button class="btn btn-info overview-btns active-btn" id="overview" onmousedown="showOptions(this); loadTabContent(this.id)">Overview</button>
+            <button class="btn btn-info overview-btns" id="report" onmousedown="showOptions(this); loadTabContent(this.id);">Reports</button>
+            <button class="btn btn-info overview-btns" id="admin" onmousedown="showOptions(this); loadTabContent(this.id);">Administration</button>
+            <!--<span class="current-time"><span class="time"><span class="hours">00</span><span class="separator">:</span></span><span class="minutes">00</span></span></span>-->
+        </div>
+    </div>
+</div>
+<div class="container-tab" id="generic_tabs" style="margin-left: 2.5%; margin-right:2.5%;width: 95%; border: none;">
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" data-backdrop="static" data-keyboard="false" role="dialog">
+    <div class="modal-dialog" name="div2">
+        <div class="modal-content" style="margin-left:0px;">
+            <div class="modal-header">
+                <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+                <h4 class="modal-title">Select module</h4>
+            </div>
+           <div class="modal-body">
+                <div class="container">
+                    <div class="row" id="modal-div">
+                        <template id="card_template">
+                            <!-- <div class="" > -->
+                            <a href="#" class="" id="moduleButton">
+                                <div class="app-btn" id="cardDiv" style="display: table-row; margin: 10px;" >                                
+                                    <img alt="Avatar" style="width:70px; height: 60px; margin-top: 10%;" id="cardImage">
+                                    <div class="middle">
+                                        <div class="text">
+                                            <p id="apptext"></p>
+                                        </div>
+                                    </div>
+                                    <div class="card-container">
+                                        <h4>
+                                            <b id="appName"></b>
+                                        </h4>
+                                        <p id="appDescription"></p>
+                                    </div>
+                            </div>
+                        </a>
+                        </template>
+                    </div>
+                </div>
+            </div>
+              <!-- <button class="red" data-dismiss="modal">Close</button> -->
+           </div> 
+    </div>
+</div>
+<!-- Modal -->
+<!-- <button class="btn btn-default" id="btn-confirm">Confirm</button> -->
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="mi-modal"
+    style="width: 60%; margin-left:20%;margin-right: 20%; margin-top: 20%;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content" style="margin: 0; ">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h1 class="modal-title" id="myModalLabel">Are you sure you want to log out?</h1>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="button green" id="modal-btn-si" style="float:left; text-align: center; width: 100px;">Yes</button>
+                <button type="button" class="button red" id="modal-btn-no" style="width: 100px;">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade under-development" style="display: none;" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  aria-hidden="true" id="mo-modal"
+    style="width: 60%; margin-left:20%;margin-right: 20%; margin-top: 0;">
+    <div class="modal-dialog modal-sm">
+       <div style="text-align: center;"><img src="/apps/OPD/assets/images/under-construction-icon-png-26.png" height="320">
+        <!-- <div style="margin-top: %; font-style: normal; text-align: center;"><h1>Report is under development!</h1></div> -->
+       </div>
+       <div class="flex" style="width: fit-content;"><button id="ud-id" onmousedown="CloseButton()" class="btn btn-danger buttons red" style="width: 15%; height: 15%; float: right; margin-top: -3%;">Close</button></div>
+    
+    </div>   
+</div>
+
+
+    <div class="alert" role="alert" id="result"></div>
+    <footer class="footer">
+        <div class="container-footer">
+            <button class="btn btn-danger buttons red " style="width: 200px; font-size: 2rem;" id="logout">Logout</button>
+            <button class="btn btn-success buttons blue" style="margin-right: 5px;" data-toggle="modal" data-target="#myModal">
+            <span>&nbsp; &nbsp; &nbsp; Applications &nbsp; &nbsp; &nbsp;<img src="/assets/images/launcher.png"></span></button>
+            <button class="green" style="margin: 5px; width: 285px; padding: 0px;" visibility: hidden; id="registerButton" onmousedown="checkProgram();" ><span>Find or Register Patient</span></button>
+            <button class="blue" style="margin: 5px; width: 205px; padding: 0px; margin-right:1px; display: none;" visibility: hidden; id="backdata" onclick="callPage(this.id)" ><span>Backdata Entry</span></button>
+            <button class="blue" style="margin: 5px; width: 205px; padding: 0px; margin-right:1px; display: none;" visibility: hidden; id="artReferral" onclick="callPage(this.id)" ><span>ART Referral</span></button>
+            <button class="blue" style="margin: 5px; width: 205px; padding: 0px; margin-right: 1px; display: none;" visibility: hidden; id="findRecord" onclick="callPage(this.id)" ><span>Find Entered Record</span></button>
+            <button class="blue" style="margin: 5px; width: 200px; padding: 0px;" visibility: hidden; id="findByButton" onmousedown="gotoFindByMenu();" ><span>Find by</span></button>
+        </div>
+         </div>
+      </footer>
+   </body>
+   <script src="/assets/js/core.js "></script>
+   <script>
+        getDDEStatus();
+        getPortalStatus();
+        
+
+        if(sessionStorage.programID == "18"){
+            var btn_backdata = document.getElementById("backdata");
+            btn_backdata.style.display = "block";
+
+            var btn_art_referral = document.getElementById("artReferral");
+            btn_art_referral.style.display = "block";
+
+            var btn_find_record = document.getElementById("findRecord");
+            btn_find_record.style.display = "block";
+        }
+
+       function getLocationID() {
+            var url =apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/global_properties?property=current_health_center_id";
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+                var obj = JSON.parse(this.responseText);
+                getLocationName(obj.current_health_center_id);
+                }
+            };
+            xhttp.open("GET", url, true);
+            xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+            xhttp.setRequestHeader('Content-type', "application/json");
+            xhttp.send();
+        }
+
+        function checkProgram(){
+            if(sessionStorage.programID == "18"){
+                window.location.href = "apps/HTS/views/encounters/consent.html";
+            }else{
+                registerPatientRedirect();
+            }
+        }
+
+        function callPage(id){
+            if (id === "backdata") {
+                window.location.href = 'apps/HTS/views/encounters/backdata.html';
+            }
+            if (id === "artReferral") {
+                window.location.href = 'apps/HTS/views/encounters/refferal.html';
+            }
+        }
+        function getLocationName(location_id){
+            var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/locations/"+location_id;
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+                var obj = JSON.parse(this.responseText);
+                document.getElementById("facility-name").innerHTML = obj.name;
+                sessionStorage.currentLocation = obj.name;
+                }
+            };
+            xhttp.open("GET", url, true);
+            xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+            xhttp.setRequestHeader('Content-type', "application/json");
+            xhttp.send();
+        }
+    getLocationID()
+    loadConfigurations();
+    
+    (document.getElementsByClassName("overview-btns ")[0]);
+    changeModule();
+    loadTabContent("overview");
+    function logout() {
+        if (window.confirm("Do you really want to logout?")) {
+            window.location = "/views/login.html";
+        }
+    }
+    var modalConfirm = function (callback) {
+        $("#logout").on("click", function () {
+            $("#mi-modal").modal('show');
+        });
+
+        $("#modal-btn-si").on("click", function () {
+            callback(true);
+            $("#mi-modal").modal('hide');
+        });
+
+        $("#modal-btn-no").on("click", function () {
+            callback(false);
+            $("#mi-modal").modal('hide');
+        });
+    };
+
+    modalConfirm(function (confirm) {
+        if (confirm) {
+            if(sessionStorage.portal_enabled === "true") {
+                
+                var portal_location = sessionStorage.portal_location;
+                sessionStorage.clear();
+                window.location = portal_location;
+            }else {
+                window.location = "/views/login.html";
+            }
+        } else {
+            $("#mi-modal").modal('hide');
+        }
+    });
+
+
+    document.getElementById("client-name").innerHTML =sessionStorage.getItem("username") ;
+    document.getElementById("location-name").innerHTML =sessionStorage.getItem("userLocation");
+    var loc = sessionStorage.getItem("userLocation");
+    loc = loc.slice(0, loc.length);
+    document.getElementById("location-name").innerHTML = loc;
+    var date = moment().format("DD/MMM/YY");
+    document.getElementById("app-date").innerHTML = moment(sessionStorage.sessionDate).format("DD/MMM/YYYY");
+    if (sessionStorage.session) {
+        document.getElementById("app-date").style.color = "red";
+    } else {
+        document.getElementById("app-date").style.color = "green";
+    }
+
+  function disableNoneART() {
+    if(parseInt(sessionStorage.programID) != 1) {
+      document.getElementById('findByButton').style = 'display: none;';
+    }
+  }
+
+  disableNoneART();
+
+if(parseInt(sessionStorage.programID) == 14 )
+{  
+    if(sessionStorage.userRoles.match(/Clinician/i))
+        OPD_activities ="presenting complaints,outpatient diagnosis,prescription";
+    else
+    OPD_activities = sessionStorage.OPD_task;
+
+    OPD_activities = "patient registration,"+OPD_activities;
+    getRadiologyActivationStatus();
+    sessionStorage.setItem("OPD_activities", OPD_activities);
+    setOPDActivities(OPD_activities)
+}
+
+function getRadiologyActivationStatus() 
+{
+    var radiology_property_url = apiProtocol + "://" + apiURL + ":" + apiPort;
+    radiology_property_url += "/api/v1/global_properties?property=activate.radiology";
+
+    var xhttp1 = new XMLHttpRequest();
+    xhttp1.onreadystatechange = function () {
+        if (this.readyState == 4 && (this.status == 201 || this.status == 200 || this.status == 404)) {
+            try {
+                var activate_radiology_property = JSON.parse(this.responseText);
+                if (activate_radiology_property["activate.radiology"] == "true") 
+                    sessionStorage.setItem("radiology_status", true);
+                else
+                    sessionStorage.setItem("radiology_status", false);
+                    
+            } catch (e) {
+
+            }
+        }
+    };
+    xhttp1.open("GET", radiology_property_url, true);
+    xhttp1.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    xhttp1.setRequestHeader('Content-type', "application/json");
+    xhttp1.send();
+}
+
+function setOPDActivities(OPD_activities) 
+{
+    values = OPD_activities;
+    var parameters = {property: "OPD_activities", property_value: values}
+    submitParameters(parameters, "/user_properties", "");
+    jQuery("#submit-cover").hide();
+}
+
+function CloseButton() { //for closing under-dev modal
+    document.getElementById("mo-modal").style = "display: none;";
+    window.document.body.removeAttribute("class");
+    var elem = document.getElementById("modal-backdrop");
+    elem.parentNode.removeChild(elem);
+}
+
+</script>
+
+<script type="text/javascript" src="/assets/js/current_time.js"></script>
+</html>

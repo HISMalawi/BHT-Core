@@ -833,12 +833,13 @@
         }
 
         if(document.getElementById("td-Weight").innerHTML.length < 1 && sessionStorage.programID == 14 && document.getElementById("td-Height").innerHTML.length < 1) {
-            nextPage();
+           setOPDActivities();
         }
         
         else 
-        if (validationANS == true)
-        submitVitals();
+        if (validationANS == true) {
+            submitVitals();
+        }
     }
 
     function confirmIfWeightIsEntered() {
@@ -956,6 +957,13 @@
 
     function nextPage() {
         nextEncounter(sessionStorage.patientID, sessionStorage.programID);
+    }
+
+    function setOPDActivities() { 
+        values = sessionStorage.OPD_activities.replace('vitals,','').replace('vitals','');
+        sessionStorage.OPD_activities   = values;
+        var parameters = {property: "OPD_activities", property_value: values}
+        submitParameters(parameters, "/user_properties", "nextPage");
     }
 
     function changeNextBtnToSubmit() {
