@@ -95,23 +95,18 @@
         let data_value_two = sessionStorage.getItem('radiology_is_set');
         var patientID = sessionStorage.getItem("patientID");
         if(data_value == 'true') {
-            // sessionStorage.setItem('radiology_is_set', 'false');
-            // sessionStorage.setItem('radiology_order_done', 'true');
-            window.location= "/../views/patient/labs.html";
-            // var labIframe = window.parent.document.getElementById('labIframe');
-            // console.log(labIframe);
-             //labIframe.setAttribute('src','./radiology/radiology_orders.html');
+            sessionStorage.setItem('radiology_is_set', 'false');
+            sessionStorage.setItem('radiology_order_done', 'true');
+            window.location= "/../views/patient/labs.html";;
         }
         else if (data_value_two == 'true'){
-            // sessionStorage.setItem('radiology_is_set', 'false');
-            // sessionStorage.setItem('radiology_order_done', 'true');
-            closeOrdersPopupModal();
-            // nextEncounter(sessionStorage.patientID, sessionStorage.programID);
-            //history.go(-2);
+             sessionStorage.setItem('radiology_is_set', 'false');
+             sessionStorage.setItem('radiology_order_done', 'true');
+             closeOrdersPopupModal();
         }
-        //else
+        else
+        finishRedirect("/views/patient_dashboard.html?patient_id=" + patientID);
         //nextEncounter(sessionStorage.patientID, sessionStorage.programID);
-        //finishRedirect("/views/patient_dashboard.html?patient_id=" + patientID);
     }
 
     function closeOrdersPopupModal() {
