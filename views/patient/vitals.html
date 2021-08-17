@@ -817,16 +817,16 @@
         if (!validationANS)
             return;
 
-        if(show_bp_only == false) {
-          if (document.getElementById("td-Weight").innerHTML.length < 1 && sessionStorage.programID != 14) {
+        if(show_bp_only == false && sessionStorage.programID != 14) {
+          if (document.getElementById("td-Weight").innerHTML.length < 1 ) {
               showMessage("Weight can not be empty");
               return;
           }
-          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.patientAge < 18 && sessionStorage.programID != 14) {
+          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.patientAge < 18 ) {
               showMessage("Height can not be empty");
               return;
           }
-          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.currentHeight == 0 && sessionStorage.programID != 14) {
+          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.currentHeight == 0 ) {
               showMessage("Height can not be empty");
               return;
           }
@@ -838,7 +838,10 @@
         
         else 
         if (validationANS == true) {
+            if(vitalsEntered['vitals-Height'] || vitalsEntered['vitals-Weight'])
             submitVitals();
+            else
+            setOPDActivities();
         }
     }
 
