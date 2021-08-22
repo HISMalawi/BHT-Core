@@ -892,7 +892,7 @@ var global_property = GlobalProperty({
           var table = document.createElement("table");
           table.setAttribute("class", "info-tables");
 
-          if(identifiersHash['Current Outcome'].match(/died/i))
+          if(identifiersHash['Current Outcome'] && identifiersHash['Current Outcome'].match(/died/i))
             patientDead = true;
 
           for (identifier in identifiersHash) {
@@ -1452,14 +1452,20 @@ var global_property = GlobalProperty({
   </div>
 </div>
 
-<div class="modal fade" id="enroll-program" role="dialog">
-  <div class="modal-dialog modal-lg">
+<div id="enroll-program">
+  <div id="enrolled-program-inner">
     <div class="modal-content">
       <div class="modal-body">
-        <h1 style="text-align: center" class="text-uppercase">Patient Is not enrolled in program, enroll now?</h1>
+        <h1 style="text-align: center" class="text-uppercase">
+          Patient is not enrolled in program, enroll now?
+        </h1>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal" style="float: left" onclick="enrollPatient()">Yes</button> <button type="button" class="btn btn-danger btn-lg" data-dismiss="modal">No</button>
+          <button class="button green navButton" onmousedown="enrollPatient()" 
+          style="float: right; width: 120px;" id="continue"><span>Enroll</span></button>
+
+          <button class="button red navButton" onmousedown="closeEnrollProgramPoP()" 
+          style="float: right; width: 165px; margin-right: 30px;" id="continue"><span>Do NOT Enroll</span></button>
       </div>
     </div>
   </div>
@@ -1481,7 +1487,7 @@ var global_property = GlobalProperty({
             if (http.readyState == 4) {
                 if (http.status == 201) {
                     var v = JSON.parse(http.responseText);
-                    $('#myModal').modal('hide');
+                    closeEnrollProgramPoP();
                 } else if (http.status == 409) {
                     alert('Username already exists');
                 } else {
@@ -1934,7 +1940,8 @@ function checkIfEnrolled(patient_id) {
         }
       }
       if (enrolled == false){
-          $("#enroll-program").modal();
+          //$("#enroll-program").modal();
+          enrollProgramPoP();
       }
     }
   };
@@ -2093,11 +2100,43 @@ function selectReason(reason, e){
   voidButton.style.backgroundColor="red";
 }
 
+function enrollProgramPoP() {
+  const box = document.getElementById('enroll-program');
+  const page_cover = document.getElementById('page-cover');
+  page_cover.style = 'display: inline;';
+  box.style = 'display:inline;';
+}
+
+function closeEnrollProgramPoP(){
+  const box = document.getElementById('enroll-program');
+  const page_cover = document.getElementById('page-cover');
+  page_cover.style = 'display: none;';
+  box.style = 'display:none;';
+}
 </script>
 <script src="/assets/js/show.lab.orders.js"></script>
 
 
 <style>
+
+  #enroll-program {
+    background: #ffffff;
+    border-radius: 0.5em;
+    box-shadow: 0 10px 20px rgba(black, 0.2);
+    left: 50%;
+    max-width: 90%;
+    position: absolute;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    width: 30em;
+    text-align: left;
+    max-height: 90vh;
+    flex-direction: column;
+    z-index: 1000000;
+    border-color: black;
+    border-style: solid;
+    display: none;
+  }
 
   #void-confirm-message {
     background: #ffffff;
@@ -2222,3 +2261,13 @@ function selectReason(reason, e){
 
 
 </div>
+
+
+<script>
+  if(sessionStorage.programID != '1'){
+   const divs = ['mi-modal-2','confirm-VL'];
+   for(const div of divs){
+    document.getElementById(div).style="display: none !important;";
+   } 
+  }
+</script>
