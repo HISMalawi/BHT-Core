@@ -32,6 +32,10 @@
     height: 88%;
     width: 96%;
   }
+
+  .tt_controls_please_select_a_program #keyboard {
+    display: none !important;
+  }
 </style>
 
 <script>
@@ -185,9 +189,14 @@
   }
 
   function submitOutcome() {
+    let program_id;
+    for(const name in selectedProgram){
+      program_id = selectedProgram[name];
+    }
+
     var outcome_date = getOutcomeDate();
     program = {
-      program_id: document.getElementById("program_id").value,
+      program_id: program_id,
       date_enrolled: outcome_date
     };
 
@@ -211,10 +220,11 @@
     var req = (window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject('MicrosoftXMLHTTP')
     req.onreadystatechange = function () {
       if (req.readyState === 4 && req.status === 201) {
-        showMessage('The patient was successfully enrolled into the program.')
+        /*showMessage('The patient was successfully enrolled into the program.')
         setTimeout(function () {
           document.location = '/views/patient/update_state.html?program_id=' + program.program_id
-        }, 3000)
+        }, 3000)*/
+        document.location = '/views/patient/update_state.html?program_id=' + program.program_id
       } else if (req.readyState === 4 && req.status === 409) {
         console.error(req.responseText)
         showMessage('The patient is already enrolled into the program.')
@@ -260,7 +270,19 @@
     submitOutcome()
   }
 
+  function changeNextButton(){
+    const nextButton = document.getElementById('nextButton');
+    nextButton.setAttribute("onmousedown","validateProgramSelected();");
+  }
+
+  function resetNextButton(){
+    const nextButton = document.getElementById('nextButton');
+    nextButton.setAttribute("onmousedown","gotoNextPage();");
+  }
+
   function fetchPrograms() {
+    changeNextButton();
+
     var path =
       sessionStorage.getItem("apiProtocol") +
       "://" +
@@ -278,8 +300,43 @@
       },
       {},
       function(data) {
+        const inputFrame = document.getElementById("inputFrame" + tstCurrentPage);
+        inputFrame.style = "height: 90% !important; width: 95.5% !important;";
+        const optionDIV = inputFrame.getElementsByTagName("div")[0];
+        optionDIV.style = "height: 90%; !important";
+
+        let programs = `<div class="programs-table">
+          <div class="table-row">
+            <div class="table-cell" id="left-programs">
+              <div id="left-table" class="inner-table">
+              </div>
+            </div>
+            <div class="table-cell" id="middle-programs">
+              <div id="middle-table" class="inner-table">
+              </div>
+            </div>
+            <div class="table-cell" id="right-programs">
+              <div id="right-table" class="inner-table">
+              </div>
+            </div>
+          </div>
+        </div>`;
+        inputFrame.innerHTML = programs;
+        const left_table = document.getElementById('left-table');
+        const middle_table = document.getElementById('middle-table');
+        const right_table = document.getElementById('right-table');
+        const tables = [left_table, middle_table, right_table];
+        let table = tables[2];
+
         data.forEach(function (program) {
-          document.getElementById('program_id').appendChild(createProgramOptions(program))
+          if(table.id == 'right-table'){
+            table = tables[0];
+          }else if(table.id == 'left-table'){
+            table = tables[1];
+          }else{
+            table = tables[2];
+          }
+          addProgram(table, program);
         })
       },
       function(error) {
@@ -296,22 +353,51 @@
     return programOption
   } 
 
-  fetchPrograms()
+  function addProgram(e, program){
+    e.innerHTML += `<div class="table-row"> 
+      <div class="table-cell program-cells not-selected" onmousedown="programSelected(this);" 
+        id="${program.program_id}">${program.name}</div>
+    </div>`;
+  }
+
+  var selectedProgram = {};
+  function programSelected(e){
+    selectedProgram = {}
+    const cells = document.getElementsByClassName('program-cells');
+    for(const cell of cells){
+      cell.setAttribute("class", "table-cell program-cells not-selected");
+    }
+    e.setAttribute("class","table-cell program-cells selected");
+    selectedProgram[e.innerHTML] = e.id;
+  }
+
+  function validateProgramSelected(){
+    let program_id; 
+    let program_name;
+    for(const name in selectedProgram){
+      program_id = selectedProgram[name];
+      program_name = name;
+    }
+
+    if(!program_id){
+      showMessage("Select program to continue.");
+    }else{
+      resetNextButton();
+      gotoNextPage();
+    }
+
+  }
 </script>
 
 <body id="mateme">
   <div id="container">
     <div id="content">
       <form>
-        <select
-          name="program_id"
-          id="program_id"
-          helpText="Please select a program"
-          validationMessage="Please select a program!"
-          tt_onUnLoad=""
-          tt_onLoad="__$(keyboard).style.display = none;"
-        >
-        </select>
+       
+        <input type="text" name="summary" id="summary"
+          tt_onLoad="fetchPrograms(); summary(); __$(keyboard).style.display = none;"
+          tt_onUnLoad="resetNextButton();" helpText= "Please select a program" 
+          optional="true" tt_pageStyleClass="NoControls"/>
 
         <input
           type="text"
@@ -378,3 +464,60 @@
     </div>
   </div>
 </body>
+
+
+
+
+<style>
+.programs-table {
+  overflow: auto;
+}
+
+.programs-table, #left-table, #middle-table, #right-table {
+  display: table;
+  width: 100%;
+  vertical-align: top;
+}
+
+#left-programs, #middle-programs, #right-programs {
+  width: 33.3%;
+}
+
+#left-table, #middle-table, #right-table {
+  width: 96% !important;
+  border-collapse: separate;
+  border-spacing: 20px;
+  color: black;
+}
+
+.table-row {
+  display: table-row;
+}
+
+.table-cell {
+  display: table-cell;
+}
+
+.program-cells {
+  border-width: 1px;
+  border-style: solid;
+  padding-left: 5px;
+  vertical-align: middle;
+}
+
+#left-table .table-row, #middle-table .table-row, #right-table .table-row {
+  /*line-height: 90px;*/
+  border-style: solid;
+  border-width: 1px;
+  text-align: left;
+  line-height: 20px;
+  height: 50px;
+  padding: 10px;
+  box-shadow: 5px 10px #888888;
+}
+
+.selected {
+  background-color: lightblue;
+}
+
+</style>
