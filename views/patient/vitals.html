@@ -223,6 +223,7 @@
             transform: rotate(360deg);
         }
     }
+
 </style>
 <script type="text/javascript">
     var patientID = sessionStorage.getItem("patientID");
@@ -301,7 +302,7 @@
         var vitalsAssigned = [
             ["Weight", "weight.png", "(KG)"],
             ["Height", "height.png", "(CM)"],
-            ["BP", "bp.png", "(mmHG)"],
+            ["BP", "bp.png", "(mmHG)"],        
             ["Temp", "temp.png", "(C)"],
             ["SPO2", "spo2.png", "(%)"],
             ["Pulse", "pulse-rate.png", "(BPM)"]
@@ -816,21 +817,32 @@
         if (!validationANS)
             return;
 
-        if(show_bp_only == false) {
-          if (document.getElementById("td-Weight").innerHTML.length < 1) {
+        if(show_bp_only == false && sessionStorage.programID != 14) {
+          if (document.getElementById("td-Weight").innerHTML.length < 1 ) {
               showMessage("Weight can not be empty");
               return;
           }
-          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.patientAge < 18) {
+          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.patientAge < 18 ) {
               showMessage("Height can not be empty");
               return;
           }
-          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.currentHeight == 0) {
+          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.currentHeight == 0 ) {
               showMessage("Height can not be empty");
               return;
           }
         }
-        submitVitals();
+
+        if(document.getElementById("td-Weight").innerHTML.length < 1 && sessionStorage.programID == 14 && document.getElementById("td-Height").innerHTML.length < 1) {
+           setOPDActivities();
+        }
+        
+        else 
+        if (validationANS == true) {
+            if(vitalsEntered['vitals-Height'] || vitalsEntered['vitals-Weight'])
+            submitVitals();
+            else
+            setOPDActivities();
+        }
     }
 
     function confirmIfWeightIsEntered() {
@@ -948,6 +960,13 @@
 
     function nextPage() {
         nextEncounter(sessionStorage.patientID, sessionStorage.programID);
+    }
+
+    function setOPDActivities() { 
+        values = sessionStorage.OPD_activities.replace('vitals,','').replace('vitals','');
+        sessionStorage.OPD_activities   = values;
+        var parameters = {property: "OPD_activities", property_value: values}
+        submitParameters(parameters, "/user_properties", "nextPage");
     }
 
     function changeNextBtnToSubmit() {
@@ -1088,13 +1107,11 @@
         jQuery(".loader").hide();
 
     }
-
 </script>
 
 <body id="mateme">
 <div id="container">
     <div id="content">
-
 
         <form onsubmit="submitEncounter();">
             <input type="text" name="vitals"

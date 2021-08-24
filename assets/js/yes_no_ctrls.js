@@ -36,7 +36,7 @@ function validateYesNo(concept_name) {
 
   var nextButton =  document.getElementById('nextButton');
   nextButton.setAttribute('onmousedown', previousNextButton[concept_name]);
-	//gotoNextPage();
+  //gotoNextPage();
 
 	eval(previousNextButton[concept_name]);
   previousNextButton[concept_name] = null;

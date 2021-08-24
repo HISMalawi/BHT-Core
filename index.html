@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="./assets/css/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="./assets/css/maindashboard/header.css">
     <link rel="stylesheet" href="./assets/css/maindashboard/footer.css">
+    <script type="text/javascript" src="/assets/js/post_parameters.js"></script>
     <link rel="stylesheet" href="./assets/css/custom.css">
     <script src="./assets/js/jquery.min.js"></script>
     <script src="./assets/js/moment.js"></script>
@@ -50,6 +51,7 @@
           sessionStorage.patientID = null;
           sessionStorage.patient_type = null;
           sessionStorage.previousWeight = null;
+          sessionStorage.national_id = null;
           
           if (parseInt(sessionStorage.programID) === 12){
             sessionStorage.ancVisitNumbers = null;
@@ -97,6 +99,14 @@
           setSessionDate();
         }
 
+        try {
+          if(sessionStorage.orderFlowStatus == undefined) {
+            sessionStorage.orderFlowStatus = false;
+          }
+        }catch(i){
+            sessionStorage.orderFlowStatus = false;
+        }
+
 
 
         resetPatientStorage();
@@ -105,6 +115,17 @@
         body {
             overflow: hidden;
         }
+        .under-development {
+        position: absolute;
+        background-color: whitesmoke;
+        width: 80%;
+        height: 60%;
+        left: 10%;
+        top: 7%;
+        z-index: 2000;
+        opacity: .99;
+        border-radius: 14px 14px;
+    }
     </style>
 </head>
 
@@ -219,6 +240,17 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="modal fade under-development" style="display: none;" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"  aria-hidden="true" id="mo-modal"
+    style="width: 60%; margin-left:20%;margin-right: 20%; margin-top: 0;">
+    <div class="modal-dialog modal-sm">
+       <div style="text-align: center;"><img src="/apps/OPD/assets/images/under-construction-icon-png-26.png" height="320">
+        <!-- <div style="margin-top: %; font-style: normal; text-align: center;"><h1>Report is under development!</h1></div> -->
+       </div>
+       <div class="flex" style="width: fit-content;"><button id="ud-id" onmousedown="CloseButton()" class="btn btn-danger buttons red" style="width: 15%; height: 15%; float: right; margin-top: -3%;">Close</button></div>
+    
+    </div>   
 </div>
 
 
@@ -365,6 +397,61 @@
   }
 
   disableNoneART();
+
+if(parseInt(sessionStorage.programID) == 14 )
+{  
+    if(sessionStorage.userRoles.match(/Clinician/i))
+        OPD_activities ="presenting complaints,outpatient diagnosis,prescription";
+    else
+    OPD_activities = sessionStorage.OPD_task;
+
+    OPD_activities = "patient registration,"+OPD_activities;
+    getRadiologyActivationStatus();
+    sessionStorage.setItem("OPD_activities", OPD_activities);
+    setOPDActivities(OPD_activities)
+}
+
+function getRadiologyActivationStatus() 
+{
+    var radiology_property_url = apiProtocol + "://" + apiURL + ":" + apiPort;
+    radiology_property_url += "/api/v1/global_properties?property=activate.radiology.orders";
+
+    var xhttp1 = new XMLHttpRequest();
+    xhttp1.onreadystatechange = function () {
+        if (this.readyState == 4 && (this.status == 201 || this.status == 200 || this.status == 404)) {
+            try {
+                var activate_radiology_property = JSON.parse(this.responseText);
+                if (activate_radiology_property["activate.radiology.orders"] == "true") 
+                    sessionStorage.setItem("radiology_status", true);
+                else
+                    sessionStorage.setItem("radiology_status", false);
+                    
+            } catch (e) {
+
+            }
+        }
+    };
+    xhttp1.open("GET", radiology_property_url, true);
+    xhttp1.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    xhttp1.setRequestHeader('Content-type', "application/json");
+    xhttp1.send();
+}
+
+function setOPDActivities(OPD_activities) 
+{
+    values = OPD_activities;
+    var parameters = {property: "OPD_activities", property_value: values}
+    submitParameters(parameters, "/user_properties", "");
+    jQuery("#submit-cover").hide();
+}
+
+function CloseButton() { //for closing under-dev modal
+    document.getElementById("mo-modal").style = "display: none;";
+    window.document.body.removeAttribute("class");
+    var elem = document.getElementById("modal-backdrop");
+    elem.parentNode.removeChild(elem);
+}
+
 </script>
 
 <script type="text/javascript" src="/assets/js/current_time.js"></script>

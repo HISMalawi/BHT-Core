@@ -1,4 +1,3 @@
-
 #lab-orders {
   width: 100%;
   border-collapse: collapse;
@@ -8,8 +7,6 @@
   background-color: teal;
   color: white;
   text-align: center;
-  border-bottom-width: 5px;
-  border-bottom-style: solid;
 }
 
 #orders-box {
@@ -119,8 +116,8 @@
 }
 
 .date-columns {
-  text-align: center !important;
-  width: 75px !important;
+  text-align: center;
+  width: 75px;
 }
 
 .results-columns {
@@ -138,10 +135,29 @@
   border-width: 0px 0px 1px 1px;
 }
 
-/*.tt_controls_lab_orders #messageBar {
+.tt_controls_lab_orders #messageBar {
   background-color: green;
   border-color: lightgreen;
-}*/
+}
+#virtual-keyboard {
+  left: 18.4px !important;
+  top: unset !important;
+  height: 270px !important;
+  width: 95.6% !important;
+  bottom: 13%;
+}
+#search_content {
+  position: fixed;
+  top: 22px;
+  margin-left: 10px;
+}
+#search_filed {
+  width: 36vw;
+  height: 30px;
+}
+#tests-left {
+  margin-top: 34px;
+}
 
 .date-col {
   text-align: center !important;

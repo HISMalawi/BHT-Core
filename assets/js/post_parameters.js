@@ -34,22 +34,25 @@ function submitParameters(parameters, url, returnToFunction) {
   
   parameters.program_id = sessionStorage.programID;
   var parametersPassed = JSON.stringify(parameters);
-  
+
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 ) {
       if ( (this.status == 201 || this.status == 200)) {
         var obj = JSON.parse(this.responseText);
           eval(returnToFunction)(obj);
+          
           try {    
                   document.getElementById("innerPop").style.display = "none";
           }catch(e) {
         
           }
       }else if (this.status == 404 || this.status == 500) {
+        jQuery(".loader").hide();
         var message = "Error " + this.status + ". An error has occured,Click yes to continue to patient dashboard or No to go to the main dashboard";
         genericError(message);
       }else if (this.status == 401) {
+        jQuery(".loader").hide();
         var message = "Error " + this.status + ". You have been logged out ,Click yes to continue to patient dashboard or No to go to the main dashboard";
         genericError(message);
       }

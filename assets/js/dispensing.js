@@ -296,7 +296,7 @@ function enterKeypadValue(e, order_id) {
             inputBox.value = null;
         } else if (e.innerHTML.match(/Dispense/i)) {
             var amount_dispensed = document.getElementById("prescription-input").value;
-            manualDispensation(order_id, amount_dispensed);
+            manualDispensation2(order_id, amount_dispensed);
             document.getElementById("prescription-modal").style = "display: none;";
         } else if (e.innerHTML.match(/Close/i)) {
             document.getElementById("prescription-modal").style = "display: none;";
@@ -368,7 +368,9 @@ function manualDispensation(order_id) {
     } catch (e) {
     }
 }
-
+function manualDispensation2(order_id, amount_dispensed) {
+    postDispensation(order_id, amount_dispensed);
+}
 function scannedMedicationBarcode(barcode) {
     var drug_id = barcode.split("-")[0];
     var quantity = barcode.split("-")[1];
@@ -764,7 +766,10 @@ function gotoAppointmentEncounterType() {
     document.location = "/views/patient/appointment.html?patient_id=" + sessionStorage.patientID;
   } else if (parseInt(sessionStorage.programID) === 2) {
     nextEncounter(sessionStorage.patientID, sessionStorage.programID, true)
-  } else{
+  } 
+  else if(sessionStorage.userRoles.match(/Pharmacist/i) && parseInt(sessionStorage.programID) == 14)
+    window.location = "/";
+    else{
     document.location = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
   }
 }
@@ -1190,7 +1195,6 @@ function addRows(data) {
 
         getDataTable().row.add([medication, start_date, quantity]).node().id = order_id;
         /*var table = $('#example').DataTable();
-
         $('#example tbody').on('click', 'tr', function () {
             var data = table.row( this ).data();
             alert( 'You clicked on '+data[0]+'\'s row' );

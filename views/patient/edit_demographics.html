@@ -37,6 +37,14 @@
     document.location = url;
   }
 
+  function editMalawiNatioanlId() {
+    var url = '/views/patient/edit_demographics/malawi_national_id.html?patient_id='+ sessionStorage.patientID;
+    if(scanned_patient_id)
+      url += "&scanned_patient_id=" + scanned_patient_id;
+
+    document.location = url;
+  }
+
   function editCellphone() {
     var url = '/views/patient/edit_demographics/cellphone.html?patient_id='+ sessionStorage.patientID;
     if(scanned_patient_id)
@@ -486,7 +494,26 @@
                 </a>
               </td>
             </tr>
+            
+            <tr id="malawi_NID"> 
+              <th class="data_header">
+                <h2>Malawi National ID</h2>
+              </th>
+              <td class='data'>
+                <p id="malawi-national-id">
+                     &nbsp;
+                </p>
+              </td>
+              <td class='anchor_class'>
+                <a onmousedown="editMalawiNatioanlId();">
+                    <span>
+                      <img alt="Edit demographic" class="edit-icons" src="/assets/images/edit-demographic.png" />
+                    </span>
+                </a>
+              </td>
+            </tr>
             <tr>
+
               <th class="data_header">
                 <h2>Cell Phone Number</h2>
               </th>
@@ -520,6 +547,11 @@
 
     <footer class="footer">
       <div class="container-footer">
+        <button id="" class="red right" style="margin: 5px 0px 0px; padding: 0px; float: left;" onclick="closeForm();">
+        <span>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Cancel &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;</span>
+        </button>
+      </div>
+      <div class="container-footer">
         <button id="btnNext" class="green right" style="margin: 5px 0px 0px; padding: 0px; float: right;" onclick="validateForm();">
         <span>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Finish &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;</span>
         </button>
@@ -533,6 +565,7 @@
     var apiProtocol = sessionStorage.apiProtocol;
     var apiURL = sessionStorage.apiURL;
     var apiPort = sessionStorage.apiPort;
+    var identifier;
     
     function ajaxRequest(){
       var url = sessionStorage.apiProtocol + '://'+apiURL+':'+apiPort+'/api/v1/patients/' + sessionStorage.patientID;
@@ -550,6 +583,17 @@
         document.getElementById("current-ta").innerHTML = results.person.addresses[0].township_division;
         document.getElementById("home-village").innerHTML = results.person.addresses[0].county_district;
         document.getElementById("current-district").innerHTML = results.person.addresses[0].state_province;
+        document.getElementById("malawi-national-id").innerHTML = sessionStorage.national_id;
+
+        for (var index = 0; index < results.patient_identifiers.length; index++) {
+          if(results.patient_identifiers[index]["identifier_type"] == 28) {
+          identifier =  results.patient_identifiers[index]["identifier"];
+
+          document.getElementById("malawi-national-id").innerHTML = identifier;
+          } else
+          document.getElementById("malawi-national-id").innerHTML = "";
+        }
+
         var identifiers = results.person.person_attributes;
         let attribute = identifiers.filter(attr =>  {
               return attr.person_attribute_type_id === 12;
@@ -565,6 +609,10 @@
         req.send(null);
       } catch (e) {
       }
+    }
+
+    function closeForm() {
+      window.location = '/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID;
     }
 
     function validateForm() {
@@ -634,6 +682,15 @@
 
     ajaxRequest();
     
+    //if(sessionStorage.national_id == null && sessionStorage.national_id == 'UNKWON' &&sessionStorage.programID != 14)
+    if(sessionStorage.programID != 14 ) {
+      document.getElementById('malawi_NID').setAttribute('style','display:none');
+    } else {
+      if (sessionStorage.national_id == 'null' || sessionStorage.national_id == 'UNKNOWN') {
+        document.getElementById('malawi_NID').setAttribute('style','display:none'); 
+      }
+    }
+
     </script>
     
     

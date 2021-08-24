@@ -4,6 +4,8 @@
 /public/touchscreentoolkit/*
 *.swp
 *.json
+*.log
 *.DS_Store
 /.idea/*
 HEAD
+index1.html

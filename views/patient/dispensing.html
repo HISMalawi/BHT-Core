@@ -68,6 +68,10 @@
   background-color: rgb(0,0,0);
   background-color: rgba(0,0,0,0.4);
 }
+.uk-table th, td 
+{
+  text-align: center;
+}
 </style>
 
 <script>
@@ -90,16 +94,29 @@ function changeNextButton() {
   bnt.setAttribute("onmousedown", "doneDispensation();")
 }
 
+var patient_id = sessionStorage.patientID;
+var tt_cancel_destination = "/views/patient_dashboard.html?patient_id=" + patient_id;
+
 function doneDispensation() {
-  if(sessionStorage.userActivities.search(/Dispensations/ig) > 0) {
-    confirmCancelEntryWithMessage(null, "Are all dispensationsations complete?, continue to patient dashboard?", '/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID, true);
-  }else {
-    window.location = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID
+  if(parseInt(sessionStorage.programID) == 14)
+  {  
+    if(sessionStorage.userRoles.match(/Pharmacist/i))
+      confirmCancelEntryWithMessage(null, "Are all dispensationsations complete?, continue to Main dashboard?", '/', true);
+    else
+      confirmCancelEntryWithMessage(null, "Are all dispensationsations complete?, continue to patient dashboard?", tt_cancel_destination, true);
+   
+  }
+  else
+  {
+    if(sessionStorage.userActivities.search(/Dispensations/ig) > 0) {
+      confirmCancelEntryWithMessage(null, "Are all dispensationsations complete?, continue to patient dashboard?", '/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID, true);
+    }else {
+      window.location = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID
+    }
   }
 
 }
-var patient_id = sessionStorage.patientID;
-var tt_cancel_destination = "/views/patient_dashboard.html?patient_id=" + patient_id;
+
 </script>
 
 
