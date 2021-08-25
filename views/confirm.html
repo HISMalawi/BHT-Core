@@ -634,6 +634,7 @@ var global_property = GlobalProperty({
     patient_id = patient["patient_id"];
     sessionStorage.patientID = patient_id;
     checkIfEnrolled(patient_id);
+    checkIfDemographicsUpdated(patient_id);
     var names = obj["names"][0];
     var client_name = document.getElementById("client-name");
     client_name.innerHTML = names["given_name"] + " " + names["family_name"];
@@ -1943,6 +1944,45 @@ function checkIfEnrolled(patient_id) {
           //$("#enroll-program").modal();
           enrollProgramPoP();
       }
+    }
+  };
+  xhttp.open("GET", url, true);
+  xhttp.setRequestHeader("Authorization",sessionStorage.getItem("authorization"));
+  xhttp.setRequestHeader("Content-type", "application/json");
+  xhttp.send();
+}
+function checkIfDemographicsUpdated(patient_id) {
+  
+  var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/dde/patients/diff?patient_id=";
+  url += sessionStorage.patientID + "&program_id="+sessionStorage.programID;
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+      var obj = JSON.parse(this.responseText);
+      if(obj.diff !== null) {
+        alertify
+          .confirm("Demographics changed", "Patient demographics have been changed remotely.<br />Use remote demographics?",  function(){
+            refreshDemographics(patient_id);
+        },
+        function(){
+        });
+      } 
+    }
+  };
+  xhttp.open("GET", url, true);
+  xhttp.setRequestHeader("Authorization",sessionStorage.getItem("authorization"));
+  xhttp.setRequestHeader("Content-type", "application/json");
+  xhttp.send();
+}
+function refreshDemographics(patient_id) {
+  
+  var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/dde/patients/refresh?patient_id=";
+  url += sessionStorage.patientID + "&program_id="+sessionStorage.programID;
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+      var obj = JSON.parse(this.responseText);
+      location.reload();
     }
   };
   xhttp.open("GET", url, true);
