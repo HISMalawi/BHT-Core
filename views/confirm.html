@@ -453,6 +453,20 @@
   left: 30%;
   top: 10%;
 }
+.ajs-button {
+  background: #23538a;
+}
+
+.demo-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+tr.demo-table {
+  text-align: left;
+  padding: 8px;
+}
+
 </style>
 
 <script>
@@ -1960,9 +1974,11 @@ function checkIfDemographicsUpdated(patient_id) {
     if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
       var obj = JSON.parse(this.responseText);
       if(obj.diff !== null) {
+        const f = buildDiffs(obj.diff);
         alertify
-          .confirm("Demographics changed", "Patient demographics have been changed remotely.<br />Use remote demographics?",  function(){
+          .confirm("Demographics changed", "Patient demographics have been changed remotely.<br />Use remote demographics? " + f,  function(){
             refreshDemographics(patient_id);
+          
         },
         function(){
         });
@@ -2021,7 +2037,21 @@ function filingNumberPrefix() {
  xhttp.setRequestHeader('Content-type', "application/json");
  xhttp.send();
 }
+function buildDiffs(diffs) {
 
+  let f = `<table>
+  <tr class='demo-table'>
+    <th>Demographic</th>
+    <th>Remote</th>
+    <th>Local</th>
+  </tr>
+  `
+  Object.keys(diffs).forEach(element => {
+    f+= `<tr><td> ${element}</td> <td> ${j[element].remote} </td> <td> ${j[element].local} </td> </tr>`  
+  });
+  f+= '</table>'
+  return f;
+}
 function userFilingNumbers() {
   var href = window.location.href;
   var url = new URL(href);
