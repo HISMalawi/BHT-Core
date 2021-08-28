@@ -2048,13 +2048,7 @@ if(sessionStorage.userRoles.match(/super|admin/i)){
 
 function voidClient(void_reason){
   document.getElementById('void-confirm-message').style = "display: none;";
-  let passedPatient = window.location.href;
-  let patient = new URL(passedPatient);
-  let person_id = patient.searchParams.get("person_id");
-
-  let url = apiProtocol + "://" + apiURL + ":" + apiPort;
-  url += "/api/v1/patients/" + person_id;
-  url += "?reason=" + void_reason;
+  const url = `${apiProtocol}://${apiURL}:${apiPort}/api/v1/patients/${sessionStorage.patientID}?reason=${void_reason}`
 
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
