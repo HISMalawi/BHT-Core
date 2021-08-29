@@ -1971,16 +1971,18 @@ function checkIfDemographicsUpdated(patient_id) {
   url += sessionStorage.patientID + "&program_id="+sessionStorage.programID;
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
+    console.log
     if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
       var obj = JSON.parse(this.responseText);
-      if(obj.diff !== null) {
+      if(Object.keys(obj.diff).length !== 0) {
         const f = buildDiffs(obj.diff);
         alertify
           .confirm("Demographics changed", "Patient demographics have been changed remotely.<br />Use remote demographics? " + f,  function(){
             refreshDemographics(patient_id);
-          
+            alertify.success('Successfully updated');
         },
         function(){
+          alertify.error('Update Cancelled');
         });
       } 
     }
@@ -2046,6 +2048,8 @@ function buildDiffs(diffs) {
     <th>Local</th>
   </tr>
   `
+  j = diffs
+
   Object.keys(diffs).forEach(element => {
     f+= `<tr><td> ${element}</td> <td> ${j[element].remote} </td> <td> ${j[element].local} </td> </tr>`  
   });
