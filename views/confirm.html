@@ -453,6 +453,20 @@
   left: 30%;
   top: 10%;
 }
+.ajs-button {
+  background: #23538a;
+}
+
+.demo-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+tr.demo-table {
+  text-align: left;
+  padding: 8px;
+}
+
 </style>
 
 <script>
@@ -634,6 +648,7 @@ var global_property = GlobalProperty({
     patient_id = patient["patient_id"];
     sessionStorage.patientID = patient_id;
     checkIfEnrolled(patient_id);
+    checkIfDemographicsUpdated(patient_id);
     var names = obj["names"][0];
     var client_name = document.getElementById("client-name");
     client_name.innerHTML = names["given_name"] + " " + names["family_name"];
@@ -1950,6 +1965,49 @@ function checkIfEnrolled(patient_id) {
   xhttp.setRequestHeader("Content-type", "application/json");
   xhttp.send();
 }
+function checkIfDemographicsUpdated(patient_id) {
+  
+  var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/dde/patients/diff?patient_id=";
+  url += sessionStorage.patientID + "&program_id="+sessionStorage.programID;
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    console.log
+    if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+      var obj = JSON.parse(this.responseText);
+      if(Object.keys(obj.diff).length !== 0) {
+        const f = buildDiffs(obj.diff);
+        alertify
+          .confirm("Demographics changed", "Patient demographics have been changed remotely.<br />Use remote demographics? " + f,  function(){
+            refreshDemographics(patient_id);
+            alertify.success('Successfully updated');
+        },
+        function(){
+          alertify.error('Update Cancelled');
+        });
+      } 
+    }
+  };
+  xhttp.open("GET", url, true);
+  xhttp.setRequestHeader("Authorization",sessionStorage.getItem("authorization"));
+  xhttp.setRequestHeader("Content-type", "application/json");
+  xhttp.send();
+}
+function refreshDemographics(patient_id) {
+  
+  var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/dde/patients/refresh?patient_id=";
+  url += sessionStorage.patientID + "&program_id="+sessionStorage.programID;
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+      var obj = JSON.parse(this.responseText);
+      location.reload();
+    }
+  };
+  xhttp.open("GET", url, true);
+  xhttp.setRequestHeader("Authorization",sessionStorage.getItem("authorization"));
+  xhttp.setRequestHeader("Content-type", "application/json");
+  xhttp.send();
+}
 var activePrefix;
 var dormantPrefix;
 var user_filing_numbers = false;
@@ -1981,7 +2039,23 @@ function filingNumberPrefix() {
  xhttp.setRequestHeader('Content-type', "application/json");
  xhttp.send();
 }
+function buildDiffs(diffs) {
 
+  let f = `<table>
+  <tr class='demo-table'>
+    <th>Demographic</th>
+    <th>Remote</th>
+    <th>Local</th>
+  </tr>
+  `
+  j = diffs
+
+  Object.keys(diffs).forEach(element => {
+    f+= `<tr><td> ${element}</td> <td> ${j[element].remote} </td> <td> ${j[element].local} </td> </tr>`  
+  });
+  f+= '</table>'
+  return f;
+}
 function userFilingNumbers() {
   var href = window.location.href;
   var url = new URL(href);
