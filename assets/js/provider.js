@@ -3,7 +3,7 @@ var providerName = null;
 var programID = sessionStorage.getItem("programID");
 function showProviderModal() {
 
-    document.getElementById('regimen-change-cover').style = 'display: none;';
+    document.getElementById('regimen-change-cover').style.zIndex = 0;
     var providerModal = document.createElement('div');
     providerModal.setAttribute('id', 'provider-modal');
     providerModal.setAttribute('class', 'provider-modal');
@@ -105,5 +105,7 @@ function checkIfInBDMode(){
         showProviderModal();
     }else {
     }
+    
+    return true;
 }
 

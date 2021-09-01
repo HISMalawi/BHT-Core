@@ -111,7 +111,7 @@ var tt_cancel_destination = "/views/patient_dashboard.html?patient_id=" + patien
       <form>
 
         <input type="text" name="summary"
-          tt_onLoad="checkIfInBDMode();__$('keyboard').style.display = 'none';dispensingPage();initDataTable();getPrescriptions();changeNextButton();"
+          tt_onLoad="__$('keyboard').style.display = 'none';dispensingPage();initDataTable();getPrescriptions();changeNextButton();checkIfInBDMode();"
           tt_pageStyleClass= "NoControls" helpText="Dispensing" optional = "true"/>
 
 
