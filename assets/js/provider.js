@@ -93,6 +93,7 @@ function setProvider() {
         providerName =  providerElemnt[0].innerHTML;
         document.getElementById("provider-modal").style.display = "none";
         var elem = document.getElementsByClassName("provider-list")[0];
+        document.getElementById('regimen-change-cover').style = 'display: none;';
         elem.remove();
     }else {
         showMessage("please select a provider from the list");
