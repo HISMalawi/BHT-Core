@@ -564,6 +564,10 @@ var global_property = GlobalProperty({
       patient_id;
     }
 
+    function checkMandatoryFields(person){
+      //if (person)
+    }
+
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -576,7 +580,13 @@ var global_property = GlobalProperty({
           }else if (locals.length >= 1 && remotes.length >=1) {
             location.href = "/views/npid_duplicates.html?health_id=" + patient_id;
           } else if (locals.length == 1) {
-            populatePatient(locals[0], locals[0]);
+            if (checkMandatoryFields(locals[0]) == true) {
+               populatePatient(locals[0], locals[0]);
+            } else {
+                 var f = JSON.parse(this.responseText);
+                 sessionStorage.patientID = f.entity.patient_id;
+                 window.location.href = "/views/patient/edit_demographics.html";
+            }
           } else {
             noPatient(patient_id);
           }
