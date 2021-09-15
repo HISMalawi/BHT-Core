@@ -113,92 +113,6 @@
     z-index: 10;
   }
 
-  /*.buttonsDIV button {
-    margin: 5px 0px 0px;
-    margin-right: 10px;
-    height: 60px;
-    font-size: 2rem;
-  }
-
-  .blue {
-    border: 1px solid #7eb9d0;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    font-size: 28px;
-    font-family: helvetica;
-    padding: 10px 10px 10px 10px;
-    text-decoration: none;
-    display: inline-block;
-    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
-    font-weight: bold;
-    color: #ffffff;
-    background-color: #a7cfdf;
-    background-image: -webkit-gradient(
-      linear,
-      left top,
-      left bottom,
-      from(#a7cfdf),
-      to(#23538a)
-    );
-    background-image: -webkit-linear-gradient(top, #a7cfdf, #23538a);
-    background-image: -moz-linear-gradient(top, #a7cfdf, #23538a);
-    background-image: -ms-linear-gradient(top, #a7cfdf, #23538a);
-    background-image: -o-linear-gradient(top, #a7cfdf, #23538a);
-    background-image: linear-gradient(to bottom, #a7cfdf, #23538a);
-    filter: progid: DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#a7cfdf, endColorstr=#23538a);
-  }
-
-  .red {
-    border: 1px solid #ff0011;
-    background-image: linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -o-linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -moz-linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -webkit-linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -ms-linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -webkit-gradient(
-      color-stop(0, rgb(255, 0, 17)),
-      color-stop(1, rgb(255, 0, 17))
-    ) !important;
-    background-color: #5c0707;
-
-    border: 1px solid #450111;
-    background-color: #77021d;
-    background-image: -webkit-gradient(
-      linear,
-      left top,
-      left bottom,
-      from(#77021d),
-      to(#3a000d)
-    );
-    background-image: -webkit-linear-gradient(top, #77021d, #3a000d);
-    background-image: -moz-linear-gradient(top, #77021d, #3a000d);
-    background-image: -ms-linear-gradient(top, #77021d, #3a000d);
-    background-image: -o-linear-gradient(top, #77021d, #3a000d);
-    background-image: linear-gradient(to bottom, #77021d, #3a000d);
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#77021d, endColorstr=#3a000d);
-    color: #fff;
-  }*/
 
   .info-tables {
     width: 99%;
@@ -565,7 +479,16 @@ var global_property = GlobalProperty({
     }
 
     function checkMandatoryFields(person){
-      //if (person)
+      console.log(person)
+       let names = person.person.names[0]
+       let address = person.person.addresses[0]
+
+       if (person.person.gender == '' || names.given_name == '' || names.family_name == '' || address.address2 == ''
+        || address.neighborhood_cell == '' || address.county_district == '' || address.state_province == '' || address.township_division == '' || address.city_village == '' ) {
+        return false
+       } else {
+        return true
+       }
     }
 
 
@@ -583,9 +506,9 @@ var global_property = GlobalProperty({
             if (checkMandatoryFields(locals[0]) == true) {
                populatePatient(locals[0], locals[0]);
             } else {
-                 var f = JSON.parse(this.responseText);
-                 sessionStorage.patientID = f.entity.patient_id;
-                 window.location.href = "/views/patient/edit_demographics.html";
+                 sessionStorage.patientID = locals[0].patient_id
+                 document.getElementById('incomplete-demographics').style="display:inline";
+                 document.getElementById('page-cover').style="display:inline";
             }
           } else {
             noPatient(patient_id);
@@ -658,7 +581,6 @@ var global_property = GlobalProperty({
     patient_id = patient["patient_id"];
     sessionStorage.patientID = patient_id;
     checkIfEnrolled(patient_id);
-    checkIfDemographicsUpdated(patient_id);
     var names = obj["names"][0];
     var client_name = document.getElementById("client-name");
     client_name.innerHTML = names["given_name"] + " " + names["family_name"];
@@ -1370,51 +1292,6 @@ var global_property = GlobalProperty({
 </div>
 
 <div class="info-table"></div>
-<!--div
-  class="modal fade"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="mySmallModalLabel"
-  aria-hidden="true"
-  id="mi-modal"
-  style="width: 60%; margin-left:20%;margin-right: 20%; margin-top: 20%;"
->
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content" style="margin: 0; ">
-      <div class="modal-header">
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <h1 class="modal-title" id="myModalLabel">
-          Patient Has Died, are you sure you want to continue?
-        </h1>
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="button green"
-          id="modal-btn-si"
-          style="float:left; text-align: center; width: 100px;"
-        >
-          Yes
-        </button>
-        <button
-          type="button"
-          class="button red"
-          id="modal-btn-no"
-          style="width: 100px;"
-        >
-          No
-        </button>
-      </div>
-    </div>
-  </div>
-</div-->
 
 <div
   class="modal fade"
@@ -1496,6 +1373,23 @@ var global_property = GlobalProperty({
   </div>
 </div>
 
+<div id="incomplete-demographics">
+  <div id="enrolled-program-inner">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h1 style="text-align: center" class="text-uppercase">
+          Client does not have complete Demographics </p>
+          Please update
+        </h1>
+      </div>
+      <div class="modal-footer">
+          <button class="button green navButton" onmousedown="javascript:location='/views/patient/edit_demographics.html'"
+          style="float: right; width: 120px;" id="continue"><span>Ok</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   function enrollPatient() {
         // sessionStorage.patientID = person_id;
@@ -1565,42 +1459,10 @@ var global_property = GlobalProperty({
       return;
     }
 
-    /*if(parseInt(sessionStorage.programID) == 23){
-      var labDashboardURL = "/apps/" + sessionStorage.applicationFolder;
-      labDashboardURL += "/views/patient_dashboard.html?patient_id=" + id;
-      window.location = labDashboardURL;
-    }*/
-
     if (patientDead == true) {
       popUpDeceasedMessage();
       return;
-      /*$("#mi-modal").modal("show");
-      var modalConfirm = function(callback) {
-        $("#continue").on("click", function() {
-          $("#mi-modal").modal("show");
-        });
 
-        $("#modal-btn-si").on("click", function() {
-          callback(true);
-          $("#mi-modal").modal("hide");
-        });
-
-        $("#modal-btn-no").on("click", function() {
-          callback(false);
-          $("#mi-modal").modal("hide");
-        });
-      };
-
-      modalConfirm(function(confirm) {
-        if (confirm) {
-          window.location.href =
-            "/views/patient_dashboard.html?patient_id=" + id;
-        } else {
-          $("#mi-modal").modal("hide");
-
-          window.location.href = "/";
-        }
-      });*/
     } else {
 
       /* .......... filing ............... */
@@ -1967,6 +1829,8 @@ function checkIfEnrolled(patient_id) {
       if (enrolled == false){
           //$("#enroll-program").modal();
           enrollProgramPoP();
+      } else {
+          checkIfDemographicsUpdated(patient_id);
       }
     }
   };
@@ -2190,6 +2054,7 @@ function closeEnrollProgramPoP(){
   const page_cover = document.getElementById('page-cover');
   page_cover.style = 'display: none;';
   box.style = 'display:none;';
+  checkIfDemographicsUpdated(sessionStorage.patientID);
 }
 </script>
 <script src="/assets/js/show.lab.orders.js"></script>
@@ -2197,7 +2062,24 @@ function closeEnrollProgramPoP(){
 
 <style>
 
-  #enroll-program {
+  #enroll-program, #incomplete-demographics {
+    background: #ffffff;
+    border-radius: 0.5em;
+    box-shadow: 0 10px 20px rgba(black, 0.2);
+    left: 50%;
+    max-width: 90%;
+    position: absolute;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    width: 30em;
+    text-align: left;
+    max-height: 90vh;
+    flex-direction: column;
+    z-index: 1000000;
+    border-color: black;
+    border-style: solid;
+    display: none;
+  } {
     background: #ffffff;
     border-radius: 0.5em;
     box-shadow: 0 10px 20px rgba(black, 0.2);
