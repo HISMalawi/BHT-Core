@@ -885,7 +885,9 @@
     getRelationships();
 
     function getVisitDates() {
-        var visits_dates_url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients/' + sessionStorage.patientID + '/visits';
+        var visits_dates_url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort;
+        visits_dates_url += '/api/v1/patients/' + sessionStorage.patientID;
+        visits_dates_url +=  '/visits?program_id=' + sessionStorage.programID;
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
@@ -905,7 +907,7 @@
 
                     html += "<tr class=\"toggler toggler1\">\n" +
                         "            <td style='width: 140px;'>\n" +
-                        "                <button onclick='printPatientVisitSummary(&#39;" + visit_date + "&#39;)' class=\"btn btn-primary btn-block\"><i class=\"fa fa-print\"></i> " + visit_date + "</button>\n" +
+                        "                <button onclick='printPatientVisitSummary(&#39;" + visit_date + "&#39;)' class=\"btn btn-primary btn-block\"><i class=\"fa fa-print\"></i> " + moment(visit_date).format('DD/MMM/YYYY') + "</button>\n" +
                         "            </td>\n" +
                         "            <td id='" + height_id + "' class='loader' style='width: 70px;'>&nbsp;</td>\n" +
                         "            <td id='" + weight_id + "' class='loader' style='width: 70px;'>&nbsp;</td>\n" +
@@ -1246,7 +1248,7 @@
 
     .mastercard-table tbody {
         display: block;
-        height: 52vh;
+        height: 45vh;
         overflow:auto;
     }
     .mastercard-table thead, .mastercard-table tbody tr {

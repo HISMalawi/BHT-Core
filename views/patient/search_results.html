@@ -114,10 +114,19 @@
 
           window.location.href = "/views/patient/new.html" + parameters;
       }else if (search_redirect.length > 0){
+
         if(people[pos]["person_type"] === "local" || people[pos]["person_type"] == undefined) {
-          window.location.href = "/views/confirm.html?person_id=" + people[pos]['Person ID'];
           sessionStorage.setItem("patientID", people[pos]["Person ID"]);
+          
+          if(parseInt(sessionStorage.programID) == 14  )
+            nextEncounter(sessionStorage.patientID, sessionStorage.programID);
+            
+          window.location.href = "/views/confirm.html?person_id=" + people[pos]['Person ID'];
         }else {
+ 
+          if(parseInt(sessionStorage.programID) == 14  )
+            nextEncounter(sessionStorage.patientID, sessionStorage.programID);
+          
           window.location.href = "/views/confirm.html?patient_id=" + people[pos]['Person ID'];
         }
         // nextEncounter(people[pos]['Person ID'] , 1, sessionStorage.programID);

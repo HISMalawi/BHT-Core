@@ -403,9 +403,8 @@ if(parseInt(sessionStorage.programID) == 14 )
     if(sessionStorage.userRoles.match(/Clinician/i))
         OPD_activities ="presenting complaints,outpatient diagnosis,prescription";
     else
-    OPD_activities = sessionStorage.OPD_task;
+    OPD_activities = "patient registration,"+sessionStorage.OPD_task;
 
-    OPD_activities = "patient registration,"+OPD_activities;
     getRadiologyActivationStatus();
     sessionStorage.setItem("OPD_activities", OPD_activities);
     setOPDActivities(OPD_activities)
