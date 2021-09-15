@@ -1,641 +1,209 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Baobab Health Trust</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/assets/css/maindashboard/footer.css">
-  <link rel="stylesheet" href="/assets/css/custom.css">
 
-  <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
-  <script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
+<script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
+<!-- <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/standard.js" defer="true"></script> -->
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 
-  <link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
-  <script src="/assets/js/moment.js"></script>
-  </head>
-  <body>
-<script>
-  var patient_id = sessionStorage.patientID;
+<link rel="stylesheet" href="/assets/css/yes_no_ctrls.css" type="text/css">
+<script type="text/javascript" src="/assets/js/generic_ajaxrequest.js"></script>
+<script type="text/javascript" src="/assets/js/moment.js"></script>
+<script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
+<!--script type="text/javascript" src="/assets/js/does_connection_exist.js"></script-->
 
-  function finish() {
-    window.location = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
+<style>
+  #clearButton {
+    display: none;
   }
 
-  function editName() {
-    var url = '/views/patient/edit_demographics/name.html?patient_id='+ sessionStorage.patientID;
-    if(scanned_patient_id)
-      url += "&scanned_patient_id=" + scanned_patient_id;
+  .inputFrameClass {
+    width: 95% !important;
+    height: 90%;
+  }
 
+  #demographics {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  #demographics th, #demographics td {
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+  }
+
+  .text {
+    text-align: left;
+    margin-left: 10px;
+  }
+
+  .headers {
+    border-right-width: 2px !important;
+    width: 15%;
+  }
+
+  .button-container {
+    width: 10%;
+  }
+
+  .data {
+    padding-left: 15px;
+  }
+</style>
+
+<body id="mateme">
+  <div id="container">
+      <div id="content">
+  
+        <form>
+          <input type="text" name="summary"
+          tt_onLoad="__$('keyboard').style.display = 'none';buildTable();"
+          tt_pageStyleClass="NoControls" 
+          helpText="Edit demographics" optional="true"/>
+        </form>
+
+  </div>
+</body>
+
+
+<script>
+var source = 'Confirmation page';
+let mainUrl = window.location.href;
+mainUrl = new URL(mainUrl);
+mainUrl.searchParams.get("source") ? (source = mainUrl.searchParams.get("source")) : source;
+
+function finishButton() {
+  let url = source == 'Patient Dashboard' ? `/views/patient_dashboard.html?patient_id=${sessionStorage.patientID}`
+    : `/views/confirm.html?person_id=${sessionStorage.patientID}`;
+  window.location  = url;
+}
+
+function configCancelBTN() {
+  let cancelButton = document.getElementById("cancelButton");
+
+  if(source != "Patient Dashboard"){
+    tt_cancel_destination = "/"; //`/views/confirm.html?person_id=${sessionStorage.patientID}`;
+  }else{
+    cancelButton.style = "display: none;";
+  }
+}
+
+function buildTable(){
+  let nextButton = document.getElementById('nextButton');
+  nextButton.setAttribute("onmousedown", "finishButton();");
+  configCancelBTN();
+  let innerHTML = `<table id="demographics">
+  </table>`;
+  
+  inputFrame = document.getElementById('inputFrame' + tstCurrentPage);
+  inputFrame.innerHTML = innerHTML;
+  fetchDemographics();
+}
+
+function fetchDemographics(){
+    let url = sessionStorage.apiProtocol + '://'+apiURL+':'+apiPort+'/api/v1/patients/' + sessionStorage.patientID;
+    let req = new XMLHttpRequest();
+
+    req.onreadystatechange = function(){
+      if (this.readyState == 4) {
+        if (this.status == 200) {
+          var results = JSON.parse(this.responseText);
+          let values = []
+          values.push({
+            title: 'Name',
+            value: results.person.names[0].given_name + " " + results.person.names[0].family_name,
+            function: 'editName'
+          });
+
+          let gender;
+          try {
+            gender = results.person.gender.match(/F/i) ? 'Female' : 'Male';
+          }catch(e){
+            gender = ''
+          }
+
+          values.push({
+            title: 'Gender' ,
+            value: gender,
+            function: 'editGender'
+          });
+
+          values.push({
+            title: 'Birthdate',
+            value: moment(results.person.birthdate).format("DD/MMM/YYYY"),
+            function: 'edithBirthdate'
+          });
+
+          let ancentory_district = results.person.addresses[0].address2;
+          let ancentory_ta = results.person.addresses[0].neighborhood_cell;
+          let ancentory_village = results.person.addresses[0].county_district;
+          values.push({
+            title: 'Ancentory address',
+            value: `${ancentory_district} | ${ancentory_ta} | ${ancentory_village}`,
+            function: 'editAddresses'
+          });
+
+          
+          let current_district = results.person.addresses[0].state_province;
+          let current_ta = results.person.addresses[0].township_division;
+          let current_village = results.person.addresses[0].city_village;
+          values.push({
+            title: 'Current address',
+            value: `${current_district} | ${current_ta} | ${current_village}`,
+            function: 'editAddresses' 
+          });
+
+          var identifiers = results.person.person_attributes;
+          let attribute = identifiers.filter(attr =>  {
+            return attr.person_attribute_type_id === 12;
+          });
+
+          values.push({
+            title: 'Cellphone',
+            value: attribute.length > 0 ? attribute[0].value : "Unknown",
+            function: 'editCellphone'
+          });
+
+          let table = document.getElementById("demographics");
+          for(value of values){
+            table.innerHTML += `<tr>
+              <td class="text headers">${value.title}</td>
+              <th class="text data">${value.value}</th>
+              <td class="button-container"><button class="button blue navButton" 
+                onmousedown="${value.function}();"><span>Edit</span></button></td>
+            </tr>`;
+          }
+        }
+      }
+    };
+    try {
+        req.open('GET', url, true);
+        req.setRequestHeader('Authorization',sessionStorage.getItem('authorization'));
+        req.send(null);
+    } catch (e) {
+    }
+}
+
+function editName() {
+    var url = '/views/patient/edit_demographics/name.html?patient_id='+ sessionStorage.patientID;
     document.location = url;
   }
 
   function editGender() {
     var url = '/views/patient/edit_demographics/gender.html?patient_id='+ sessionStorage.patientID;
-    if(scanned_patient_id)
-      url += "&scanned_patient_id=" + scanned_patient_id;
-
     document.location = url;
   }
 
   function editCellphone() {
     var url = '/views/patient/edit_demographics/cellphone.html?patient_id='+ sessionStorage.patientID;
-    if(scanned_patient_id)
-      url += "&scanned_patient_id=" + scanned_patient_id;
-
     document.location = url;
   }
 
   function editBirthdate() {
     var url = '/views/patient/edit_demographics/birthdate.html?patient_id='+ sessionStorage.patientID;
-    if(scanned_patient_id)
-      url += "&scanned_patient_id=" + scanned_patient_id;
-
     document.location = url;
   }
 
   function editAddresses() {
     var url = '/views/patient/edit_demographics/addresses.html?patient_id='+ sessionStorage.patientID;
-    if(scanned_patient_id)
-      url += "&scanned_patient_id=" + scanned_patient_id;
-
     document.location = url;
   }
 
-  function hideValidateDemographicsFieldsAlert() {
-    document.getElementById("alert-div").style.display = 'none';
-    document.getElementById("alert-cover").style.display = 'none';
-  }
-
-  function validateDemographicsFields() {
-    document.getElementById("alert-div").style.display = 'inline';
-    document.getElementById("alert-cover").style.display = 'inline';
-    return false;
-  }
 </script>
-
-<style>
-    body {
-        -webkit-user-select: none;  /* Chrome all / Safari all */
-        -moz-user-select: none;     /* Firefox all */
-        -ms-user-select: none;      /* IE 10+ */
-        user-select: none;          /* Likely future */
-    }
-
-    img {
-        user-drag: none;
-        user-select: none;
-        -moz-user-select: none;
-        -webkit-user-drag: none;
-        -webkit-user-select: none;
-        -ms-user-select: none;
-        pointer-events: none;
-    }
-
-    /* ............................. Table like DIV starts ............................... */
-    .container {
-        display: table;
-        width: 100%;
-        padding: 0px 1px 0px 1px;
-    }
-    /* ............................. Table like DIV ends ............................... */
-
-
-
-    /* ............................. Row contents starts ............................... */
-
-    .edit-icons {
-        width: 40px;
-        height: 40px;
-        text-align: center;
-    }
-    .anchor_class a{
-        border: 1px solid black;
-        border-style: outset;
-        border-radius: 2px;
-        cursor: pointer;
-        display: block;
-        text-align: center;
-        background-color: white;
-        box-shadow: inset 3px -3px 3px -2px grey;
-        width: 100%;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-        -moz-box-shadow: inset 0 0 10px #000000;
-        -webkit-box-shadow: inset 0 0 10px #000000;
-        text-decoration: none;
-    }
-
-    .data p {
-        font-size: 18px;
-        margin-left: 5px;
-    }
-
-    .data {
-        width: 40%;
-        border-width: 0px 0px 1px 1px;
-        border-style: solid;
-        padding-left: 5px;
-        text-align: left;
-        border-style: solid;
-        border-width: 1px;
-        text-align: left;
-        word-wrap: break-word;
-    }
-
-    #alert-cover{
-        display: none;
-        position: absolute;
-        background-color: black;
-        width: 100%;
-        height: 102%;
-        left: 0%;
-        top: 0%;
-        z-index: 990;
-        opacity: 0.65;
-    }
-
-    #alert-div {
-        display: none;
-        background-color: #F4F4F4;
-        border: 2px solid #E0E0E0;
-        border-radius: 15px;
-        height: 183px;
-        padding: 5px;
-        position: absolute;
-        top: 20%;
-        /*margin-top: 100px;
-        */
-        width: 560px;
-        /*margin-left: 430px;
-        */
-        left: 25%;
-        z-index: 991;
-    }
-
-    #alert-ok-btn{
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-        bottom: 45px;
-        -moz-user-select: none;
-        background-image: none;
-        border: 1px solid transparent;
-        border-radius: 4px;
-        cursor: pointer;
-        display: inline-block;
-        font-size: 20px;
-        font-weight: bolder;
-        line-height: 2.29;
-        padding: 6px 56px;
-        text-align: center;
-        vertical-align: middle;
-        white-space: nowrap;
-        background-color: #337ab7;
-        border-color: #2e6da4;
-        color: #fff;
-        left: 38%;
-        margin-top: -5px;
-    }
-
-    /* ............................. Row contents ends ............................... */
-    body {
-        -moz-user-select: none;
-    }
-
-    table {
-        vertical-align: middle;
-        width: 100%;
-        -moz-user-select: none;
-    }
-
-    .demographics_container {
-        background-color: #FFF;
-        margin: 20px 20px 20px 20px;
-        overflow: auto;
-    }
-
-    .data_header {
-        text-align: left;
-        border-style: solid;
-        border-width: 1px;
-        padding-left: 2px;
-        text-align: left;
-        font-size: 12px;
-    }
-
-    .btn {
-        padding-bottom: 5px;
-        text-align: center;
-        width: 99%;
-        height: 50%;
-        cursor: pointer;
-        box-shadow: inset 2px -4px 2px 0px;
-        background-color: white;
-        border-radius: 7px;
-        border: solid black 3px;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-        -moz-box-shadow:    inset 0 0 10px #000000;
-        -webkit-box-shadow: inset 0 0 10px #000000;
-        box-shadow:         inset 0 0 10px #000000;
-    }
-
-    .task-icons {
-        height: 40px;
-        width: 90px;
-    }
-
-    .main-container th {
-        font-size: 12px;
-        text-align: left;
-    }
-</style>
-
-<style>
-/* .......................... demographics css starts ................................. */
-.demographics {
-  position: fixed;
-  width: 99%;
-  top: 0px;
-  left: 5px;
-  margin: auto;
-  padding: 0px 1px 0px 1px;
-  border-style: solid;
-  border-width: 0px 0px 1px 0px;
-  color: black;
-  background: white;
-}
-
-.main-page-container-rows  {
-  display: table-row;
-}
-
-.cells {
-    display: table-cell;
-    vertical-align: top;
-    border-left: 1px solid black;
-    border-top: 1px solid black;
-    padding: 0px !important;
-}
-
-.gender-icon {
-    width: 60px !important;
-    height: 60px !important;
-}
-
-.demographics-table {
-  width: 100%;
-}
-
-.attributes-table {
-  width: 100%;
-}
-
-.main-container th {
-  font-size: 13px;
-  text-align: left;
-}
-
-.village-reach-icon {
-  width: 60px !important;
-  height: 60px !important;
-  padding: 0px;
-  border-right: 1px solid #000000 !important;
-  float: right;
-}
-.value{
-    font-size: 0.8em;
-    padding: 3px;
-    width: 60%;
-}
-.titl{
-    font-size: 0.8em !important;
-    width: 40%;
-    text-align: left;
-    background: white !important;
-    padding: 3px;
-}
-
-.icons{
-    margin-top: 0px !important;
-}
-/* ........................................................... */
-</style>
-
-
-<div class="demographics">
-  <div style="font-size: 2.3em; background-color: rgb(112, 128, 144); color: rgb(238, 238, 238); padding: 15px;" align="center">
-      Edit Demographics
-  </div>
-
-</div>
-  </br>
-<div style="padding-top: 45px;"></div>
-<div class="main-container">
-      <div id="details" style="float:none; width:97%;">
-        <div class="container">
-          <table class="demographics_container">
-            <tr>
-              <th class="data_header"><h2>Name</h2></th>
-              <td class='data' style='border-width:1px 1px 1px'>
-                <p id="name">
-                  &nbsp;
-                </p>
-              </td>
-              <td class='anchor_class'>
-                <a onmousedown="editName();">
-                    <span>
-                      <img alt="Edit demographic" class="edit-icons" src="/assets/images/edit-demographic.png" />
-                    </span>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th class="data_header">
-                <h2>Gender</h2>
-              </th>
-              <td class='data'>
-                <p id="gender">
-                   &nbsp;
-                </p>
-              </td>
-              <td class='anchor_class'>
-                <a onmousedown="editGender();">
-                    <span>
-                        <img alt="Edit demographic" class="edit-icons" src="/assets/images/edit-demographic.png" />
-                    </span>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th class="data_header">
-                <h2>Birthdate</h2>
-              </th>
-              <td class='data' style='border-width:1px 1px 1px'>
-                <p id="birthdate">
-                   &nbsp;
-                </p>
-              </td>
-              <td class='anchor_class'>
-                <a onmousedown="editBirthdate();">
-                    <span>
-                      <img alt="Edit demographic" class="edit-icons" src="/assets/images/edit-demographic.png" />
-                    </span>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th class="data_header">
-                <h2>Home district</h2>
-              </th>
-              <td class='data'>
-                <p id="home-district">
-                    &nbsp;
-                </p>
-              </td>
-              <td class='anchor_class'>
-                <a onmousedown="editAddresses();">
-                <span>
-                  <img alt="Edit demographic" class="edit-icons" src="/assets/images/edit-demographic.png" />
-                </span></a>
-              </td>
-            </tr>
-            <tr>
-              <th class="data_header">
-                <h2>Home TA</h2>
-              </th>
-              <td class='data'>
-                <p id="home-village">
-                     &nbsp;
-                </p>
-              </td>
-              <td class='anchor_class'>
-                <a onmousedown="editAddresses();">
-                <span>
-                  <img alt="Edit demographic" class="edit-icons" src="/assets/images/edit-demographic.png" />
-                </span></a>
-              </td>
-            </tr>
-            <tr>
-              <th class="data_header">
-                <h2>Home village</h2>
-              </th>
-              <td class='data' style='border-width:1px 1px 1px'>
-                <p id="district">
-                   &nbsp;
-                </p>
-              </td>
-              <td class='anchor_class'>
-                <a onmousedown="editAddresses();">
-                    <span>
-                      <img alt="Edit demographic" class="edit-icons" src="/assets/images/edit-demographic.png" />
-                    </span>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th class="data_header">
-                <h2>Current district</h2>
-              </th>
-              <td class='data' style='border-width:1px 1px 1px'>
-                <p id="current-district">
-                   &nbsp;
-                </p>
-              </td>
-              <td class='anchor_class'>
-                <a onmousedown="editAddresses();">
-                    <span>
-                      <img alt="Edit demographic" class="edit-icons" src="/assets/images/edit-demographic.png" />
-                    </span>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th class="data_header">
-                <h2>Current T/A</h2>
-              </th>
-              <td class='data' style='border-width:1px 1px 1px'>
-                <p id="current-ta">
-                   &nbsp;
-                </p>
-              </td>
-              <td class='anchor_class'>
-                <a onmousedown="editAddresses();">
-                    <span>
-                      <img alt="Edit demographic" class="edit-icons" src="/assets/images/edit-demographic.png" />
-                    </span>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th class="data_header">
-                <h2>Current village</h2>
-              </th>
-              <td class='data' style='border-width:1px 1px 1px'>
-                <p id="current-village">
-                   &nbsp;
-                </p>
-              </td>
-              <td class='anchor_class'>
-                <a onmousedown="editAddresses();">
-                    <span>
-                      <img alt="Edit demographic" class="edit-icons" src="/assets/images/edit-demographic.png" />
-                    </span>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th class="data_header">
-                <h2>Cell Phone Number</h2>
-              </th>
-              <td class='data'>
-                <p id="cellphone-number">
-                     &nbsp;
-                </p>
-              </td>
-              <td class='anchor_class'>
-                <a onmousedown="editCellphone();">
-                    <span>
-                      <img alt="Edit demographic" class="edit-icons" src="/assets/images/edit-demographic.png" />
-                    </span>
-                </a>
-              </td>
-            </tr>
-
-    <div id="alert-cover"></div>
-  
-      <div id="alert-div">
-        <div style="text-align: center; color: white; border-style: solid; 
-          border-color: black;font-size: 25px;border-width: 0px 0px 1px 0px;
-          border-radius: 9px 9px 0px 0px;background-color: slategray;">Notice</div>
-        <p style="text-align: center; color: black; font-size: 25px;">Enter all demographics to continue</p>
-        <div style="padding-top: 65px;">
-          <span id="alert-ok-btn" 
-          onclick="hideValidateDemographicsFieldsAlert();" 
-          style="position: relative;"> Ok</span>
-        </div>
-      </div>
-
-    <footer class="footer">
-      <div class="container-footer">
-        <button id="btnNext" class="green right" style="margin: 5px 0px 0px; padding: 0px; float: right;" onclick="validateForm();">
-        <span>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Finish &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;</span>
-        </button>
-      </div>
-    </footer>  
-    </table>
-    </div>
-    </div>
-    </div>
-    <script type="text/javascript">
-    var apiProtocol = sessionStorage.apiProtocol;
-    var apiURL = sessionStorage.apiURL;
-    var apiPort = sessionStorage.apiPort;
-    
-    function ajaxRequest(){
-      var url = sessionStorage.apiProtocol + '://'+apiURL+':'+apiPort+'/api/v1/patients/' + sessionStorage.patientID;
-      var req = new XMLHttpRequest();
-      req.onreadystatechange = function(){
-      if (this.readyState == 4) {
-      if (this.status == 200) {
-        var results = JSON.parse(this.responseText);
-        document.getElementById("name").innerHTML = results.person.names[0].given_name + " " + results.person.names[0].family_name;
-        document.getElementById("gender").innerHTML = results.person.gender;
-        document.getElementById("birthdate").innerHTML = moment(results.person.birthdate).format("DD/MMM/YYYY");
-        document.getElementById("district").innerHTML = results.person.addresses[0].neighborhood_cell;
-        document.getElementById("home-district").innerHTML = results.person.addresses[0].address2;
-        document.getElementById("current-village").innerHTML = results.person.addresses[0].city_village;
-        document.getElementById("current-ta").innerHTML = results.person.addresses[0].township_division;
-        document.getElementById("home-village").innerHTML = results.person.addresses[0].county_district;
-        document.getElementById("current-district").innerHTML = results.person.addresses[0].state_province;
-        var identifiers = results.person.person_attributes;
-        let attribute = identifiers.filter(attr =>  {
-              return attr.person_attribute_type_id === 12;
-            });
-        let f = (attribute.length > 0 ? attribute[0].value : "Unknown");
-        document.getElementById("cellphone-number").innerHTML = f;
-      }
-      }
-      };
-      try {
-        req.open('GET', url, true);
-        req.setRequestHeader('Authorization',sessionStorage.getItem('authorization'));
-        req.send(null);
-      } catch (e) {
-      }
-    }
-
-    function validateForm() {
-      var errors = [];
-      // alert("here");
-      var name = document.getElementById("name").innerHTML;
-      var birthdate = document.getElementById("birthdate").innerHTML;
-      var gender = document.getElementById("gender").innerHTML;
-      var district = document.getElementById("district").innerHTML;
-      var home_district = document.getElementById("home-district").innerHTML;
-      var current_village = document.getElementById("current-village").innerHTML;
-      var current_ta = document.getElementById("current-ta").innerHTML;
-      var home_village = document.getElementById("home-village").innerHTML;
-      var current_district = document.getElementById("current-district").innerHTML;
-      var cellphone_number = document.getElementById("cellphone-number").innerHTML;
-
-      name = name.replace(/&nbsp;/gi," ").trim();
-      birthdate = birthdate.replace(/&nbsp;/gi," ").trim();
-      gender = gender.replace(/&nbsp;/gi," ").trim();
-      district = district.replace(/&nbsp;/gi," ").trim();
-      home_district = home_district.replace(/&nbsp;/gi," ").trim();
-      current_village = current_village.replace(/&nbsp;/gi," ").trim();
-      current_ta = current_ta.replace(/&nbsp;/gi," ").trim();
-      home_village = home_village.replace(/&nbsp;/gi," ").trim();
-      current_district = current_district.replace(/&nbsp;/gi," ").trim();
-      cellphone_number = cellphone_number.replace(/&nbsp;/gi," ").trim();
-
-      if (name === "") {
-        validateDemographicsFields();
-        return false;
-      }
-      if (birthdate === "") {
-        validateDemographicsFields();
-        return false;
-      }
-      if (gender === "") {
-        validateDemographicsFields();
-        return false;
-      }
-      if (district  === "" || home_district === "" || current_village === "" || current_ta === "" || home_village === "" || current_district === "") {
-        validateDemographicsFields();
-        return false;
-      }
-      if (cellphone_number === "") {
-        validateDemographicsFields();
-        return false;
-      }
-      else{
-        finish();
-      }
-
-    }
-
-
-    var scanned_patient_id = window.location.href;
-    scanned_patient_id = new URL(scanned_patient_id);
-    scanned_patient_id = scanned_patient_id.searchParams.get("scanned_patient_id");
-
-    if(scanned_patient_id) {
-      var fnh = document.getElementById('btnNext');
-      fnh.setAttribute('onclick', 'confirmationPage("' + scanned_patient_id + '");');
-    }
-
-    function confirmationPage(scanned_patient_id) {
-      location = '/views/confirm.html?person_id=' + scanned_patient_id;
-    }
-
-    ajaxRequest();
-    
-    </script>
-    
-    
-   </body>
- </html>
