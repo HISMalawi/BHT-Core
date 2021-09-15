@@ -108,7 +108,7 @@ function postMNID(identifier) {
   if(sessionStorage.programID == undefined)
     return;
 
-  if(sessionStorage.programID.length < 1)
+  if(sessionStorage.programID != 14)
     return;
 
   var xhttp = new XMLHttpRequest();
