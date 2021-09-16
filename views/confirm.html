@@ -1845,10 +1845,10 @@ function checkIfDemographicsUpdated(patient_id) {
   url += sessionStorage.patientID + "&program_id="+sessionStorage.programID;
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
-    console.log
     if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
       var obj = JSON.parse(this.responseText);
-      if(Object.keys(obj.diff).length !== 0) {
+      
+      if(obj.diff != null && Object.keys(obj.diff).length !== 0) {
         const f = buildDiffs(obj.diff);
         alertify
           .confirm("Demographics changed", "Patient demographics have been changed remotely.<br />Use remote demographics? " + f,  function(){
@@ -1952,6 +1952,10 @@ function userFilingNumbers() {
         }catch(e) {
           user_filing_numbers = false;
         }
+        
+        if(user_filing_numbers)
+          filingNumberPrefix();
+
       }
     }
  };
@@ -1986,7 +1990,6 @@ function closeFilingNumPopUP() {
 }
 
 userFilingNumbers();
-filingNumberPrefix();
 
 if(sessionStorage.userRoles.match(/super|admin/i)){
   document.getElementById('voidBTN').style = "display: inline; float: left; margin-left: 40px;";
