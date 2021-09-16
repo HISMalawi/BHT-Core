@@ -23,6 +23,7 @@
     <div id="content">
       <style>
   #Unknown, #whitespace{ display:none; }
+  #Unknown{ display:block; }
 
 /* .tt_controls_malawi_national_id #num , #plus, #apostrophe, #star, #char, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; } */
 
@@ -100,6 +101,12 @@
     var isValid = regex.test(mnid);
 
     if (!isValid) {
+      console.log(mnid);
+      if (mnid == 'Unknown' || mnid == 'UNKNOWN') {
+        console.log(mnid);
+        postMalawiNatioanlId();
+        return;
+      }
       showMessage("Not a valid MAlawi National ID");
     } else {
       postMalawiNatioanlId();
