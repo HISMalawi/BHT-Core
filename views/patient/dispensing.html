@@ -128,7 +128,7 @@ function doneDispensation() {
       <form>
 
         <input type="text" name="summary"
-          tt_onLoad="checkIfInBDMode();__$('keyboard').style.display = 'none';dispensingPage();initDataTable();getPrescriptions();changeNextButton();"
+          tt_onLoad="__$('keyboard').style.display = 'none';dispensingPage();initDataTable();getPrescriptions();changeNextButton();checkIfInBDMode();"
           tt_pageStyleClass= "NoControls" helpText="Dispensing" optional = "true"/>
 
 
