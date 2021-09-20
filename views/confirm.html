@@ -2241,15 +2241,166 @@ function closeEnrollProgramPoP(){
     float: left !important;
     width: 150px;
   }
+
+  #update-dde-demographics-table caption {
+    font-weight: bolder;
+    font-size: 20px;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+  }
+  
+  #mi-modal-2, #confirm-VL {
+    display: none;
+  }
+
 </style>
 
 
 <script>
-  if(sessionStorage.programID != '1'){
-   const divs = ['mi-modal-2','confirm-VL'];
-   for(const div of divs){
-    document.getElementById(div).style="display: none !important;";
-   } 
+
+  function buildDiffs(diffs) {
+    let box = document.getElementById("update-dde-demographics");
+    let table = `
+    <table id="update-dde-demographics-table">
+      <thead>
+        <caption>Demographics mismatch</caption>
+        <tr>
+          <th style="width: 20%;">&nbsp;</th>
+          <th style="width: 40%;">Local</th>
+          <th style="width: 40%;">Remote</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="headers">First name</td>
+          <td id="local_given_name">&nbsp;</td>
+          <td id="remote_given_name">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Last name</td>
+          <td id="local_family_name">&nbsp;</td>
+          <td id="remote_family_name">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Gender</td>
+          <td id="local_gender">&nbsp;</td>
+          <td id="remote_gender">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Birthdate</td>
+          <td id="local_birthdate">&nbsp;</td>
+          <td id="remote_birthdate">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Home district</td>
+          <td id="local_home_district">&nbsp;</td>
+          <td id="remote_home_district">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Home TA</td>
+          <td id="local_home_traditional_authority">&nbsp;</td>
+          <td id="remote_home_traditional_authority">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Home village</td>
+          <td id="local_home_village">&nbsp;</td>
+          <td id="remote_home_village">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Current district</td>
+          <td id="local_current_district">&nbsp;</td>
+          <td id="remote_current_district">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Current TA</td>
+          <td id="local_current_traditional_authority">&nbsp;</td>
+          <td id="remote_current_traditional_authority">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Current village</td>
+          <td id="local_current_village">&nbsp;</td>
+          <td id="remote_current_village">&nbsp;</td>
+        </tr>
+      <tbody>
+      <tfooter>
+        <tr>
+          <td>&nbsp;</td>
+          <td><button class="button blue navButton" onmousedown="alert('Local')" 
+            style="float: right;" id="continue"><span>Use local</span>
+            </button></td>
+          <td><button class="button blue navButton" onmousedown="alert('Remote');" 
+            style="float: right;" id="continue"><span>Use remote</span>
+            </button></td>
+        </tr>
+      </tfooter>
+    </table>`;
+
+    let params = ['given_name', 'family_name', 'gender', 'birthdate', 
+      'home_district', 'home_traditional_authority', 'home_village',
+      'current_traditional_authority', 'current_district', 'current_village'];
+    //
+
+    let first_name = sessionStorage.given_name;
+    let last_name = sessionStorage.family_name;
+
+    let gender = sessionStorage.patientGender;
+    let birthdate = sessionStorage.patientDOB;
+
+
+    let ancestry_district = document.getElementById('ancestry-district').innerHTML;
+    let ancestry_ta = document.getElementById('ancestry-ta').innerHTML;
+    let ancestry_village = document.getElementById('ancestry-village').innerHTML;
+    
+    let current_district = document.getElementById('current-district').innerHTML;
+    let current_ta = document.getElementById('current-ta').innerHTML;
+    let current_village = document.getElementById('current-village').innerHTML;
+    box.innerHTML = table;
+
+    for(const el of params){
+      e = document.getElementById(`remote_${el}`);
+      e2 = document.getElementById(`local_${el}`);
+      if(el.match(/given_name/)){
+        e.innerHTML = first_name;
+        e2.innerHTML = first_name;
+      } else if (el.match(/family_name/)){
+        e.innerHTML = last_name;
+        e2.innerHTML = last_name;
+      } else if (el.match(/gender/)){
+        e.innerHTML = gender;
+        e2.innerHTML = gender;
+      } else if (el.match(/birthdate/)){
+        e.innerHTML = birthdate;
+        e2.innerHTML = birthdate;
+      } else if (el.match(/home_district/)){
+        e.innerHTML = ancestry_district;
+        e2.innerHTML = ancestry_district;
+      } else if (el.match(/home_traditional_authority/)){
+        e.innerHTML = ancestry_ta;
+        e2.innerHTML = ancestry_ta;
+      } else if (el.match(/home_village/)){
+        e.innerHTML = ancestry_village;
+        e2.innerHTML = ancestry_village;
+      } else if (el.match(/current_district/)){
+        e.innerHTML = current_district;
+        e2.innerHTML = current_district;
+      } else if (el.match(/current_traditional_authority/)){
+        e.innerHTML = current_ta;
+        e2.innerHTML = current_ta;
+      } else if (el.match(/current_village/)){
+        e.innerHTML = current_village;
+        e2.innerHTML = current_village;
+      }
+    }
+
+    Object.keys(diffs).forEach(element => {
+      let el = document.getElementById(`local_${element}`);
+      let el2 = document.getElementById(`remote_${element}`);
+      el.innerHTML = (element.match(/birthdate/i) ? moment(diffs[element].local).format("DD/MMM/YYYY") : diffs[element].local);
+      el2.innerHTML = (element.match(/birthdate/i) ? moment(diffs[element].remote).format("DD/MMM/YYYY") : diffs[element].remote);
+      let tr = el.parentElement;
+      tr.style = "font-weight: bold; background-color:#f8d7da; color:#721c24;";
+    });
+
   }
 
   function buildDiffs(diffs) {
