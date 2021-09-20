@@ -2241,6 +2241,13 @@ function closeEnrollProgramPoP(){
     float: left !important;
     width: 150px;
   }
+
+  #update-dde-demographics-table caption {
+    font-weight: bolder;
+    font-size: 20px;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+  }
 </style>
 
 
@@ -2257,6 +2264,7 @@ function closeEnrollProgramPoP(){
     let table = `
     <table id="update-dde-demographics-table">
       <thead>
+        <caption>Demographics mismatch</caption>
         <tr>
           <th style="width: 20%;">&nbsp;</th>
           <th style="width: 40%;">Local</th>
@@ -2393,5 +2401,6 @@ function closeEnrollProgramPoP(){
       let tr = el.parentElement;
       tr.style = "font-weight: bold; background-color:#f8d7da; color:#721c24;";
     });
+
   }
 </script>
