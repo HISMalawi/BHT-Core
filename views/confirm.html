@@ -2248,16 +2248,15 @@ function closeEnrollProgramPoP(){
     border-style: solid;
     border-width: 0px 0px 1px 0px;
   }
+  
+  #mi-modal-2, #confirm-VL {
+    display: none;
+  }
+
 </style>
 
 
 <script>
-  if(sessionStorage.programID != '1'){
-   const divs = ['mi-modal-2','confirm-VL'];
-   for(const div of divs){
-    document.getElementById(div).style="display: none !important;";
-   } 
-  }
 
   function buildDiffs(diffs) {
     let box = document.getElementById("update-dde-demographics");
