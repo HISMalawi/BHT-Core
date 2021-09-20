@@ -2388,8 +2388,8 @@ function closeEnrollProgramPoP(){
     Object.keys(diffs).forEach(element => {
       let el = document.getElementById(`local_${element}`);
       let el2 = document.getElementById(`remote_${element}`);
-      el.innerHTML = diffs[element].local;
-      el2.innerHTML = diffs[element].remote;
+      el.innerHTML = (element.match(/birthdate/i) ? moment(diffs[element].local).format("DD/MMM/YYYY") : diffs[element].local);
+      el2.innerHTML = (element.match(/birthdate/i) ? moment(diffs[element].remote).format("DD/MMM/YYYY") : diffs[element].remote);
       let tr = el.parentElement;
       tr.style = "font-weight: bold; background-color:#f8d7da; color:#721c24;";
     });
