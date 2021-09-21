@@ -1848,14 +1848,6 @@ function checkIfDemographicsUpdated(patient_id) {
       var obj = JSON.parse(this.responseText);
       
       if(obj.diff != null && Object.keys(obj.diff).length !== 0) {
-        /*alertify
-          .confirm("Demographics changed", "Patient demographics have been changed remotely.<br />Use remote demographics? " + f,  function(){
-            refreshDemographics(patient_id);
-            alertify.success('Successfully updated');
-        },
-        function(){
-          alertify.error('Update Cancelled');
-        });*/
         document.getElementById("page-cover").style = 'display: inline;';
         document.getElementById("update-dde-demographics").style = 'display: inline;';
         buildDiffs(obj.diff);
@@ -2328,7 +2320,7 @@ function closeEnrollProgramPoP(){
           <td><button class="button blue navButton" onmousedown="alert('Local')" 
             style="float: right;" id="continue"><span>Use local</span>
             </button></td>
-          <td><button class="button blue navButton" onmousedown="alert('Remote');" 
+          <td><button class="button blue navButton" onmousedown="refreshDemographics(sessionStorage.patient_id)"
             style="float: right;" id="continue"><span>Use remote</span>
             </button></td>
         </tr>
