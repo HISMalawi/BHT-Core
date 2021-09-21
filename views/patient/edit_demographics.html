@@ -132,8 +132,8 @@ function fetchDemographics(){
           });
 
           let ancentory_district = results.person.addresses[0].address2;
-          let ancentory_ta = results.person.addresses[0].neighborhood_cell;
-          let ancentory_village = results.person.addresses[0].county_district;
+          let ancentory_ta = results.person.addresses[0].county_district;
+          let ancentory_village = results.person.addresses[0].neighborhood_cell;
           values.push({
             title: 'Ancentory address',
             value: `${ancentory_district} | ${ancentory_ta} | ${ancentory_village}`,
