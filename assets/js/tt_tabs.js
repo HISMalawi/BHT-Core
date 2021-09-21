@@ -1,106 +1,103 @@
 // use 'esversion: 6';
 
 class ttTabsPlugin {
-    load(target, items) {
-        let content = document.createElement('div');
-        content.setAttribute("id", "ttp-tabs-content");
-        target.appendChild(content);
-
-        let tabSelectPane = document.createElement('div');
-        tabSelectPane.setAttribute("id", "ttp-tabs-select-pane");
-        tabSelectPane.setAttribute("class", "ttp-tabs-container");
-        content.appendChild(tabSelectPane);
-
-        let tabView = document.createElement('div');
-        tabView.setAttribute("id", "tt-tabs-tab-view");
-        tabView.setAttribute("class", "ttp-tabs-container");
-        content.appendChild(tabView);
+    load(target, records) {
+        let left_content = `<div class="inner-duplicate-table">`;
         
-        let tabPills = document.createElement('ul');
-        tabSelectPane.appendChild(tabPills);
-
-        items.forEach((item) => {
+        records.forEach((item) => {
             let person = item.person;
-            let li = document.createElement("li");
-            let ul2 = document.createElement("ul");
-            ul2.style.padding = 0;
-            let li2 = document.createElement("li");
-            li2.style.marginLeft = "10%";
-            li2.setAttribute("class", "list2");
-            li.setAttribute("id", "duplicate_" + person.id);
-            li.setAttribute("onmousedown", "setDOCID('" + person.id + "')");
-            li2.setAttribute("id", person.given_name);
-            li2.innerHTML= "<strong>DOB:</strong> " + person.birthdate + " <br> <strong>home village:</strong>" + person.home_village;
-            // li2.innerHTML = person.home_village;
-            li.innerHTML = person.given_name + " " + person.family_name;
-            li.addEventListener("click", () => {
-                this._clearSelection(tabSelectPane);
-                li.classList.add('ttp-selected-item');
-                this._displayDuplicate(item, tabView);
-            });
-            tabPills.appendChild(li);
-            li.appendChild(ul2);
-            ul2.appendChild(li2);
+            let birthdate = (person.birthdate ? moment(person.birthdate).format("DD/MMM/YYYY") : 'N/A');
+            left_content += `<div class="inner-duplicate-table-row">
+                <div id="client-${person.id}" class="inner-duplicate-table-cell client-cards">
+                    <table>
+                        <tr>
+                            <td>Name:</td><th>${person.given_name}&nbsp;${person.family_name}</th>
+                        </tr>
+                        <tr>
+                            <td>DOB:</td><th>${birthdate}&nbsp;${person.gender ? '(' + person.gender + ')' : null}&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td>Home district:</td><th>${person.home_district}</th>
+                        </tr>
+                        <tr>
+                            <td>Home TA:</td><th>${person.home_traditional_authority}</th>
+                        </tr>
+                        <tr>
+                            <td>Home village:</td><th>${person.home_village}</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>`;
+            
         });
+        left_content += "</div>";
 
-        // Open first tab
-        let tabSelector = tabSelectPane.querySelector("li:first-child");
-        tabSelector.classList.add('ttp-selected-item');
-        this._displayDuplicate(items[0], tabView);
+        let innerContent = `<div class="duplicate-table">
+            <div class="duplicate-table-row">
+                <div class="duplicate-table-cell" id="duplicate-table-cell-left">${left_content}</div>
+                <div class="duplicate-table-cell" id="duplicate-table-cell-right">&nbsp;</div>
+            </div>
+        </div>`;
+
+        target.innerHTML = innerContent;
+        records.forEach((item) => {
+            let person = item.person;
+            let div = document.getElementById(`client-${person.id}`);
+            div.addEventListener("click", () => {
+                setDOCID(`'${person.id}'`);
+                this.calculateScore(item);
+            });
+        });
     }
 
-    _displayDuplicate(duplicate, cell) {
-        let {score, person} = duplicate;
-
-        // Clear cell
-        cell.innerHTML = '';
-
-        let heading = document.createElement("h1");
-        heading.innerHTML = (score * 100) + '% match';
-        cell.appendChild(heading);
-
-        let personTable = document.createElement("table");
-        cell.appendChild(personTable);
+    calculateScore(el){
+        const score = el.score * 100;
+        const person = el.person;
+        let birthdate = (person.birthdate ? moment(person.birthdate).format("DD/MMM/YYYY") : 'N/A');
+        let gender = person.gender ? person.gender.toUpperCase() : '';
+        let innerContent = `<div class="score-table">
+            <div class="score-table-row">
+                <div class="score-table-cell">
+                  <h1>Match Score&nbsp;<span id="percentage-score">${score}%</span></h1>
+                </div>
+            </div>
+            <div class="score-table-row">
+                <div class="score-table-cell">
+                    <table>
+                        <tr>
+                            <td>First name:</td><th>${person.given_name}</th>
+                        </tr>
+                        <tr>
+                            <td>Last name:</td><th>${person.family_name}</th>
+                        </tr>
+                        <tr>
+                            <td>Birthdate:</td><th>${birthdate}</th>
+                        </tr>
+                        <tr>
+                            <td>Gender:</td><th>${gender.match(/F/i) ? 'Female' : (gender == '' ? 'N/A' : 'Male')}</th>
+                        </tr>
+                        <tr>
+                            <td>Home district:</td><th>${person.home_district}</th>
+                        </tr>
+                        <tr>
+                            <td>Home TA:</td><th>${person.home_traditional_authority}</th>
+                        </tr>
+                        <tr>
+                            <td>Home village:</td><th>${person.home_village}</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>`;
         
-        let personTableBody = document.createElement("tbody");
-        personTable.appendChild(personTableBody);
-
-        for (let field in person) {
-            if (field.match(/_soundex$/) || field.match(/^id$/)) {
-                continue;
-            }
-            this.addRowToTable(personTableBody, field, person);
+        let selectedCard = document.getElementById(`client-${person.id}`);
+        let cards = document.getElementsByClassName('client-cards');
+        for(const card of cards) {
+         card.style = "background: hsl(0 0% 100%);";
         }
-    }
-
-    _clearSelection(tabSelectPane) {
-        let selected = tabSelectPane.getElementsByClassName("ttp-selected-item");
-        for (let i = 0; i < selected.length; i++) {
-            let tabSelector = selected[i];
-            tabSelector.classList.remove("ttp-selected-item");
-        }
-    }
-
-    addRowToTable(table, field, person) {
-        let value = person[field] ;
-
-        let row = document.createElement("tr");
-        table.appendChild(row);
-
-    
-            let titleCell = document.createElement("td");
-            titleCell.innerHTML = field.replace(/_+/, ' ') + ": ";
-            row.appendChild(titleCell);
         
-        if (field === 'given_name') {
-            let valueCell = document.createElement("td");
-            // let filename = person.gender.toUpperCase() === "M" ? "male.gif" : "female.gif";
-            valueCell.innerHTML = /* '<img src="touchscreentoolkit/lib/images/' + filename + '" />' + */ value;
-            row.appendChild(valueCell);
-        } else {
-            let valueCell = document.createElement("td");
-            valueCell.innerHTML = value;
-            row.appendChild(valueCell);
-        }
+        selectedCard.style = "background: lightblue;"
+        document.getElementById("duplicate-table-cell-right").innerHTML = innerContent;
     }
+
 }

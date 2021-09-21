@@ -269,7 +269,7 @@
         
     function setDOCID(doc_id) {
 		var nextbtn = document.getElementById("nextButton");
-		nextbtn.setAttribute("onmousedown","importPatient('"+doc_id+"')");
+		nextbtn.setAttribute("onmousedown",`importPatient(${doc_id});`);
 		nextbtn.setAttribute("class","button navButton green");
 		nextbtn.innerHTML = "<span>Select</span>";
     }

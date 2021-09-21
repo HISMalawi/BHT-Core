@@ -1,52 +1,81 @@
-#ttp-tabs-content .ttp-tabs-container {
-    display: inline-block;
-    padding: 10px;
-    max-height: 550px;
-    height: 90%;
-}
-
-#ttp-tabs-select-pane {
-    border-right: 1px solid #777;
-    min-width: 25%;
-    float: left;
-    overflow-y: scroll;
-}
-
-#ttp-tabs-tab-view {
-    min-width: 75%;
-    float: right;
-    box-sizing: content-box;
-}
-
-td {
-    text-transform: capitalize;
-    /* padding: 10px; */
-}
-
-#ttp-tabs-tab-view table {
+.duplicate-table {
+    display: table;
+    height:95%;
     width: 100%;
 }
 
-#ttp-tabs-select-pane > ul {
-    list-style-type: none;
-    padding: 0;
+.duplicate-table-row {
+    display: table-row;
 }
 
-#ttp-tabs-select-pane  > ul > li {
-    border-bottom: 1px solid #777;
-    margin-bottom: 10px;
+.duplicate-table-cell {
+    display: table-cell;
+    padding: 10px;
+    position: inherit;
+    vertical-align: top;
 }
 
-
-.list2 {
-    font-size: 11pt;
-    list-style-type: none;
-    font-style: italic;
-    margin-left: 10%;
+#duplicate-table-cell-right {
+    width: 55%;
+    border-width: 0px 0px 0px 1px;
+    border-style: solid;
 }
 
-/* Used for highlighting tab buttons when selected. */
-.ttp-selected-item {
-    color: blue;
-    font-weight: bolder;
+#duplicate-table-cell-left {
+    width: 45%;
+    overflow: auto;
+}
+
+#duplicate-table-cell-right h1 {
+    font-size: 45px;
+}
+
+.inner-duplicate-table {
+    display: table;
+    width: 100%;
+}
+
+.inner-duplicate-table-row {
+    display: table-row;
+}
+
+.inner-duplicate-table-cell {
+    display: table-cell;
+}
+
+.inner-duplicate-table-cell {
+    border-style: solid;
+    box-shadow: 0 1rem 2rem hsl(0 0% 0% / 20%);
+    background: hsl(0 0% 100%);
+    color: hsl(200 50% 20%);
+    line-height: 1.5;
+    border: 1px solid hsl(0 0% 83%);
+}
+
+.inner-duplicate-table-cell table {
+    width: 100%;
+    border-collapse: separate;
+    margin: 5px;
+    border-spacing: 20px;
+    color: black;
+    line-height: 0px;
+    text-align: left;
+}
+
+.score-table {
+    display: table;
+    width: 100%;
+}
+
+.score-table-row {
+    display: table-row;
+}
+
+.score-table-cell {
+    display: table-cell;
+}
+
+.score-table table {
+    width: 100%;
+    text-align: left;
 }
