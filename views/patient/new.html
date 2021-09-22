@@ -801,20 +801,38 @@
 
             function potentialduplicateCheck() {
                 var inputFrame = document.getElementById('inputFrame' + tstCurrentPage);
-                helpText = __$('helpText' + tstCurrentPage);
-                helpText.innerHTML = "<b>Name:</b> " +  __$('given_name').value;
-                helpText.innerHTML += " " + __$('family_name').value;
-                helpText.innerHTML += " (" + __$('gender').value + ")";
-                helpText.innerHTML += "<br />";
-                helpText.innerHTML += "<b style='margin-left: 1.9%;'>Home district:</b> " + homeDistrict;
-                helpText.innerHTML += " <b>Home Ta:</b> " + homeTA;
-                helpText.innerHTML += " <b>Home village:</b> " +homeVillage;
-                helpText.setAttribute("style","font-size: 20px;");
+                var date_estimated = 0;
+                if (__$('person_birth_year').value !== "Unknown") {
+                    birth_date = new Date(__$('person_birth_year').value + "/" + __$('person_birth_month').value + "/" + __$('person_birth_day').value);
+                    birth_date = moment(birth_date).format("DD/MMM/YYYY");
+                } else if (__$('person_birth_year').value === "Unknown") {
+                    date_estimated = 1;
+                    birth_date = moment().subtract(parseInt(__$('person_age_estimate').value), "years").format("YYYY");
+                    birth_date = birth_date + "-07-01";
+                }
+                if (__$('person_birth_year').value !== "Unknown" && __$('person_birth_month').value === "Unknown") {
+                    date_estimated = 1;
+                    birth_date = __$('person_birth_year').value + "-07-01";
+                }
+                if (__$('person_birth_year').value !== "Unknown" && __$('person_birth_month').value !== "Unknown" && __$('person_birth_day').value === "Unknown") {
+                    date_estimated = 1;
+                    birth_date = __$('person_birth_year').value + "-" + __$('person_birth_month').value + "-15";
+                }
+
+                newClient = {
+                    given_name: __$('given_name').value,
+                    family_name: __$('family_name').value,
+                    gender: (__$('gender').value == "F" ? "Female" : "Male"),
+                    birthdate: `${moment(birth_date).format("DD/MMM/YYYY")} ${date_estimated == 1 ? "(estimated)" : ""}`,
+                    home_district: homeDistrict,
+                    home_ta: homeTA,
+                    home_village: homeVillage
+                };
 
                 tabs = new ttTabsPlugin();
                 inputView = document.getElementById('inputFrame' + tstCurrentPage);
                 inputView.setAttribute("style","height: 90%; width: 96%;");
-                tabs.load(inputView, potential_duplicates_arr);
+                tabs.load(inputView, potential_duplicates_arr, newClient);
             }
 
             function culBirthdate() {
@@ -1209,8 +1227,9 @@
             <input id="identifier" name="identifier" type="hidden" value="" />
 
             <input name="commit" type="submit" value="Create person" /> -->
-             <input  helpText="" id="duplicates" name="duplicates" 
+             <input id="duplicates" name="duplicates" 
              condition="duplicatesAvailable() == true;"
+             helpText="Possible duplicate(s)"
              optional="true" tt_onLoad="potentialduplicateCheck();removeClear(); __$('keyboard').style.display = 'none'; disablebutton();" 
              tt_onUnLoad="addClear();removeDuplicatesButton();" tt_pageStyleClass="NoControls" type="text" />           
 

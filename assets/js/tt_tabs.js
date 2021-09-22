@@ -1,7 +1,7 @@
 // use 'esversion: 6';
 
 class ttTabsPlugin {
-    load(target, records) {
+    load(target, records, newClient) {
         let left_content = `<div class="inner-duplicate-table">`;
         
         records.forEach((item) => {
@@ -11,19 +11,16 @@ class ttTabsPlugin {
                 <div id="client-${person.id}" class="inner-duplicate-table-cell client-cards">
                     <table>
                         <tr>
+                            <th colspan="2" style="border-style: solid; border-width: 0px 0px 1px 0px;font-size: 20px; 
+                                text-align: right; padding-bottom: 10px;">
+                                    ${item.score * 100}%
+                            </td>
+                        </tr>
+                        <tr>
                             <td>Name:</td><th>${person.given_name}&nbsp;${person.family_name}</th>
                         </tr>
                         <tr>
                             <td>DOB:</td><th>${birthdate}&nbsp;${person.gender ? '(' + person.gender + ')' : null}&nbsp;</th>
-                        </tr>
-                        <tr>
-                            <td>Home district:</td><th>${person.home_district}</th>
-                        </tr>
-                        <tr>
-                            <td>Home TA:</td><th>${person.home_traditional_authority}</th>
-                        </tr>
-                        <tr>
-                            <td>Home village:</td><th>${person.home_village}</th>
                         </tr>
                     </table>
                 </div>
@@ -45,12 +42,12 @@ class ttTabsPlugin {
             let div = document.getElementById(`client-${person.id}`);
             div.addEventListener("click", () => {
                 setDOCID(`'${person.id}'`);
-                this.calculateScore(item);
+                this.calculateScore(item, newClient);
             });
         });
     }
 
-    calculateScore(el){
+    calculateScore(el, newClient){
         const score = el.score * 100;
         const person = el.person;
         let birthdate = (person.birthdate ? moment(person.birthdate).format("DD/MMM/YYYY") : 'N/A');
@@ -65,25 +62,30 @@ class ttTabsPlugin {
                 <div class="score-table-cell">
                     <table>
                         <tr>
-                            <td>First name:</td><th>${person.given_name}</th>
+                            <td>&nbsp;</td><td>New clinet</td><td>Existing client</td>
+                        </tr>
+                        <tr><td colspan="3"><hr /></td></tr>
+                        <tr>
+                            <td>First name:</td><th>${newClient.given_name}</th><th>${person.given_name}</th>
                         </tr>
                         <tr>
-                            <td>Last name:</td><th>${person.family_name}</th>
+                            <td>Last name:</td><th>${person.family_name}</th><th>${person.family_name}</th>
                         </tr>
                         <tr>
-                            <td>Birthdate:</td><th>${birthdate}</th>
+                            <td>Birthdate:</td><th>${newClient.birthdate}</th><th>${birthdate}</th>
                         </tr>
                         <tr>
-                            <td>Gender:</td><th>${gender.match(/F/i) ? 'Female' : (gender == '' ? 'N/A' : 'Male')}</th>
+                            <td>Gender:</td><th>${newClient.gender}</th>
+                            <th>${gender.match(/F/i) ? 'Female' : (gender == '' ? 'N/A' : 'Male')}</th>
                         </tr>
                         <tr>
-                            <td>Home district:</td><th>${person.home_district}</th>
+                            <td>Home district:</td><th>${newClient.home_district}</th><th>${person.home_district}</th>
                         </tr>
                         <tr>
-                            <td>Home TA:</td><th>${person.home_traditional_authority}</th>
+                            <td>Home TA:</td><th>${newClient.home_ta}</th><th>${person.home_traditional_authority}</th>
                         </tr>
                         <tr>
-                            <td>Home village:</td><th>${person.home_village}</th>
+                            <td>Home village:</td><th>${newClient.home_village}</th><th>${person.home_village}</th>
                         </tr>
                     </table>
                 </div>
