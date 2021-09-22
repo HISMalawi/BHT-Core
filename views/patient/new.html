@@ -254,6 +254,9 @@
             f.appendChild(table);
         }
         function disablebutton() {
+            let nextButton = document.getElementById("nextButton");
+            nextButton.setAttribute("onmousedown","");
+            nextButton.innerHTML = "<span>Select</span>";
             addButton();
         }
         
@@ -296,20 +299,23 @@
         }
     }
     function addButton() {
-        if(document.getElementById("newBtn") == null) {
+        if(!document.getElementById("newBtn")) {
             var footer = document.getElementById('buttons');
             var newbutton = document.createElement('button');
             newbutton.setAttribute('id', 'newBtn');
-            newbutton.setAttribute('onmousedown', 'gotoNextPage();');
+            newbutton.setAttribute('onmousedown', 'removeDuplicatesButton();gotoNextPage();');
             newbutton.innerHTML="<span>Not a duplicate</span>";
-        footer.appendChild(newbutton);
+            footer.appendChild(newbutton);
         }else if(document.getElementById("newBtn").style.display != "block") {
            document.getElementById("newBtn").style.display = "block";
         }
             
     }
+
      function removeDuplicatesButton() {
-           document.getElementById("newBtn").style.display = "none";
+        if(__$("newBtn"))
+            __$("newBtn").style = "display:none;";
+
     }   
 
     function importID(reassign_link) {
@@ -1212,6 +1218,7 @@
             <select allowFreeText="false" helpText="Register guardian?"
                     id="guardian_present"
                     name="guardian_present"
+                    tt_onLoad="removeDuplicatesButton();"
                     condition="showTypeOfPatient() == true;"
                     ttMatchFromBeginning="true">
                 <option value="Yes">Yes</option>
@@ -1231,7 +1238,7 @@
              condition="duplicatesAvailable() == true;"
              helpText="Possible duplicate(s)"
              optional="true" tt_onLoad="potentialduplicateCheck();removeClear(); __$('keyboard').style.display = 'none'; disablebutton();" 
-             tt_onUnLoad="addClear();removeDuplicatesButton();" tt_pageStyleClass="NoControls" type="text" />           
+             tt_onUnLoad="removeDuplicatesButton();" tt_pageStyleClass="NoControls" type="text" />           
 
             <input type="text" name="summary" id="summary"
                    tt_onLoad="summary();__$('keyboard').style.display = 'none';changeFinishBtn();"
