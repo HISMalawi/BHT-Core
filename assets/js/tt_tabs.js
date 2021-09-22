@@ -32,7 +32,7 @@ class ttTabsPlugin {
         let innerContent = `<div class="duplicate-table">
             <div class="duplicate-table-row">
                 <div class="duplicate-table-cell" id="duplicate-table-cell-left">${left_content}</div>
-                <div class="duplicate-table-cell" id="duplicate-table-cell-right">&nbsp;</div>
+                <div class="duplicate-table-cell" id="duplicate-table-cell-right">${this.rightDiv(newClient)}</div>
             </div>
         </div>`;
 
@@ -62,7 +62,7 @@ class ttTabsPlugin {
                 <div class="score-table-cell">
                     <table>
                         <tr>
-                            <td>&nbsp;</td><td>New clinet</td><td>Existing client</td>
+                            <td>&nbsp;</td><td>New client</td><td>Existing client</td>
                         </tr>
                         <tr><td colspan="3"><hr /></td></tr>
                         <tr>
@@ -100,6 +100,48 @@ class ttTabsPlugin {
         
         selectedCard.style = "background: lightblue;"
         document.getElementById("duplicate-table-cell-right").innerHTML = innerContent;
+    }
+
+    rightDiv(newClient){
+        return `<div class="score-table">
+            <div class="score-table-row">
+                <div class="score-table-cell">
+                  <h1>Match Score&nbsp;<span id="percentage-score">&nbsp;-&nbsp;</span></h1>
+                </div>
+            </div>
+            <div class="score-table-row">
+                <div class="score-table-cell">
+                    <table>
+                        <tr>
+                            <td>&nbsp;</td><td>New client</td><td>Existing client</td>
+                        </tr>
+                        <tr><td colspan="3"><hr /></td></tr>
+                        <tr>
+                            <td>First name:</td><th>${newClient.given_name}</th><th>&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td>Last name:</td><th>${newClient.family_name}</th><th>&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td>Birthdate:</td><th>${newClient.birthdate}</th><th>&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td>Gender:</td><th>${newClient.gender}</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td>Home district:</td><th>${newClient.home_district}</th><th>&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td>Home TA:</td><th>${newClient.home_ta}</th><th>&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td>Home village:</td><th>${newClient.home_village}</th><th>&nbsp;</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>`;
     }
 
 }
