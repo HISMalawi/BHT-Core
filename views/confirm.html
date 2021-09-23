@@ -483,7 +483,7 @@ var global_property = GlobalProperty({
        let address = person.person.addresses[0]
 
        if (person.person.gender == '' || names.given_name == '' || names.family_name == '' || address.address2 == ''
-        || address.neighborhood_cell == '' || address.county_district == '' || address.state_province == '' || address.township_division == '' || address.city_village == '' ) {
+        || address.neighborhood_cell == '' || address.county_district == '' || address.state_province == '' || address.township_division == '' || address.city_village == ''  || person.person.birthdate == '') {
         return false
        } else {
         return true
@@ -936,6 +936,36 @@ var global_property = GlobalProperty({
       );
       req.send(null);
     } catch (e) {}
+  }
+
+  function updateDDE(diff) {
+      var url =
+        sessionStorage.apiProtocol + "://" +
+        apiURL +
+        ":" +
+        apiPort +
+        "/api/v1/people/" +
+        patient_id;
+      var xhr = new XMLHttpRequest();
+      xhr.open("PUT", url);
+      xhr.setRequestHeader(
+        "Authorization",
+        sessionStorage.getItem("authorization")
+      );
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      xhr.onreadystatechange = function () {
+         if (xhr.readyState === 4) {
+            console.log(xhr.status);
+            console.log(xhr.responseText);
+            location.reload();
+         }};
+
+      diff.program_id = sessionStorage.programID
+
+      var data = JSON.stringify(diff);
+
+      xhr.send(data);
   }
 
   function buildAlerts(patient_id) {
@@ -2249,8 +2279,10 @@ function closeEnrollProgramPoP(){
 
 
 <script>
+  let local_differences = {}
 
   function buildDiffs(diffs) {
+
     let box = document.getElementById("update-dde-demographics");
     let table = `
     <table id="update-dde-demographics-table">
@@ -2317,7 +2349,7 @@ function closeEnrollProgramPoP(){
       <tfooter>
         <tr>
           <td>&nbsp;</td>
-          <td><button class="button blue navButton" onmousedown="alert('Local')" 
+          <td><button class="button blue navButton" onmousedown="updateDDE(local_differences)"
             style="float: right;" id="continue"><span>Use local</span>
             </button></td>
           <td><button class="button blue navButton" onmousedown="refreshDemographics(sessionStorage.patient_id)"
@@ -2384,14 +2416,17 @@ function closeEnrollProgramPoP(){
       }
     }
 
+
     Object.keys(diffs).forEach(element => {
       let el = document.getElementById(`local_${element}`);
       let el2 = document.getElementById(`remote_${element}`);
       el.innerHTML = (element.match(/birthdate/i) ? moment(diffs[element].local).format("DD/MMM/YYYY") : diffs[element].local);
       el2.innerHTML = (element.match(/birthdate/i) ? moment(diffs[element].remote).format("DD/MMM/YYYY") : diffs[element].remote);
       let tr = el.parentElement;
+      local_differences[element] = document.getElementById(`local_${element}`).innerHTML
       tr.style = "font-weight: bold; background-color:#f8d7da; color:#721c24;";
     });
 
   }
+
 </script>
