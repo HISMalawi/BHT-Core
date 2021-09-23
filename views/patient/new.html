@@ -1140,7 +1140,7 @@
                    <div id="malawi" style="background-color: black;">
                     <input type="text" name="malawiNationalId" id="malawiNationalId" textCase="upper"
                     style="font-weight:bold;font-size:58px;margin-bottom: 15px;border-style: solid; border-width: 0px 0px 2px 0px; width: 99%; border-color: black;text-transform: uppercase;"
-                    tt_onLoad=""
+                    tt_onLoad="addScanBody()"
                     condition="isProgramOPD() == true"
                     field_type="number"
                     helpText="Malawi National ID"
@@ -1601,9 +1601,13 @@
   }
 
   function scanMNID(e) {
+      console.log("HEllo malawi");
+
       var sca =e.value.split('<');
       if (typeof(sca) == "undefined") {
+          console.log('sca: ',sca);
         return;
+        
       }
       else {
         sca = sca['1'];
@@ -1613,7 +1617,7 @@
   }
   
    function addScanBody() {
-    var elements = document.getElementsByName('malawiNationalId');
+    var elements = document.getElementById('touchscreenInput16');
     var barCodeInner = document.createElement('div');
     var table = document.createElement('table');
     var t_row = document.createElement('tr');
@@ -1628,7 +1632,7 @@
     img.setAttribute('style','height: 97px; vertical-align: middle;');
     t_colunm_1.append(img);
     t_row.appendChild(t_colunm_1);
-    t_colunm_2.append(elements[0]);
+    t_colunm_2.append(elements);
     //elements[0].remove();
     t_row.appendChild(t_colunm_2);
     table.append(t_row);
