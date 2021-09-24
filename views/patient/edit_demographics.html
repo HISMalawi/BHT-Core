@@ -46,6 +46,38 @@
   .data {
     padding-left: 15px;
   }
+
+  #incomplete-demographics {
+    background: #ffffff;
+    border-radius: 0.5em;
+    box-shadow: 0 10px 20px rgba(black, 0.2);
+    left: 50%;
+    max-width: 90%;
+    position: absolute;
+    top: 36%;
+    transform: translate(-50%, -50%);
+    width: 30em;
+    text-align: left;
+    max-height: 90vh;
+    flex-direction: column;
+    z-index: 1000000;
+    border-color: black;
+    border-style: solid;
+    display: none;
+  }
+
+  #page-cover {
+    display: none;
+    position: absolute;
+    background-color: black;
+    width: 100%;
+    height: 102%;
+    left: 0%;
+    top: 0%;
+    z-index: 999;
+    opacity: 0.65;
+  }
+
 </style>
 
 <body id="mateme">
@@ -60,6 +92,25 @@
         </form>
 
   </div>
+
+  <div id="incomplete-demographics">
+  <div id="enrolled-program-inner">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h1 style="text-align: center" class="text-uppercase">
+          Client does not have complete Demographics </p>
+          Please update
+        </h1>
+      </div>
+      <div class="modal-footer">
+          <button class="button green navButton" onmousedown="closeDiv('incomplete-demographics');closeDiv('page-cover')"
+          style="float: right; width: 120px;" id="continue"><span>Ok</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-cover"></div>
 </body>
 
 
@@ -70,9 +121,24 @@ mainUrl = new URL(mainUrl);
 mainUrl.searchParams.get("source") ? (source = mainUrl.searchParams.get("source")) : source;
 
 function finishButton() {
-  let url = source == 'Patient Dashboard' ? `/views/patient_dashboard.html?patient_id=${sessionStorage.patientID}`
-    : `/views/confirm.html?person_id=${sessionStorage.patientID}`;
-  window.location  = url;
+  var complete = CheckAllFieldsComplete()
+  if (complete == true){
+    let url = source == 'Patient Dashboard' ? `/views/patient_dashboard.html?patient_id=${sessionStorage.patientID}`
+      : `/views/confirm.html?person_id=${sessionStorage.patientID}`;
+    window.location  = url;
+  }else{
+    document.getElementById('incomplete-demographics').style="display:inline";
+    document.getElementById('page-cover').style="display:inline";
+  }
+}
+
+function closeDiv(id) {
+  var x = document.getElementById(id);
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
 }
 
 function configCancelBTN() {
@@ -108,6 +174,7 @@ function fetchDemographics(){
           let values = []
           values.push({
             title: 'Name',
+            id: 'name',
             value: results.person.names[0].given_name + " " + results.person.names[0].family_name,
             function: 'editName'
           });
@@ -179,6 +246,20 @@ function fetchDemographics(){
         req.send(null);
     } catch (e) {
     }
+}
+
+function CheckAllFieldsComplete() {
+  for ( let i = 0; i < document.getElementById("demographics").rows.length - 1; i++) {
+    if (i == 0) {
+      if (document.getElementById("demographics").rows[i].cells[1].innerHTML.split(" ").includes(' ') && !sessionStorage.userRoles.includes('Program Manager')) {
+        return false
+      }
+    }
+    if (document.getElementById("demographics").rows[i].cells[1].innerHTML.split("|").includes(' ') && !sessionStorage.userRoles.includes('Program Manager')) {
+      return false
+    }
+  }
+  return true
 }
 
 function editName() {
