@@ -470,22 +470,23 @@
         var data = document.getElementById("vitals-input").value;
         var validation_result = false;
 
-        if (activeInput.id.match(/weight/i)) {
-            validation_result = validateWeight(data);
-        } else if (activeInput.id.match(/height/i)) {
-            validation_result = validateHeight(data);
-        } else if (activeInput.id.match(/bp/i)) {
-            validation_result = validateBP(data);
-        } else if (activeInput.id.match(/Temp/i)) {
-            validation_result = validateTemp(data);
-        } else if (activeInput.id.match(/SPO2/i)) {
-            validation_result = validateSPO2(data);
-        } else if (activeInput.id.match(/Pulse/i)) {
-            validation_result = validatePulse(data);
-        } else {
-            validation_result = true;
-        }
+        if (activeInput.id.match(/weight/i)) 
+            validation_result = validateWeight(data.replace(/\s/g,''));
 
+        if (activeInput.id.match(/height/i)) 
+            validation_result = validateHeight(data);
+
+        if (activeInput.id.match(/bp/i)) 
+            validation_result = validateBP(data);
+
+        if (activeInput.id.match(/Temp/i))
+            validation_result = validateTemp(data);
+
+        if (activeInput.id.match(/SPO2/i))
+            validation_result = validateSPO2(data);
+
+        if (activeInput.id.match(/Pulse/i))
+            validation_result = validatePulse(data);
 
         return validation_result;
     }
@@ -570,13 +571,13 @@
         }
 
         if (temp < 35 && temp >= 30) {
-
             showValidate("temperature reading is too low");
             return false;
         }
 
         if (temp < 30) {
             showMessage("temperature is too low");
+            return false;
         }
 
         if (temp > 42) {
@@ -612,16 +613,10 @@
             maxValue = 250;
             absMaxValue = 300;
         }
-        if (weight.trim().length < 1)
-            return true;
 
-        if (!(weight.indexOf("/") == -1)) {
-            showMessage("Please remove /.");
-            return false;
-        }
-
-        if (!(weight.indexOf("%") == -1)) {
-            showMessage("Please remove %.");
+        let converted_weight = parseFloat(weight).toFixed(1);
+        if(converted_weight.toString() != weight){
+            showMessage("Please enter a valid weight. Not forgetting to add a decimal.<br />For example; 45.6");
             return false;
         }
 
@@ -630,32 +625,14 @@
             return false;
         }
 
-        if (!isNumeric(weight)) {
-            showMessage("Not a valid weight - please enter a valid weight.");
+
+        if (parseFloat(weight) < parseFloat(minValue) || parseFloat(weight) < parseFloat(absMinValue)) {
+            showMessage(`Weight entered is less than minimum ${minValue}.0`);
             return false;
         }
 
-        if (weight < minValue || weight < absMinValue) {
-            showMessage("Weight entered is less than minimum " + minValue + ".0");
-            return true;
-        }
-
-        if (weight > maxValue || weight > absMaxValue) {
-            showMessage("Weight entered is greater than maximum " + maxValue + ".0");
-            return true;
-        }
-
-        var afterDecimal = [];
-        afterDecimal.push(weight);
-        afterDecimal = afterDecimal.join(",").split(".")[1];
-
-        if (afterDecimal == undefined) {
-            showMessage('Please include a valid number<br />after the "."');
-            return false;
-        }
-
-        if (!isNumeric(afterDecimal)) {
-            showMessage('Please include a valid number<br />after the "."');
+        if (parseFloat(weight) > parseFloat(maxValue) || parseFloat(weight) > parseFloat(absMaxValue)) {
+            showMessage(`Weight entered is greater than maximum ${maxValue}.0`);
             return false;
         }
 
@@ -663,31 +640,14 @@
     }
 
     function validateHeight(height) {
-        if (height.trim().length < 1)
-            return true;
-
-        if (!(height.indexOf("/") == -1)) {
-            showMessage("Please remove /.");
+        let converted_height = parseInt(height);
+        if(converted_height.toString() != height){
+            showMessage("Please enter a valid number, do <b>NOT</b> add a decimal.<br />For example; 160");
             return false;
         }
 
-        if (!(height.indexOf("%") == -1)) {
-            showMessage("Please remove %.");
-            return false;
-        }
-
-        if (!isNumeric(height)) {
-            showMessage("Not a valid height - please enter a valid height.");
-            return false;
-        }
-
-        if (!isNumeric(height)) {
-            showMessage("Not a valid height - please enter a valid height.");
-            return false;
-        }
-
-        if (height > 220 || height < 40) {
-            showMessage("height is out of range");
+        if (!(parseInt(height) >= 40 && parseInt(height) <= 220)) {
+            showMessage(`Height is out of range.<br />Range is between 40 and 220`);
             return false;
         }
 
@@ -813,24 +773,23 @@
     function validateEntries() {
 
         var validationANS = validateUserInput();
-        if (!validationANS)
+        if (!validationANS){
             return;
-
-        if(show_bp_only == false) {
-          if (document.getElementById("td-Weight").innerHTML.length < 1) {
-              showMessage("Weight can not be empty");
-              return;
-          }
-          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.patientAge < 18) {
-              showMessage("Height can not be empty");
-              return;
-          }
-          if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.currentHeight == 0) {
-              showMessage("Height can not be empty");
-              return;
-          }
+        }else{
+            if(show_bp_only == false) {
+                if (document.getElementById("td-Weight").innerHTML.length < 1) {
+                    showMessage("Weight can not be empty");
+                    return;
+                }else if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.patientAge < 18) {
+                    showMessage("Height can not be empty");
+                    return;
+                }else if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.currentHeight == 0) {
+                    showMessage("Height can not be empty");
+                    return;
+                }
+            }
+            submitVitals();
         }
-        submitVitals();
     }
 
     function confirmIfWeightIsEntered() {
