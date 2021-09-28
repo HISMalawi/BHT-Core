@@ -115,7 +115,15 @@
   }
 
   function postMalawiNatioanlId() {
-    mnid = value = $('touchscreenInput' + tstCurrentPage).value;;
+
+    mnid = value = $('touchscreenInput' + tstCurrentPage).value;
+
+    var ACTION =  'PATCH';
+
+    if ( patient_identifier_id == '') {
+      ACTION = 'POST';
+    }
+    
     var identifier_type = 28;
 
     var http = new XMLHttpRequest();
@@ -138,17 +146,20 @@
     }
     params = JSON.stringify(params);
 
-    http.open('PATCH', url, true);
+    http.open(ACTION, url, true);
     //Send the proper header information along with the request
     http.setRequestHeader('Content-type', 'application/json');
     http.onreadystatechange = function () { //Call a function when the state changes.
       if (http.readyState == 4) {
+        
 
         if (http.status == 200) {
           document.location = '/views/patient/edit_demographics.html?patient_id=' + sessionStorage.patientID;
         } else if (http.status == 400) {
           showMessage("Bad Request");
-        } else {
+        } else if (http.status == 201) {
+          document.location = '/views/patient/edit_demographics.html?patient_id=' + sessionStorage.patientID;
+        }else {
           showMessage("error" + http.status);
         }
       }
