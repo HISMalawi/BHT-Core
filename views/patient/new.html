@@ -196,9 +196,13 @@
                 ["Current Village", parameter.current_village],
                 ["Landmark", parameter.landmark],
                 ["Cell phone", parameter.cell_phone_number],
-                ["Patient Type", parameter.patient_type],
-                ["Register Guardian", parameter.relationship]
+                ["Patient Type", parameter.patient_type]
             ];
+
+            if(parameter.patient_type.match(/Drug refill|External/i))
+                attributes.push(["Facility Name", selectedFacility.name]);
+
+            attributes.push(["Register Guardian", parameter.relationship]);
 
             if (military_site) {
                 attributes = attributes.concat([
@@ -1163,6 +1167,7 @@
                     helpText="Please select facility name"
                     id="facility_name"
                     tt_onLoad="setCurrentLocation();"
+                    tt_onUnLoad="fetchLocationName();"
                     name="facility_name"></select>
 
 
@@ -1434,6 +1439,13 @@
             ]
         };
 
+        if(patient_type.value.match(/Drug refill|consultation/i)){
+            obs.observations.push({
+                concept_id: 7054, 
+                value_text: selectedFacility.name
+            })
+        }
+
         submitParameters(obs, "/observations", "savePatienttypeThenRedirect");
     }
 
@@ -1575,4 +1587,27 @@
   function showTypeOfPatient() {
     return sessionStorage.programID == '1' ? true : false;
   }
+
+  var selectedFacility;
+
+  function fetchLocationName() {
+        let location_id = __$('facility_name').value;
+        let url = apiProtocol + '://' + apiURL + ':' + apiPort + `/api/v1/locations/${location_id}`;
+        let req = new XMLHttpRequest();
+        req.onreadystatechange = function(){
+        
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    selectedFacility = JSON.parse(this.responseText);
+                }
+            }
+        };
+        try {
+        req.open('GET', url, true);
+        req.setRequestHeader('Authorization',sessionStorage.getItem('authorization'));
+        req.send(null);
+        } catch (e) {
+        
+        }
+    }
 </script>
