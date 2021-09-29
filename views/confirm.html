@@ -2438,7 +2438,7 @@ function closeEnrollProgramPoP(){
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
                 let obs = JSON.parse(this.responseText);
-                if(obs) {
+                if(obs && obs.length > 0) {
                     sessionStorage.patient_type = (obs[0].value_coded == 7572 ? 'New patient' : (obs[0].value_coded == 10522 ? 'Drug refill' : 'External Consultation'));
                 }else{
                     sessionStorage.patient_type = null;
