@@ -33,7 +33,7 @@
                 let obs = JSON.parse(this.responseText);
                 let helpText = `<span style="font-size: 14px">&nbsp;(Current type:`;
                 if(obs) {
-                    current_type = (obs[0].value_coded == 7572 ? 'New patient' : 'External Consultation');
+                    current_type = (obs[0].value_coded == 7572 ? 'New patient' : (obs[0].value_coded == 10522 ? 'Drug refill' : 'External Consultation'));
                     helpText += ` <b>${current_type}</b>)</span>`
                 }else{
                     helpText += ` <b>Not set</b>)</span>`
@@ -50,7 +50,8 @@
 
     function submitSelection(){
         let selected_option = document.getElementById('touchscreenInput' + tstCurrentPage).value;
-        let valid_input = (selected_option == 'External consultation' || selected_option == 'New patient');
+        let valid_input = (selected_option == 'External consultation' || 
+            selected_option == 'New patient' || selected_option == 'Drug refill');
         if(!valid_input){
             showMessage('Please select a valid option.');
             return;
@@ -76,7 +77,7 @@
 
     function postObs(encounter){
         let selected_option = document.getElementById('touchscreenInput' + tstCurrentPage).value;
-        let patient_type = selected_option == 'New patient' ? 7572 : 9684
+        let patient_type = selected_option == 'New patient' ? 7572 : (selected_option == 'Drug refill' ? 10522 : 9684);
         var currentTime = moment().format(' HH:mm:ss');
         var obs_datetime = moment(sessionStorage.sessionDate).format('YYYY-MM-DD');
 
@@ -116,6 +117,7 @@
             key="gender">
                 <option value=""></option>
                 <option value="New patient">New patient</option>
+                <option value="Drug refill">Drug refill</option>
                 <option value="External consultation">External consultation</option>
         </select>
 
