@@ -121,13 +121,13 @@ i
 
 			let address = `<table class="homes-address">
 				<tr>
-					<td>District:</td><td>${address_obj ?  address_obj.address2 : 'N/A'}</td>
+					<td>District:</td><td>${address_obj.address2 ? address_obj.address2 : 'N/A'}</td>
 				</tr>
 				<tr>
-					<td>TA:</td><td>${address_obj ?  address_obj.county_district : 'N/A'}</td>
+					<td>TA:</td><td>${address_obj.county_district ? address_obj.county_district : 'N/A'}</td>
 				</tr>
 				<tr>
-					<td>Village:</td><td>${address_obj ? address_obj.neighborhood_cell : 'N/A'}</td>
+					<td>Village:</td><td>${address_obj.neighborhood_cell ? address_obj.neighborhood_cell : 'N/A'}</td>
 				</tr>
 			</table>`;
 
