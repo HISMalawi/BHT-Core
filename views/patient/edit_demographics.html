@@ -121,15 +121,9 @@ mainUrl = new URL(mainUrl);
 mainUrl.searchParams.get("source") ? (source = mainUrl.searchParams.get("source")) : source;
 
 function finishButton() {
-  var complete = CheckAllFieldsComplete()
-  if (complete == true){
     let url = source == 'Patient Dashboard' ? `/views/patient_dashboard.html?patient_id=${sessionStorage.patientID}`
       : `/views/confirm.html?person_id=${sessionStorage.patientID}`;
     window.location  = url;
-  }else{
-    document.getElementById('incomplete-demographics').style="display:inline";
-    document.getElementById('page-cover').style="display:inline";
-  }
 }
 
 function closeDiv(id) {
@@ -248,19 +242,6 @@ function fetchDemographics(){
     }
 }
 
-function CheckAllFieldsComplete() {
-  for ( let i = 0; i < document.getElementById("demographics").rows.length - 1; i++) {
-    if (i == 0) {
-      if (document.getElementById("demographics").rows[i].cells[1].innerHTML.split(" ").includes(' ') && !sessionStorage.userRoles.includes('Program Manager')) {
-        return false
-      }
-    }
-    if (document.getElementById("demographics").rows[i].cells[1].innerHTML.split("|").includes(' ') && !sessionStorage.userRoles.includes('Program Manager')) {
-      return false
-    }
-  }
-  return true
-}
 
 function editName() {
     var url = '/views/patient/edit_demographics/name.html?patient_id='+ sessionStorage.patientID;
