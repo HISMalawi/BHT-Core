@@ -80,16 +80,18 @@ class ttTabsPlugin {
             </div>
             <div class="score-table-row">
                 <div class="score-table-cell">
-                    <table>
+                    <table style="width: 100%;">
                         <tr>
-                            <td>&nbsp;</td><td>New client</td><td>Existing client</td>
+                            <td style="width:20%;">&nbsp;</td>
+                            <td style="width:40%;">New client</td>
+                            <td  style="width:80%;">Existing client</td>
                         </tr>
                         <tr><td colspan="3"><hr /></td></tr>
                         <tr>
                             <td>First name:</td><th>${newClient.given_name}</th><th>${person.given_name}</th>
                         </tr>
                         <tr>
-                            <td>Last name:</td><th>${person.family_name}</th><th>${person.family_name}</th>
+                            <td>Last name:</td><th>${newClient.family_name}</th><th>${person.family_name}</th>
                         </tr>
                         <tr>
                             <td>Birthdate:</td><th>${newClient.birthdate}</th><th>${birthdate}</th>
@@ -133,7 +135,9 @@ class ttTabsPlugin {
                 <div class="score-table-cell">
                     <table>
                         <tr>
-                            <td>&nbsp;</td><td>New client</td><td>Existing client</td>
+                            <td style="width:20%;">&nbsp;</td>
+                            <td style="width:40%;">New client</td>
+                            <td style="width:40%;">Existing client</td>
                         </tr>
                         <tr><td colspan="3"><hr /></td></tr>
                         <tr>
