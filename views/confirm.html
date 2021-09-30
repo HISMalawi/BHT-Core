@@ -1482,6 +1482,13 @@ var global_property = GlobalProperty({
   }
 
   function finish(id) {
+
+    if(compleDemographics() == false && !sessionStorage.userRoles.match(/Program Manager/i)){
+      document.getElementById('incomplete-demographics').style="display:inline";
+      document.getElementById('page-cover').style="display:inline";
+      return
+    }
+
     sessionStorage.patientID = id;
     if(sessionStorage.programID != '1'){
       nextEncounter(sessionStorage.patientID, sessionStorage.programID);
@@ -2459,4 +2466,29 @@ function closeEnrollProgramPoP(){
     }
 
     fetchClientType();
+
+
+    function compleDemographics(){
+      let ancestry_district = document.getElementById("ancestry-district").innerHTML;
+      let ancestry_ta = document.getElementById("ancestry-ta").innerHTML;
+      let ancestry_village = document.getElementById("ancestry-village").innerHTML;
+
+      let current_district = document.getElementById("current-district").innerHTML;
+      let current_ta = document.getElementById("current-ta").innerHTML;
+      let current_village = document.getElementById("current-village").innerHTML;
+
+      let complete_demographics = true;
+      let addresses = [
+        ancestry_district, ancestry_ta, ancestry_village, 
+        current_district, current_ta, current_village
+      ];
+
+      for(const address of addresses){
+        if(address.replace(/\s/g,'') == "")
+          complete_demographics = false;
+
+      }
+
+      return complete_demographics
+    }
 </script>
