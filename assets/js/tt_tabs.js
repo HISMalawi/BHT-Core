@@ -31,7 +31,9 @@ class ttTabsPlugin {
 
         let innerContent = `<div class="duplicate-table">
             <div class="duplicate-table-row">
-                <div class="duplicate-table-cell" id="duplicate-table-cell-left">${left_content}</div>
+                <div class="duplicate-table-cell" id="duplicate-table-cell-left">
+                    <div style="overflow: auto; height: 70vh;">${left_content}</div>
+                </div>
                 <div class="duplicate-table-cell" id="duplicate-table-cell-right">${this.rightDiv(newClient)}</div>
             </div>
         </div>`;
