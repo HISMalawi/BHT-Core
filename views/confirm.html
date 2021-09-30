@@ -599,7 +599,7 @@ var global_property = GlobalProperty({
       var ancestry_district = document.getElementById("ancestry-district");
       var ancestry_ta = document.getElementById("ancestry-ta");
       var ancestry_village = document.getElementById("ancestry-village");
-      ancestry_district.innerHTML = obj["addresses"][0]["county_district"];
+      ancestry_district.innerHTML = obj["addresses"][0]["address2"];
       ancestry_ta.innerHTML = obj["addresses"][0]["county_district"];
       ancestry_village.innerHTML = obj["addresses"][0]["neighborhood_cell"];
 
@@ -1550,11 +1550,18 @@ var global_property = GlobalProperty({
     p.setAttribute('style','text-align: center;font-size: 35px;');
     p.innerHTML = `<p>Client with ID "${identifier}" <b>NOT</b> found.</p>`;
     tstMessageBar.appendChild(p);
-   
+    let redirectURL;
+
+    if(identifier.length == 6 || identifier.length == 13){
+      redirectURL = `/views/voided_identifiers.html?identifier=${identifier}`;
+    }else{
+      redirectURL = "/";
+    }
+
     var noBTN = document.createElement('button');
     noBTN.innerHTML = "<span>OK</span>";
     noBTN.setAttribute('class', 'button blue navButton filing-number-btn');
-    noBTN.setAttribute('onmousedown','document.location="/";');
+    noBTN.setAttribute('onmousedown',`document.location="${redirectURL}";`);
     tstMessageBar.appendChild(noBTN);
 
     tstMessageBar.setAttribute('id', 'address-confirmation');
