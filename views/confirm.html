@@ -482,8 +482,8 @@ var global_property = GlobalProperty({
        let names = person.person.names[0]
        let address = person.person.addresses[0]
 
-       if (person.person.gender == '' || names.given_name == '' || names.family_name == '' || address.address2 == ''
-        || address.neighborhood_cell == '' || address.county_district == '' || address.state_province == '' || address.township_division == '' || address.city_village == ''  || person.person.birthdate == '') {
+       if (person.person.gender || names.given_name || names.family_name || address.address2 
+        || address.neighborhood_cell || address.county_district || address.state_province  || address.township_division || address.city_village  || person.person.birthdate) {
         return false
        } else {
         return true
