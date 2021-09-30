@@ -3,30 +3,48 @@
 class ttTabsPlugin {
     load(target, records, newClient) {
         let left_content = `<div class="inner-duplicate-table">`;
-        
+        let unsorted_score = [];
         records.forEach((item) => {
-            let person = item.person;
-            let birthdate = (person.birthdate ? moment(person.birthdate).format("DD/MMM/YYYY") : 'N/A');
-            left_content += `<div class="inner-duplicate-table-row">
-                <div id="client-${person.id}" class="inner-duplicate-table-cell client-cards">
-                    <table>
-                        <tr>
-                            <th colspan="2" style="border-style: solid; border-width: 0px 0px 1px 0px;font-size: 20px; 
-                                text-align: right; padding-bottom: 10px;">
-                                    ${item.score * 100}%
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Name:</td><th>${person.given_name}&nbsp;${person.family_name}</th>
-                        </tr>
-                        <tr>
-                            <td>DOB:</td><th>${birthdate}&nbsp;${person.gender ? '(' + person.gender + ')' : null}&nbsp;</th>
-                        </tr>
-                    </table>
-                </div>
-            </div>`;
-            
+            let score = item.score * 100;
+            unsorted_score.push(score);
         });
+
+        unsorted_score = unsorted_score.sort().reverse();
+        let clients = [];
+
+        for(const sc of unsorted_score){
+            records.forEach((item) => {
+                if(sc != (item.score * 100))
+                    return;
+
+                if(clients.indexOf(item.person) >= 0)
+                    return;
+
+                clients.push(item.person);
+                let person = item.person;
+                let birthdate = (person.birthdate ? moment(person.birthdate).format("DD/MMM/YYYY") : 'N/A');
+                left_content += `<div class="inner-duplicate-table-row">
+                    <div id="client-${person.id}" class="inner-duplicate-table-cell client-cards">
+                        <table>
+                            <tr>
+                                <th colspan="2" style="border-style: solid; border-width: 0px 0px 1px 0px;font-size: 20px; 
+                                    text-align: right; padding-bottom: 10px;">
+                                        ${item.score * 100}%
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Name:</td><th>${person.given_name}&nbsp;${person.family_name}</th>
+                            </tr>
+                            <tr>
+                                <td>DOB:</td><th>${birthdate}&nbsp;${person.gender ? '(' + person.gender + ')' : null}&nbsp;</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>`;
+            });
+         }
+
+        clients = [];
         left_content += "</div>";
 
         let innerContent = `<div class="duplicate-table">
