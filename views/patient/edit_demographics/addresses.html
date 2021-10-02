@@ -40,6 +40,8 @@
     <script type="text/javascript" src="/assets/js/demographics.js"></script>
     <script type="text/javascript" src="/assets/js/post_parameters.js"></script>
     <script type="text/javascript" src="/assets/js/data.js"></script>
+    
+    <script type="text/javascript" src="/assets/js/add.locations.js"></script>
 
 </head>
 <body id="mateme">
@@ -317,8 +319,8 @@
                    helpText="Home TA"
                    condition="$('home_region').value != '4'"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('home_district').value);addInput('home_ta');"
-                   tt_onUnLoad=" jQuery('#nextButton').show();getInput();"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('home_district').value);addInput('home_ta');addLocation('TA','home_district');"
+                   tt_onUnLoad=" jQuery('#nextButton').show();getInput();removeAddLocation();"
                    objectType="traditional_authority"/>
 
             <input type="text" name="home_village" key="home_village"
@@ -326,8 +328,8 @@
                    helpText="Home Village"
                    condition="$('home_region').value != '4'"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('home_ta').value);addInput('home_village');"
-                   tt_onUnload="jQuery('#nextButton').show();getInput();"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('home_ta').value);addInput('home_village');addLocation('Village','home_ta');"
+                   tt_onUnload="jQuery('#nextButton').show();getInput();removeAddLocation();"
                    objectType="village"/>
 
             <!-- Home Address ............................................. -->
@@ -379,8 +381,8 @@
                    helpText="Current TA"
                    condition="$('current_region').value != '4'"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('current_district').value);addInput('current_ta');"
-                   tt_onUnload="jQuery('#nextButton').show();getInput();"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('current_district').value);addInput('current_ta');addLocation('TA','current_district');"
+                   tt_onUnload="jQuery('#nextButton').show();getInput();removeAddLocation();"
                    objectType="traditional_authority"/>
 
             <input type="text" name="current_village" key="current_village"
@@ -389,7 +391,7 @@
                    ajaxURL=""
                    condition="$('current_region').value != '4'"
                    tt_requireNextClick='true'
-                   tt_onLoad="clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('current_ta').value);addInput('current_village');validateInput();"
+                   tt_onLoad="clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('current_ta').value);addInput('current_village');validateInput();addLocation('Village','current_ta');"
                    tt_onUnload="jQuery('#nextButton').show();getInput();"
                    objectType="village"/>
 
