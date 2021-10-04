@@ -482,12 +482,22 @@ var global_property = GlobalProperty({
        let names = person.person.names[0]
        let address = person.person.addresses[0]
 
-       if (person.person.gender || names.given_name || names.family_name || address.address2 
-        || address.neighborhood_cell || address.county_district || address.state_province  || address.township_division || address.city_village  || person.person.birthdate) {
+       if (isValid(person.person.gender) || isValid(names.given_name) || isValid(names.family_name) 
+             || isValid(address.address2) || isValid(address.neighborhood_cell) || isValid(address.county_district) 
+          || isValid(address.state_province)  || isValid(address.township_division) || isValid(address.city_village)
+            || isValid(person.person.birthdate)) {
         return false
        } else {
         return true
        }
+    }
+
+    function isValid(value){
+        if(value!== null && value !== '' && typeof(value) !== 'undefined'){
+          return true;
+        }else{
+          return false;
+        }
     }
 
 
