@@ -482,18 +482,18 @@ var global_property = GlobalProperty({
        let names = person.person.names[0]
        let address = person.person.addresses[0]
 
-       if (isValid(person.person.gender) || isValid(names.given_name) || isValid(names.family_name) 
-             || isValid(address.address2) || isValid(address.neighborhood_cell) || isValid(address.county_district) 
-          || isValid(address.state_province)  || isValid(address.township_division) || isValid(address.city_village)
-            || isValid(person.person.birthdate)) {
-        return false
+       if (isValid(person.person.gender) && isValid(names.given_name) && isValid(names.family_name)
+             && isValid(address.address2) && isValid(address.neighborhood_cell) && isValid(address.county_district)
+          && isValid(address.state_province)  && isValid(address.township_division) && isValid(address.city_village)
+            && isValid(person.person.birthdate)) {
+        return true;
        } else {
-        return true
+        return false;
        }
     }
 
     function isValid(value){
-        if(value!== null && value !== '' && typeof(value) !== 'undefined'){
+        if(value != undefined && value.replace(/\s+/g, '') != '' && value != null){
           return true;
         }else{
           return false;
@@ -515,6 +515,7 @@ var global_property = GlobalProperty({
             if (checkMandatoryFields(locals[0]) == true) {
                populatePatient(locals[0], locals[0]);
             } else {
+                 return
                  sessionStorage.patientID = locals[0].patient_id
                  document.getElementById('incomplete-demographics').style="display:inline";
                  document.getElementById('page-cover').style="display:inline";
@@ -538,9 +539,9 @@ var global_property = GlobalProperty({
         window.location.href = "/";
       }else if (this.status == 422) {
         var f = JSON.parse(this.responseText);
-        //sessionStorage.patientID = f.patient_id;
         sessionStorage.patientID = f.entity.patient_id;
-        window.location.href = "/views/patient/edit_demographics.html";
+        document.getElementById('incomplete-demographics').style="display:inline";
+        document.getElementById('page-cover').style="display:inline";
       }
     };
     xhttp.open("GET", url, true);
@@ -810,7 +811,6 @@ var global_property = GlobalProperty({
               var obj = JSON.parse(this.responseText);
               var url = "/patients/" + patientID + "/labels/national_health_id";
               url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1" + url;
-              // console.log(obj.new_identifier);
               document.location = url;
               // var id = v.new_identifier.identifier;
               document.getElementById("continue").setAttribute("disabled", "");
