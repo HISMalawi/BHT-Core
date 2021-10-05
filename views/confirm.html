@@ -515,7 +515,6 @@ var global_property = GlobalProperty({
             if (checkMandatoryFields(locals[0]) == true) {
                populatePatient(locals[0], locals[0]);
             } else {
-                 return
                  sessionStorage.patientID = locals[0].patient_id
                  document.getElementById('incomplete-demographics').style="display:inline";
                  document.getElementById('page-cover').style="display:inline";
