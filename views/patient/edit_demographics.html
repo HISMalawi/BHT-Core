@@ -253,6 +253,11 @@ function editName() {
     document.location = url;
   }
 
+  function edithBirthdate(){
+    var url = '/views/patient/edit_demographics/birthdate.html?patient_id='+ sessionStorage.patientID;
+    document.location = url;
+  }
+
   function editCellphone() {
     var url = '/views/patient/edit_demographics/cellphone.html?patient_id='+ sessionStorage.patientID;
     document.location = url;
