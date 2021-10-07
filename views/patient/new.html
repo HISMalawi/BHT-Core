@@ -1439,7 +1439,7 @@
             ]
         };
 
-        if(patient_type.value.match(/Drug refill|consultation/i)){
+        if(patient_type && patient_type.value.match(/Drug refill|consultation/i)){
             obs.observations.push({
                 concept_id: 7054, 
                 value_text: selectedFacility.name
