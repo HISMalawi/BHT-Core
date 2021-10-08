@@ -584,7 +584,11 @@ var global_property = GlobalProperty({
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send();
   }
+
+  var localPatient
+
   function populatePatient(obj, obj_2) {
+    localPatient = obj;
     var patient = obj;
     obj = obj["person"];
     patient_id = patient["patient_id"];
@@ -1428,6 +1432,25 @@ var global_property = GlobalProperty({
   </div>
 </div>
 
+<div id="npid-diff">
+  <div id="enrolled-program-inner">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h1 style="text-align: center" class="text-uppercase">
+          NPID has been changed from a remote location </p>
+          Would you like to print it?
+        </h1>
+      </div>
+      <div class="modal-footer">
+          <button class="button green navButton" onmousedown="/"
+          style="float: right; width: 120px;" id="yes"><span>Yes</span></button>
+          <button class="red button navButton" onmousedown="document.getElementById('npid-diff').style = 'none', document.getElementById('page-cover').style = 'none'"
+          style="float: left; width: 120px;" id="no"><span>No</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   function enrollPatient() {
         // sessionStorage.patientID = person_id;
@@ -1891,6 +1914,38 @@ function checkIfEnrolled(patient_id) {
   xhttp.setRequestHeader("Content-type", "application/json");
   xhttp.send();
 }
+
+
+function createNPID(npid) {
+  var data = {"identifier": npid,
+              "patient_id": sessionStorage.patientID,
+              "identifier_type": 3};
+  var url =
+    sessionStorage.apiProtocol + "://" +
+    apiURL +
+    ":" +
+    apiPort +
+    "/api/v1/patient_identifiers/";
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", url);
+  xhr.setRequestHeader(
+    "Authorization",
+    sessionStorage.getItem("authorization")
+  );
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  xhr.onreadystatechange = function () {
+     if (xhr.readyState === 4 && xhr.status == 201) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        document.location = '/views/print/npid.html?identifier=' + npid;
+     }};
+
+  var data = JSON.stringify(data);
+
+  xhr.send(data);
+}
+
 function checkIfDemographicsUpdated(patient_id) {
   
   var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/dde/patients/diff?patient_id=";
@@ -1900,10 +1955,14 @@ function checkIfDemographicsUpdated(patient_id) {
     if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
       var obj = JSON.parse(this.responseText);
       
-      if(obj.diff != null && Object.keys(obj.diff).length !== 0) {
+      if(obj.diff != null && Object.keys(obj.diff).length !== 0 && obj.diff.npid != undefined) {
         document.getElementById("page-cover").style = 'display: inline;';
-        document.getElementById("update-dde-demographics").style = 'display: inline;';
-        buildDiffs(obj.diff);
+        document.getElementById("yes").setAttribute("onmousedown", `createNPID('${obj.diff.npid.remote}')`)
+        document.getElementById('npid-diff').style="display:inline";
+      } else if (obj.diff != null && Object.keys(obj.diff).length !== 0) {
+          document.getElementById("page-cover").style = 'display: inline;';
+          document.getElementById("update-dde-demographics").style = 'display: inline;';
+          buildDiffs(obj.diff);
       } 
     }
   };
@@ -2095,7 +2154,7 @@ function closeEnrollProgramPoP(){
 
 <style>
 
-  #enroll-program, #incomplete-demographics {
+  #enroll-program, #incomplete-demographics, #npid-diff {
     background: #ffffff;
     border-radius: 0.5em;
     box-shadow: 0 10px 20px rgba(black, 0.2);
