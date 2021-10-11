@@ -296,6 +296,22 @@
                     document.getElementById('nextButton').setAttribute('onmousedown','postAddresses()')
                 }
             }
+
+            function changeCaption(field_name) {
+                let setlectedRegion = document.getElementById(field_name).value
+                let helpText = field_name.match(/home/i) ? "Home" : "Current" ;
+
+                if (setlectedRegion == '4') {
+                    document.getElementById(`helpText${tstCurrentPage}`).innerHTML = `${helpText} Country`;
+                    let location = document.getElementById('location-add')
+
+                    if (location) {
+                        location.setAttribute('style','display:none;')
+                    }
+                } else {
+                    document.getElementById(`helpText${tstCurrentPage}`).innerHTML = `${helpText} District`;
+                }
+            }
         </script>
 
         <form method="PUT">
@@ -322,7 +338,7 @@
                    setvalue=""
                    tt_pageStyleClass="NoKeyboard"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);changeCaption('home_region');"
                    tt_onUnload=" jQuery('#nextButton').show();getInput();"
                    objectType="districts"/>
 
@@ -371,10 +387,10 @@
                    ajaxURL=""
                    tt_pageStyleClass="NoKeyboard"
                    tt_requireNextClick='true'
-                   tt_onLoad="clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('current_region').value);addLocation('District','current_district');setForeignerDataForSave();"
+                   tt_onLoad="clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('current_region').value);setForeignerDataForSave();changeCaption('current_region');"
                    tt_onUnload="jQuery('#nextButton').show();getInput();"
                    objectType="districts"/>
-tru
+
             <input type="text"
                    name="current_ta"
                    key="current_ta"
