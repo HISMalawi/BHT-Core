@@ -83,7 +83,7 @@
                 } else if (title.match(/Current District/i)) {
                     parametersPassed.current_district = (data || 'Unknown');
                 } else if (title.match(/Current TA/i)) {
-                    parametersPassed.current_traditional_authority = data;
+                    parametersPassed.current_traditional_authority = (data || 'Unknown');
                 } else if (title.match(/Current Village/i)) {
                     parametersPassed.current_village = (data || 'Unknown');
                 } else if (title.match(/Landmark/i)) {

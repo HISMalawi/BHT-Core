@@ -8,6 +8,11 @@
         tstUsername = "";
         tstUserKeyboardPref = "qwerty";
 
+        sessionStorage.removeItem('home_ta');
+        sessionStorage.removeItem('home_village');
+        sessionStorage.removeItem('current_ta');
+        sessionStorage.removeItem('current_village');
+
         var d = new Date();
         d.toDateString();
 
@@ -284,6 +289,13 @@
                 var element = document.getElementById("inputFrame" + tstCurrentPage);
                 element.style = "overflow: auto;";
             }
+
+            function  setForeignerDataForSave() {
+                if (document.getElementById('current_region').value == 4) {
+                    document.getElementById('nextButton').innerHTML = "<span>Finish</span>"
+                    document.getElementById('nextButton').setAttribute('onmousedown','postAddresses()')
+                }
+            }
         </script>
 
         <form method="PUT">
@@ -296,7 +308,7 @@
                    helpText="Region of origin"
                    ajaxURL="/regions"
                    setvalue=""
-                   tt_onLoad="clearInput(); jQuery('#nextButton').hide();addInput('home_region');"
+                   tt_onLoad="clearInput(); jQuery('#nextButton').hide();"
                    tt_onUnload="jQuery('#nextButton').show();getInput();"
                    tt_requireNextClick='false'
                    tt_pageStyleClass="NoKeyboard"
@@ -310,7 +322,7 @@
                    setvalue=""
                    tt_pageStyleClass="NoKeyboard"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);addInput('home_district');"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);"
                    tt_onUnload=" jQuery('#nextButton').show();getInput();"
                    objectType="districts"/>
 
@@ -319,7 +331,7 @@
                    helpText="Home TA"
                    condition="$('home_region').value != '4'"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('home_district').value);addInput('home_ta');addLocation('TA','home_district');"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('home_district').value);addLocation('TA','home_district');"
                    tt_onUnLoad=" jQuery('#nextButton').show();getInput();removeAddLocation();"
                    objectType="traditional_authority"/>
 
@@ -328,14 +340,14 @@
                    helpText="Home Village"
                    condition="$('home_region').value != '4'"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('home_ta').value);addInput('home_village');addLocation('Village','home_ta');"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('home_ta').value);addLocation('Village','home_ta');"
                    tt_onUnload="jQuery('#nextButton').show();getInput();removeAddLocation();"
                    objectType="village"/>
 
             <!-- Home Address ............................................. -->
 
             <!-- ................... Current Address ........................... -->
-            <!--   <input type="text" name="region[region_name]" key="current_region"
+            <input type="text" name="region[region_name]" key="current_region"
                 id="current_region"
                 field_type="alpha"
                 xhelpText="Region"
@@ -344,54 +356,47 @@
                 setvalue = ""
                 tt_requireNextClick = 'false'
                 tt_pageStyleClass = "NoKeyboard"
-                tt_onLoad="clearInput(); jQuery('#nextButton').hide();addInput('current_region');"
+                tt_onLoad="clearInput(); jQuery('#nextButton').hide();"
                 tt_onUnload ="jQuery('#nextButton').show();getInput();"
-                objectType="region" /> -->
+                objectType="region" />
 
 
-            <select name="region[region_name]" id="current_region"
-                    key="current_region" helpText="Current Region"
-                    tt_requireNextClick='false'
-                    tt_pageStyleClass="NoKeyboard"
-                    field_type="alpha"
-                    setvalue=""
-                    objectType="region"
-                    tt_onLoad="clearInput(); jQuery('#nextButton').hide();addInput('current_region');"
-                    tt_onUnload="jQuery('#nextButton').show();getInput();" tt_onUnload="getInput();">
-                <option value=""></option>
-                <option value="1">Central Region</option>
-                <option value="2">Northern Region</option>
-                <option value="3">Southern Region</option>
-            </select>
-
-            <input type="text" name="current_district" key="current_district"
+            <input type="text"
+                   name="current_district"
+                   key="current_district"
                    id="current_district"
                    field_type="alpha"
                    xhelpText="District"
                    helpText="Current District"
-                   setvalue=""
+                   ajaxURL=""
                    tt_pageStyleClass="NoKeyboard"
-                   tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('current_region').value);addInput('current_district');"
+                   tt_requireNextClick='true'
+                   tt_onLoad="clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('current_region').value);addLocation('District','current_district');setForeignerDataForSave();"
                    tt_onUnload="jQuery('#nextButton').show();getInput();"
                    objectType="districts"/>
-
-            <input type="text" name="current_ta" key="current_ta"
-                   id="current_ta" field_type="alpha"
+tru
+            <input type="text"
+                   name="current_ta"
+                   key="current_ta"
+                   id="current_ta"
+                   field_type="alpha"
                    helpText="Current TA"
                    condition="$('current_region').value != '4'"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('current_district').value);addInput('current_ta');addLocation('TA','current_district');"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('current_district').value);addLocation('TA','current_district');"
                    tt_onUnload="jQuery('#nextButton').show();getInput();removeAddLocation();"
                    objectType="traditional_authority"/>
 
-            <input type="text" name="current_village" key="current_village"
-                   id="current_village" field_type="alpha"
+            <input type="text"
+                   name="current_village"
+                   key="current_village"
+                   id="current_village"
+                   field_type="alpha"
                    helpText="Current Village"
                    ajaxURL=""
                    condition="$('current_region').value != '4'"
                    tt_requireNextClick='true'
-                   tt_onLoad="clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('current_ta').value);addInput('current_village');validateInput();addLocation('Village','current_ta');"
+                   tt_onLoad="clearInput();set_ajaxURL_for_suggestions('/villages?traditional_authority_id=', document.getElementById('current_ta').value);validateInput();addLocation('Village','current_ta');"
                    tt_onUnload="jQuery('#nextButton').show();getInput();"
                    objectType="village"/>
 
@@ -461,21 +466,21 @@
     function postAddresses() {
         getInput();
         home_district = sessionStorage.getItem("home_district")
-        home_traditional_authority = sessionStorage.getItem("home_ta");
-        home_village = sessionStorage.getItem("home_village");
+        home_traditional_authority = (sessionStorage.getItem("home_ta") || 'Unknown');
+        home_village = (sessionStorage.getItem("home_village") || 'Unknown');
         current_district = sessionStorage.getItem("current_district");
-        current_traditional_authority = sessionStorage.getItem("current_ta");
-        current_village = sessionStorage.getItem("current_village");
+        current_traditional_authority = (sessionStorage.getItem("current_ta") || 'Unknown');
+        current_village = (sessionStorage.getItem("current_village") || 'Unknown');
         var http = new XMLHttpRequest();
         var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/people/' + sessionStorage.patientID;
         var new_address = {
             home_district: sessionStorage.getItem("home_district"),
-            home_traditional_authority: sessionStorage.getItem("home_ta"),
-            home_village: sessionStorage.getItem("home_village"),
+            home_traditional_authority: (sessionStorage.getItem("home_ta") || 'Unknown'),
+            home_village: (sessionStorage.getItem("home_village") || 'Unknown'),
             current_region: sessionStorage.getItem("current_region"),
             current_district: sessionStorage.getItem("current_district"),
-            current_traditional_authority: sessionStorage.getItem("current_ta"),
-            current_village: sessionStorage.getItem("current_village")
+            current_traditional_authority: (sessionStorage.getItem("current_ta") || 'Unknown'),
+            current_village: (sessionStorage.getItem("current_village") || 'Unknown')
         };
 
         if(sessionStorage.dde_enabled === 'true') {
