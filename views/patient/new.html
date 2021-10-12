@@ -124,6 +124,7 @@
             }
         }
 
+
         function calBirthdateFromEstimetedYear(age) {
             var currYear = new Date().getFullYear();
             estYear = (currYear - parseInt(age));
@@ -950,6 +951,23 @@
                 }
                 // getNames(__$('home_district').value, "District", "/districts?paginate=false&region_id=" + document.getElementById('current_region').value);
 
+
+            function changeCaption(field_name) {
+                let selectedRegion = document.getElementById(field_name).value
+                let helpText = field_name.match(/home/i) ? "Home" : "Current" ;
+
+                if (selectedRegion == '4') {
+                    document.getElementById(`helpText${tstCurrentPage}`).innerHTML = `${helpText} Country`;
+                    let location = document.getElementById('location-add')
+
+                    if (location) {
+                        location.setAttribute('style','display:none;')
+                    }
+                } else {
+                    document.getElementById(`helpText${tstCurrentPage}`).innerHTML = `${helpText} District`;
+                }
+            }
+
         </script>
 
         <form action="/views/patient_dashboard.html" method="POST">
@@ -1034,7 +1052,7 @@
                    setvalue=""
                    tt_pageStyleClass="NoKeyboard"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);changeCaption('home_region');"
                    tt_onUnload="jQuery('#nextButton').show();homeDistrict = getNames(__$('home_district').value, 'District', '/districts?paginate=false&district_id=' + document.getElementById('home_district').value);"
                    objectType="districts"/>
 
@@ -1080,7 +1098,7 @@
                    setvalue=""
                    tt_pageStyleClass="NoKeyboard"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('current_region').value);"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('current_region').value);changeCaption('current_region')"
                    tt_onUnload="jQuery('#nextButton').show();"
                    objectType="districts"/>
 
