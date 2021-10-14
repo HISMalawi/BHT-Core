@@ -191,20 +191,30 @@ function fetchDemographics(){
             value: moment(results.person.birthdate).format("DD/MMM/YYYY"),
             function: 'edithBirthdate'
           });
+          let ancentory_district = '';
+          let ancentory_ta = ''; 
+          let ancentory_village = '';
+          let current_district = '';
+          let current_ta = '';
+          let current_village = '';
 
-          let ancentory_district = results.person.addresses[0].address2;
-          let ancentory_ta = results.person.addresses[0].county_district;
-          let ancentory_village = results.person.addresses[0].neighborhood_cell;
+          try {
+          ancentory_district = results.person.addresses[0].address2;
+          ancentory_ta = results.person.addresses[0].county_district;
+          ancentory_village = results.person.addresses[0].neighborhood_cell;
+          } catch {}
           values.push({
             title: 'Ancentory address',
             value: `${ancentory_district} | ${ancentory_ta} | ${ancentory_village}`,
             function: 'editAddresses'
           });
 
-          
-          let current_district = results.person.addresses[0].state_province;
-          let current_ta = results.person.addresses[0].township_division;
-          let current_village = results.person.addresses[0].city_village;
+
+          try {
+            current_district = results.person.addresses[0].state_province;
+            current_ta = results.person.addresses[0].township_division;
+            current_village = results.person.addresses[0].city_village;
+          }catch {}
           values.push({
             title: 'Current address',
             value: `${current_district} | ${current_ta} | ${current_village}`,
