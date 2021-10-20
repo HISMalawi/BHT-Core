@@ -377,7 +377,7 @@
     });
 
 
-    document.getElementById("client-name").innerHTML =sessionStorage.getItem("username") ;
+    document.getElementById("client-name").innerHTML =sessionStorage.getItem("username")+ " (<span style='color: green;'>"+sessionStorage.userRoles+"</span>)";
     document.getElementById("location-name").innerHTML =sessionStorage.getItem("userLocation");
     var loc = sessionStorage.getItem("userLocation");
     loc = loc.slice(0, loc.length);
@@ -402,6 +402,9 @@ if(parseInt(sessionStorage.programID) == 14 )
 {  
     if(sessionStorage.userRoles.match(/Clinician/i))
         OPD_activities ="presenting complaints,outpatient diagnosis,prescription";
+    else
+    if(sessionStorage.userRoles.match(/Registration Clerk/i))
+        OPD_activities ="vitals";
     else
     OPD_activities = sessionStorage.OPD_task;
     

@@ -189,8 +189,55 @@ var tt_cancel_destination = "/views/patient/lab/test_without_results.html";
 
     </div>
   </div>
+
+  <div id="cover"></div>
+  <div id="confirmation-message">
+    <p id="message">&nbsp;</p>
+    <div>
+      <button id="continue-result" class="popup-btn button blue navButton"><span>Process result</span></button>
+      <button id="new-result" class="popup-btn button green navButton"><span>Re-enter result</span></button>
+    </div>
+  </div>
+
 </body>
 
+<style>
+  #cover {
+  background-color: black;
+  width: 100%;
+  height: 102%;
+  left: 0%;
+  top: 0%;
+  z-index: 990;
+  opacity: 0.65;
+  text-align: center;
+  display: none;
+  position: absolute;
+}
+
+#confirmation-message {
+  display: none;
+  position: absolute;
+  z-index: 991;
+  margin: 0 auto;
+  padding: 3px;
+  background-color: tomato;
+  left: 250px;
+  width: 450px;
+  top: 100px;
+  font-size: 2em;
+  text-align: center;
+  background-color: tomato;
+  padding: 10px;
+  border: 5px outset tomato;
+  border-radius: 15px;
+}
+
+.popup-btn {
+  font-size: 24px !important;
+  width: 218px;
+}
+</style>
 
 <script>
 
@@ -270,25 +317,98 @@ function lastPage() {
 function validateAlphaResult(){
   let result = document.getElementById('touchscreenInput' + tstCurrentPage).value;
   let processed_result = result.match(/^(>|<|=)(.*)/);
+  let result_only;
+  let modifier;
 
-  if(result.length === 0 || !result.trim()){
+  try {
+    result_only = result.substring(1,result.length).replace(/^\s+|\s+$/g, "");
+    modifier = result.match(/>|<|=/)[0].replace(/\s/g,'');
+  }catch(e){
+    result_only = '';
+    modifier = '';
+  }
+
+  if(result.length === 0 || !result.replace(/^\s+|\s+$/g, "")){
     showMessage("Result is empty. Please enter a valid result.");
   }else if(processed_result == null){
-    showMessage('You must enter a modifier plus result (for example =LDL)');
+    showMessage('You must enter a modifier plus result (for example: &#60;LDL)');
+  }else if(modifier.length < 1 || result_only.length < 1){
+    showMessage("You must enter a modifier plus result (for example: &#60;LDL)</p>");
   }else{
-    addToOrdersObj(result.match(/>|<|=/)[0], result.substring(1,result.length), 'text');
+    if(result_only == parseFloat(result_only).toString()){
+      showMessage("Enter result as Numeric");
+    }else if(parseInt(testID) == 856){
+      valid_result = validateVLresultsEntry(modifier, result_only);
+      if(valid_result){
+        addToOrdersObj(modifier, result_only, 'text');
+      }else{
+        showInvalidVLresultMessage(modifier, result_only, 'text');
+      }
+    }else{
+      addToOrdersObj(modifier, result_only, 'text');
+    }
   }
 }
 
 function validateNumericResults(){
-  let result = document.getElementById('touchscreenInput' + tstCurrentPage).value;
+  let result = (document.getElementById('touchscreenInput' + tstCurrentPage).value).replace(/^\s+|\s+$/g, "");
+;
   if(result.match(/^(>|<|=)([0-9.]+)$|Unknown/)){
     let modifier = result.substring(0,1);
     let numeric_result = result.substring(1,result.length);
-    addToOrdersObj(modifier, numeric_result, 'numeric');
+
+    if(parseInt(testID) == 856){
+      valid_result = validateVLresultsEntry(modifier, numeric_result);
+      if(valid_result){
+        addToOrdersObj(modifier, numeric_result, 'numeric');
+      }else{
+        showInvalidVLresultMessage(modifier, numeric_result, 'numeric');
+      }
+    }else{
+      addToOrdersObj(modifier, numeric_result, 'numeric');
+    }
   }else{
     showMessage('You must enter a modifier plus numbers only (for example =90)');
   }
+}
+
+function validateVLresultsEntry(modifier, result){
+
+  if(orderSpecimen.name.match(/DBS/i)){
+    if(modifier.match(/</) && !result.match(/ldl|400|550|839/i)){
+      return false;
+    }else if(modifier.match(/=/) && !(parseFloat(result) >= 400)){
+      return false;
+    }else if(modifier == '>'){
+      return false;
+    }
+  }
+
+  if(modifier.match(/</) && !result.match(/ldl|20|40|150/i)){
+    return false;
+  }else if(modifier.match(/=/) && !(parseFloat(result) >= 20)){
+    return false;
+  }
+
+  return true;
+}
+
+function showInvalidVLresultMessage(modifier, result, textNumeric){
+  document.getElementById('cover').style = 'display:inline;';
+  document.getElementById("message").innerHTML = `Invalid results for ${orderSpecimen.name} HIV Viral Load`;
+  document.getElementById('confirmation-message').style = 'display: inline-block;';
+
+  let new_result = document.getElementById("new-result");
+  let continue_result = document.getElementById("continue-result");
+
+  new_result.setAttribute("onmousedown", "hidePopUp();");
+  continue_result.setAttribute("onmousedown", `addToOrdersObj('${modifier}', 
+    '${result}', '${textNumeric}','Confirmed by user: ${sessionStorage.username}');hidePopUp();`);
+}
+
+function hidePopUp(){
+  document.getElementById('cover').style = 'display:none;';
+  document.getElementById('confirmation-message').style = 'display: none;';
 }
 
 function createEncounter(){
@@ -373,7 +493,26 @@ function fetchObsID() {
     orderDate = paramsPassed.searchParams.get("order_date");
     obsID = paramsPassed.searchParams.get("test_type_id");
     mainTestID = paramsPassed.searchParams.get("test_id");
+    accessionNumber = paramsPassed.searchParams.get("accession_number");
+
     getTestIndicators();
+    getSpecimen();
+}
+
+function getSpecimen(){
+    let url = sessionStorage.apiProtocol + "://" + sessionStorage.apiURL + ":";
+    url += sessionStorage.apiPort + `/api/v1/lab/orders?accession_number=${accessionNumber}`;
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+          orderSpecimen = JSON.parse(this.responseText)[0].specimen;
+        }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    xhttp.setRequestHeader('Content-type', "application/json");
+    xhttp.send();
 }
 
 function getTestIndicators() {
@@ -494,7 +633,7 @@ function setHelpText(){
   }
 }
 
-function addToOrdersObj(modifier, result, textNumeric){
+function addToOrdersObj(modifier, result, textNumeric, comments = ''){
   measuresHash[testID] = {
     indicator: {
       concept_id: obsID
@@ -502,7 +641,8 @@ function addToOrdersObj(modifier, result, textNumeric){
     value: result,
     value_modifier: modifier,
     value_type: textNumeric,
-    test_name: selectedIndicators[testID]
+    test_name: selectedIndicators[testID],
+    comments: comments
   };
 
   removeSelectedIndicator(testID, {})
@@ -560,6 +700,7 @@ var obsID;
 var testID;
 var measuresHash = {};
 var mainTestID;
-
+var accessionNumber;
+var orderSpecimen;
 fetchObsID();
 </script>

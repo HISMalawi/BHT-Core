@@ -111,92 +111,6 @@
     z-index: 10;
   }
 
-  /*.buttonsDIV button {
-    margin: 5px 0px 0px;
-    margin-right: 10px;
-    height: 60px;
-    font-size: 2rem;
-  }
-
-  .blue {
-    border: 1px solid #7eb9d0;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    font-size: 28px;
-    font-family: helvetica;
-    padding: 10px 10px 10px 10px;
-    text-decoration: none;
-    display: inline-block;
-    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
-    font-weight: bold;
-    color: #ffffff;
-    background-color: #a7cfdf;
-    background-image: -webkit-gradient(
-      linear,
-      left top,
-      left bottom,
-      from(#a7cfdf),
-      to(#23538a)
-    );
-    background-image: -webkit-linear-gradient(top, #a7cfdf, #23538a);
-    background-image: -moz-linear-gradient(top, #a7cfdf, #23538a);
-    background-image: -ms-linear-gradient(top, #a7cfdf, #23538a);
-    background-image: -o-linear-gradient(top, #a7cfdf, #23538a);
-    background-image: linear-gradient(to bottom, #a7cfdf, #23538a);
-    filter: progid: DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#a7cfdf, endColorstr=#23538a);
-  }
-
-  .red {
-    border: 1px solid #ff0011;
-    background-image: linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -o-linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -moz-linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -webkit-linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -ms-linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -webkit-gradient(
-      color-stop(0, rgb(255, 0, 17)),
-      color-stop(1, rgb(255, 0, 17))
-    ) !important;
-    background-color: #5c0707;
-
-    border: 1px solid #450111;
-    background-color: #77021d;
-    background-image: -webkit-gradient(
-      linear,
-      left top,
-      left bottom,
-      from(#77021d),
-      to(#3a000d)
-    );
-    background-image: -webkit-linear-gradient(top, #77021d, #3a000d);
-    background-image: -moz-linear-gradient(top, #77021d, #3a000d);
-    background-image: -ms-linear-gradient(top, #77021d, #3a000d);
-    background-image: -o-linear-gradient(top, #77021d, #3a000d);
-    background-image: linear-gradient(to bottom, #77021d, #3a000d);
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#77021d, endColorstr=#3a000d);
-    color: #fff;
-  }*/
 
   .info-tables {
     width: 99%;
@@ -565,6 +479,18 @@ var global_property = GlobalProperty({
       patient_id;
     }
 
+    function checkMandatoryFields(person){
+       let names = person.person.names[0]
+       let address = person.person.addresses[0]
+
+       if (person.person.gender == '' || names.given_name == '' || names.family_name == '' || address.address2 == ''
+        || address.neighborhood_cell == '' || address.county_district == '' || address.state_province == '' || address.township_division == '' || address.city_village == ''  || person.person.birthdate == '') {
+        return false
+       } else {
+        return true
+       }
+    }
+
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -577,7 +503,13 @@ var global_property = GlobalProperty({
           }else if (locals.length >= 1 && remotes.length >=1) {
             location.href = "/views/npid_duplicates.html?health_id=" + patient_id;
           } else if (locals.length == 1) {
-            populatePatient(locals[0], locals[0]);
+            if (checkMandatoryFields(locals[0]) == true) {
+               populatePatient(locals[0], locals[0]);
+            } else {
+                 sessionStorage.patientID = locals[0].patient_id
+                 document.getElementById('incomplete-demographics').style="display:inline";
+                 document.getElementById('page-cover').style="display:inline";
+            }
           } else {
             noPatient();
           }
@@ -712,7 +644,6 @@ var global_property = GlobalProperty({
     patient_id = patient["patient_id"];
     sessionStorage.patientID = patient_id;
     checkIfEnrolled(patient_id);
-    checkIfDemographicsUpdated(patient_id);
     var names = obj["names"][0];
     var client_name = document.getElementById("client-name");
     client_name.innerHTML = names["given_name"] + " " + names["family_name"];
@@ -1089,6 +1020,36 @@ var global_property = GlobalProperty({
       );
       req.send(null);
     } catch (e) {}
+  }
+
+  function updateDDE(diff) {
+      var url =
+        sessionStorage.apiProtocol + "://" +
+        apiURL +
+        ":" +
+        apiPort +
+        "/api/v1/people/" +
+        patient_id;
+      var xhr = new XMLHttpRequest();
+      xhr.open("PUT", url);
+      xhr.setRequestHeader(
+        "Authorization",
+        sessionStorage.getItem("authorization")
+      );
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      xhr.onreadystatechange = function () {
+         if (xhr.readyState === 4) {
+            console.log(xhr.status);
+            console.log(xhr.responseText);
+            location.reload();
+         }};
+
+      diff.program_id = sessionStorage.programID
+
+      var data = JSON.stringify(diff);
+
+      xhr.send(data);
   }
 
   function buildAlerts(patient_id) {
@@ -1570,6 +1531,23 @@ var global_property = GlobalProperty({
   </div>
 </div>
 
+<div id="incomplete-demographics">
+  <div id="enrolled-program-inner">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h1 style="text-align: center" class="text-uppercase">
+          Client does not have complete Demographics </p>
+          Please update
+        </h1>
+      </div>
+      <div class="modal-footer">
+          <button class="button green navButton" onmousedown="javascript:location='/views/patient/edit_demographics.html'"
+          style="float: right; width: 120px;" id="continue"><span>Ok</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 
   function enrollPatient() {
@@ -1610,12 +1588,6 @@ var global_property = GlobalProperty({
       nextEncounter(sessionStorage.patientID, sessionStorage.programID);
       return;
     }
-
-    /*if(parseInt(sessionStorage.programID) == 23){
-      var labDashboardURL = "/apps/" + sessionStorage.applicationFolder;
-      labDashboardURL += "/views/patient_dashboard.html?patient_id=" + id;
-      window.location = labDashboardURL;
-    }*/
 
     if (patientDead == true) {
       $("#mi-modal").modal("show");
@@ -2009,6 +1981,8 @@ function checkIfEnrolled(patient_id) {
       if (enrolled == false){
           //$("#enroll-program").modal();
           enrollProgramPoP();
+      } else {
+          checkIfDemographicsUpdated(patient_id);
       }
     }
   };
@@ -2023,19 +1997,13 @@ function checkIfDemographicsUpdated(patient_id) {
   url += sessionStorage.patientID + "&program_id="+sessionStorage.programID;
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
-    console.log
     if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
       var obj = JSON.parse(this.responseText);
-      if(Object.keys(obj.diff).length !== 0) {
-        const f = buildDiffs(obj.diff);
-        alertify
-          .confirm("Demographics changed", "Patient demographics have been changed remotely.<br />Use remote demographics? " + f,  function(){
-            refreshDemographics(patient_id);
-            alertify.success('Successfully updated');
-        },
-        function(){
-          alertify.error('Update Cancelled');
-        });
+      
+      if(obj.diff != null && Object.keys(obj.diff).length !== 0) {
+        document.getElementById("page-cover").style = 'display: inline;';
+        document.getElementById("update-dde-demographics").style = 'display: inline;';
+        buildDiffs(obj.diff);
       } 
     }
   };
@@ -2091,23 +2059,7 @@ function filingNumberPrefix() {
  xhttp.setRequestHeader('Content-type', "application/json");
  xhttp.send();
 }
-function buildDiffs(diffs) {
 
-  let f = `<table>
-  <tr class='demo-table'>
-    <th>Demographic</th>
-    <th>Remote</th>
-    <th>Local</th>
-  </tr>
-  `
-  j = diffs
-
-  Object.keys(diffs).forEach(element => {
-    f+= `<tr><td> ${element}</td> <td> ${j[element].remote} </td> <td> ${j[element].local} </td> </tr>`  
-  });
-  f+= '</table>'
-  return f;
-}
 function userFilingNumbers() {
   var href = window.location.href;
   var url = new URL(href);
@@ -2130,6 +2082,10 @@ function userFilingNumbers() {
         }catch(e) {
           user_filing_numbers = false;
         }
+        
+        if(user_filing_numbers)
+          filingNumberPrefix();
+
       }
     }
  };
@@ -2164,7 +2120,6 @@ function closeFilingNumPopUP() {
 }
 
 userFilingNumbers();
-filingNumberPrefix();
 
 if(sessionStorage.userRoles.match(/super|admin/i)){
   document.getElementById('voidBTN').style = "display: inline; float: left; margin-left: 40px;";
@@ -2243,6 +2198,7 @@ function closeEnrollProgramPoP(){
   const page_cover = document.getElementById('page-cover');
   page_cover.style = 'display: none;';
   box.style = 'display:none;';
+  checkIfDemographicsUpdated(sessionStorage.patientID);
 }
 </script>
 <script src="/assets/js/show.lab.orders.js"></script>
@@ -2250,7 +2206,7 @@ function closeEnrollProgramPoP(){
 
 <style>
 
-  #enroll-program {
+  #enroll-program, #incomplete-demographics {
     background: #ffffff;
     border-radius: 0.5em;
     box-shadow: 0 10px 20px rgba(black, 0.2);
@@ -2444,11 +2400,217 @@ function closeEnrollProgramPoP(){
 </div>
 
 
-<script>
-  if(sessionStorage.programID != '1'){
-   const divs = ['mi-modal-2','confirm-VL'];
-   for(const div of divs){
-    document.getElementById(div).style="display: none !important;";
-   } 
+<div id="update-dde-demographics">
+  Here ...
+</div>
+
+<style>
+  #update-dde-demographics {
+    background: #ffffff;
+    border-radius: 0.5em;
+    box-shadow: 0 10px 20px rgba(black, 0.2);
+    left: 50%;
+    max-width: 90%;
+    position: absolute;
+    top: 45%;
+    transform: translate(-50%, -50%);
+    width: 50em;
+    text-align: left;
+    max-height: 90vh;
+    flex-direction: column;
+    z-index: 1000000;
+    border-color: black;
+    border-style: solid;
+    display: none;
   }
+  
+  #update-dde-demographics-table{
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  #update-dde-demographics-table td, #update-dde-demographics-table th {
+    border-width: 0px 0px 1px 0px;
+    border-style: solid;
+    line-height: 40px;
+    text-align: left;
+    padding-left: 10px;
+    border-color: #e1e1e1;
+    font-weight: bold;
+  }
+
+  .headers {
+    font-weight: normal !important;
+  }
+
+  #update-dde-demographics-table button {
+    float: left !important;
+    width: 150px;
+  }
+
+  #update-dde-demographics-table caption {
+    font-weight: bolder;
+    font-size: 20px;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+  }
+  
+  #mi-modal-2, #confirm-VL {
+    display: none;
+  }
+
+</style>
+
+
+<script>
+  let local_differences = {}
+
+  function buildDiffs(diffs) {
+
+    let box = document.getElementById("update-dde-demographics");
+    let table = `
+    <table id="update-dde-demographics-table">
+      <thead>
+        <caption>Demographics mismatch</caption>
+        <tr>
+          <th style="width: 20%;">&nbsp;</th>
+          <th style="width: 40%;">Local</th>
+          <th style="width: 40%;">Remote</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="headers">First name</td>
+          <td id="local_given_name">&nbsp;</td>
+          <td id="remote_given_name">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Last name</td>
+          <td id="local_family_name">&nbsp;</td>
+          <td id="remote_family_name">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Gender</td>
+          <td id="local_gender">&nbsp;</td>
+          <td id="remote_gender">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Birthdate</td>
+          <td id="local_birthdate">&nbsp;</td>
+          <td id="remote_birthdate">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Home district</td>
+          <td id="local_home_district">&nbsp;</td>
+          <td id="remote_home_district">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Home TA</td>
+          <td id="local_home_traditional_authority">&nbsp;</td>
+          <td id="remote_home_traditional_authority">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Home village</td>
+          <td id="local_home_village">&nbsp;</td>
+          <td id="remote_home_village">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Current district</td>
+          <td id="local_current_district">&nbsp;</td>
+          <td id="remote_current_district">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Current TA</td>
+          <td id="local_current_traditional_authority">&nbsp;</td>
+          <td id="remote_current_traditional_authority">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Current village</td>
+          <td id="local_current_village">&nbsp;</td>
+          <td id="remote_current_village">&nbsp;</td>
+        </tr>
+      <tbody>
+      <tfooter>
+        <tr>
+          <td>&nbsp;</td>
+          <td><button class="button blue navButton" onmousedown="updateDDE(local_differences)"
+            style="float: right;" id="continue"><span>Use local</span>
+            </button></td>
+          <td><button class="button blue navButton" onmousedown="refreshDemographics(sessionStorage.patient_id)"
+            style="float: right;" id="continue"><span>Use remote</span>
+            </button></td>
+        </tr>
+      </tfooter>
+    </table>`;
+
+    let params = ['given_name', 'family_name', 'gender', 'birthdate', 
+      'home_district', 'home_traditional_authority', 'home_village',
+      'current_traditional_authority', 'current_district', 'current_village'];
+    //
+
+    let first_name = sessionStorage.given_name;
+    let last_name = sessionStorage.family_name;
+
+    let gender = sessionStorage.patientGender;
+    let birthdate = sessionStorage.patientDOB;
+
+
+    let ancestry_district = document.getElementById('ancestry-district').innerHTML;
+    let ancestry_ta = document.getElementById('ancestry-ta').innerHTML;
+    let ancestry_village = document.getElementById('ancestry-village').innerHTML;
+    
+    let current_district = document.getElementById('current-district').innerHTML;
+    let current_ta = document.getElementById('current-ta').innerHTML;
+    let current_village = document.getElementById('current-village').innerHTML;
+    box.innerHTML = table;
+
+    for(const el of params){
+      e = document.getElementById(`remote_${el}`);
+      e2 = document.getElementById(`local_${el}`);
+      if(el.match(/given_name/)){
+        e.innerHTML = first_name;
+        e2.innerHTML = first_name;
+      } else if (el.match(/family_name/)){
+        e.innerHTML = last_name;
+        e2.innerHTML = last_name;
+      } else if (el.match(/gender/)){
+        e.innerHTML = gender;
+        e2.innerHTML = gender;
+      } else if (el.match(/birthdate/)){
+        e.innerHTML = birthdate;
+        e2.innerHTML = birthdate;
+      } else if (el.match(/home_district/)){
+        e.innerHTML = ancestry_district;
+        e2.innerHTML = ancestry_district;
+      } else if (el.match(/home_traditional_authority/)){
+        e.innerHTML = ancestry_ta;
+        e2.innerHTML = ancestry_ta;
+      } else if (el.match(/home_village/)){
+        e.innerHTML = ancestry_village;
+        e2.innerHTML = ancestry_village;
+      } else if (el.match(/current_district/)){
+        e.innerHTML = current_district;
+        e2.innerHTML = current_district;
+      } else if (el.match(/current_traditional_authority/)){
+        e.innerHTML = current_ta;
+        e2.innerHTML = current_ta;
+      } else if (el.match(/current_village/)){
+        e.innerHTML = current_village;
+        e2.innerHTML = current_village;
+      }
+    }
+
+
+    Object.keys(diffs).forEach(element => {
+      let el = document.getElementById(`local_${element}`);
+      let el2 = document.getElementById(`remote_${element}`);
+      el.innerHTML = (element.match(/birthdate/i) ? moment(diffs[element].local).format("DD/MMM/YYYY") : diffs[element].local);
+      el2.innerHTML = (element.match(/birthdate/i) ? moment(diffs[element].remote).format("DD/MMM/YYYY") : diffs[element].remote);
+      let tr = el.parentElement;
+      local_differences[element] = document.getElementById(`local_${element}`).innerHTML
+      tr.style = "font-weight: bold; background-color:#f8d7da; color:#721c24;";
+    });
+
+  }
+
 </script>

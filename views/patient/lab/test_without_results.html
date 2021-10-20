@@ -120,7 +120,7 @@ function renderData(orders) {
             continue;
          
         dataTable.row.add([accession_number, specimen, 
-          tests[t].name, order_date, addEnterResultsBTN(tests[t].concept_id, tests[t].id, 
+          tests[t].name, order_date, addEnterResultsBTN(accession_number, tests[t].concept_id, tests[t].id, 
             tests[t].name, moment(order_date).format("YYYY-MM-DD"))]).draw();
       }
     }
@@ -149,12 +149,12 @@ function renderData(orders) {
     });
   }
 
-  function addEnterResultsBTN(test_type_id,test_id, test_name, order_date){
+  function addEnterResultsBTN(accession_number, test_type_id,test_id, test_name, order_date){
       return `<button class="button blue navButton"
-        onmousedown="selectTest('${test_type_id}','${test_id}', '${test_name}', '${order_date}');"><span>Select</span></button>`
+        onmousedown="selectTest('${accession_number}', '${test_type_id}','${test_id}', '${test_name}', '${order_date}');"><span>Select</span></button>`
   }
 
-  function selectTest(test_type_id, test_id, test_name, order_date){
-    location = `result_entering.html?test_type_id=${test_type_id}&test_id=${test_id}&test_name=${test_name}&order_date=${order_date}`;
+  function selectTest(accession_number, test_type_id, test_id, test_name, order_date){
+    location = `result_entering.html?test_type_id=${test_type_id}&test_id=${test_id}&accession_number=${accession_number}&test_name=${test_name}&order_date=${order_date}`;
   }
 </script>
