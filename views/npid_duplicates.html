@@ -506,6 +506,10 @@ function checkMandatoryFields(person){
    let names = person.names[0]
    let address = person.addresses[0]
 
+   if (person.addresses.length == 0) {
+    return false;
+   }
+
    if (isValid(person.gender) && isValid(names.given_name) && isValid(names.family_name)
          && isValid(address.address2) && isValid(address.neighborhood_cell) && isValid(address.county_district)
       && isValid(address.state_province)  && isValid(address.township_division) && isValid(address.city_village)
@@ -525,6 +529,7 @@ function isValid(value){
 }
 
 function CheckBeforeReassign(doc_id,patient_id){
+
   if (checkMandatoryFields(localClients.filter(id => id.patient_id == patient_id)[0].person) == true) {
     reassignID(doc_id,patient_id);
   } else {
