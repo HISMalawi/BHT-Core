@@ -114,7 +114,7 @@
           window.location.href = "/views/patient/new.html" + parameters;
       }else if (search_redirect.length > 0){
         if(people[pos]["person_type"] === "local" || people[pos]["person_type"] == undefined) {
-          window.location.href = "/views/confirm.html?person_id=" + people[pos]['Person ID'];
+          window.location.href = "/views/confirm.html?patient_id=" + people[pos]['NPID'];
           sessionStorage.setItem("patientID", people[pos]["Person ID"]);
         }else {
           window.location.href = "/views/confirm.html?patient_id=" + people[pos]['NPID'];
