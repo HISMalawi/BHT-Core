@@ -1515,7 +1515,7 @@ var global_property = GlobalProperty({
 
   function finish(id) {
 
-    if(compleDemographics() == false && !sessionStorage.userRoles.match(/Program Manager/i) &&  sessionStorage.programID === "1"){
+    if(compleDemographics() == false && !sessionStorage.userRoles.match(/Program Manager/i)){
       document.getElementById('incomplete-demographics').style="display:inline";
       document.getElementById('page-cover').style="display:inline";
       return
