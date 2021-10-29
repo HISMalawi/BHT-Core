@@ -1947,7 +1947,9 @@ function createNPID(npid) {
 }
 
 function checkIfDemographicsUpdated(patient_id) {
-  
+  if (sessionStorage.dde_enabled !== "true")
+    return;
+
   var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/dde/patients/diff?patient_id=";
   url += sessionStorage.patientID + "&program_id="+sessionStorage.programID;
   var xhttp = new XMLHttpRequest();
