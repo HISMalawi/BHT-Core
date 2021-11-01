@@ -396,7 +396,7 @@ function findClients() {
     url += "&gender="+ gender + "&program_id=";
     url += sessionStorage.programID;
    }else {
-    url = "/search/people?given_name=" + first_name + "&family_name=" + last_name +"&gender=" + gender;
+    url = "/search/patients?given_name=" + first_name + "&family_name=" + last_name +"&gender=" + gender;
    }
 
    functiontobecalled = 'searchResults'
@@ -496,24 +496,33 @@ function searchResults(results){
           doc_id:                   doc_id
   			}
       }else {
-        found_clients[x] = {
-          given_name: 							null_or_empty(data[x].names[0].given_name),
-          middle_name: 							null_or_empty(data[x].names[0].middle_name),
-          family_name: 							null_or_empty(data[x].names[0].family_name),
-          gender: 									null_or_empty(data[x].gender),
-          birthdate: 								null_or_empty(data[x].birthdate),
-          birthdate_estimated: 			null_or_empty(data[x].birthdate_estimated),
-          home_district:						null_or_empty((data[x].addresses[0] || {}).address2),
-          home_ta:									null_or_empty((data[x].addresses[0] || {}).county_district),
-          home_village:							null_or_empty((data[x].addresses[0] || {}).neighborhood_cell),
-          current_district:					null_or_empty((data[x].addresses[0] || {}).state_province),
-          current_ta:								null_or_empty((data[x].addresses[0] || {}).township_division),
-          current_village:					null_or_empty((data[x].addresses[0] || {}).city_village),
+        let person = data[x].person;
+        let identifiers = data[x].patient_identifiers;
+        let npid = null;
 
-          person_id:								data[x].person_id
-      // li.setAttribute("tag", ((i + 1)/2 > 0 ? "odd" : "even"));
+        for(const identifier of identifiers){
+          if(identifier.identifier_type == 3)
+            npid = identifier.identifier;
+
         }
 
+        found_clients[x] = {
+          given_name: 							null_or_empty(person.names[0].given_name),
+          middle_name: 							null_or_empty(person.names[0].middle_name),
+          family_name: 							null_or_empty(person.names[0].family_name),
+          gender: 									null_or_empty(person.gender),
+          birthdate: 								null_or_empty(person.birthdate),
+          birthdate_estimated: 			null_or_empty(person.birthdate_estimated),
+          home_district:						null_or_empty((person.addresses[0] || {}).address2),
+          home_ta:									null_or_empty((person.addresses[0] || {}).county_district),
+          home_village:							null_or_empty((person.addresses[0] || {}).neighborhood_cell),
+          current_district:					null_or_empty((person.addresses[0] || {}).state_province),
+          current_ta:								null_or_empty((person.addresses[0] || {}).township_division),
+          current_village:					null_or_empty((person.addresses[0] || {}).city_village),
+          person_type:              "Local",
+          person_id:								person.person_id,
+          npid:                     npid
+        }
       }
     }
   } 
