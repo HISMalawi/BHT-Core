@@ -51,9 +51,10 @@
 
       <form method='PUT'>
         <input type="text" name="malawiNationalId" id="malawiNationalId" textCase="upper" key="malawiNationalId"
-        style="font-weight:bold;font-size:58px;margin-bottom: 15px;border-style: solid; border-width: 0px 0px 2px 0px; width: 99%; border-color: black;text-transform: uppercase;"
+        style="margin-bottom: 15px; width: 99%; border-color: black;text-transform: uppercase;"
           helpText="Malawi National ID"
           field_type="number"
+          tt_pageStyleClass="nota"
           validationRule="^(?=[a-zA-Z0-9]*$)(?=\d+[a-zA-Z]|[a-zA-Z]+\d)([a-zA-Z\d]){8}$"
           validationMessage="Not a valid Malawi National ID"
           tt_onUnLoad="getInput();" 
@@ -217,11 +218,12 @@
     var t_row = document.createElement('tr');
     var t_colunm_1 = document.createElement('td');
     var t_colunm_2 = document.createElement('td');
+    t_colunm_2.style = "width: 97%";
     var img = document.createElement('img');
     barCodeInner.setAttribute('id','barCodeInner');
     barCodeInner.setAttribute('class','table-div-cell app-details');
     img.setAttribute('src',img_base64);
-    img.setAttribute('style','height: 97px; vertical-align: middle;');
+    img.setAttribute('style','height: 50px; vertical-align: middle;');
     t_colunm_1.append(img);
     t_row.appendChild(t_colunm_1);
     t_colunm_2.append(elements[0]);

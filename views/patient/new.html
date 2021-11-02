@@ -1160,13 +1160,14 @@
                    field_type="password"
                    tt_onLoad="$(nextButton).style.display = block;"
                    />
-      
+                   margin-bottom: 15px;
                    <div id="malawi" style="background-color: black;">
                     <input type="text" name="malawiNationalId" id="malawiNationalId" textCase="upper"
-                    style="font-weight:bold;font-size:58px;margin-bottom: 15px;border-style: solid; border-width: 0px 0px 2px 0px; width: 99%; border-color: black;text-transform: uppercase;"
+                    style="margin-bottom: 15px; width: 99%; border-color: black;text-transform: uppercase;"
                     tt_onLoad="addScanBody()"
                     condition="isProgramOPD() == true"
                     field_type="number"
+                    tt_pageStyleClass="nota"
                     helpText="Malawi National ID"
                     validationRule="^(?=[a-zA-Z0-9]*$)(?=\d+[a-zA-Z]|[a-zA-Z]+\d)([a-zA-Z\d]){8}$|Unknown|Not Available|N\/A"
                     validationMessage="Not a valid MAlawi National ID"
@@ -1649,13 +1650,14 @@
     var t_row = document.createElement('tr');
     var t_colunm_1 = document.createElement('td');
     var t_colunm_2 = document.createElement('td');
+    t_colunm_2.style = "width: 97%";
     var img = document.createElement('img');
 
     barCodeInner.setAttribute('id','barCodeInner');
     barCodeInner.setAttribute('class','table-div-cell app-details');
 
     img.setAttribute('src',img_base64);
-    img.setAttribute('style','height: 97px; vertical-align: middle;');
+    img.setAttribute('style','height: 50px; vertical-align: middle;');
     t_colunm_1.append(img);
     t_row.appendChild(t_colunm_1);
     t_colunm_2.append(elements);
