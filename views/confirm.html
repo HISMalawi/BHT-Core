@@ -5,7 +5,7 @@
 <script src="/apps/ART/assets/js/fast_track_alert.js"></script>
 
 <script src="/assets/js/generic_ajaxrequest.js"></script>
-<link rel="stylesheet" href="/assets/css/bootstrap/bootstrap.min.css">
+<!--link rel="stylesheet" href="/assets/css/bootstrap/bootstrap.min.css" /-->
 <!-- <rel="stylesheet" href="/assets/css/maindashboard/headefooter.css">  -->
 <link rel="stylesheet"  href="/public/touchscreentoolkit/lib/stylesheets/touch-fancy.css" />
 <!--ink rel="stylesheet" href="/assets/css/custom.css" /-->
@@ -22,6 +22,8 @@
 <script src="/assets/js/httpUtils.js"></script>
 <script src="/assets/js/uiUtils.js"></script>
 <script src="/assets/js/GlobalProperty.js"></script>
+
+<script type="text/javascript" src="/assets/anc/js/initializeItems.js"></script>
 
 <link
   rel="stylesheet"
@@ -164,7 +166,7 @@
   z-index: 991;
 }
 
-#address-confirmation-cover {
+#a4dress-confirmation-cover {
   display: none;
   position: absolute;
   background-color: black;
@@ -450,14 +452,11 @@ var global_property = GlobalProperty({
     var url = new URL(url_string);
     var patient_id = url.searchParams.get("patient_id");
     var person_id = url.searchParams.get("person_id");
-    var person_mnid = url.searchParams.get("person_mnid");
     if (person_id != null) {
       getClientbyID(person_id);
     } else if (patient_id != null) {
       patient_id = patient_id.replace(/-/g, "");
       getClient(patient_id);
-    } else if (person_mnid != null) {
-      getClientByMNID(person_mnid);
     }
   }
 
@@ -483,12 +482,22 @@ var global_property = GlobalProperty({
        let names = person.person.names[0]
        let address = person.person.addresses[0]
 
-       if (person.person.gender == '' || names.given_name == '' || names.family_name == '' || address.address2 == ''
-        || address.neighborhood_cell == '' || address.county_district == '' || address.state_province == '' || address.township_division == '' || address.city_village == ''  || person.person.birthdate == '') {
-        return false
+       if (isValid(person.person.gender) && isValid(names.given_name) && isValid(names.family_name)
+             && isValid(address.address2) && isValid(address.neighborhood_cell) && isValid(address.county_district)
+          && isValid(address.state_province)  && isValid(address.township_division) && isValid(address.city_village)
+            && isValid(person.person.birthdate)) {
+        return true;
        } else {
-        return true
+        return false;
        }
+    }
+
+    function isValid(value){
+        if(value != undefined && value.replace(/\s+/g, '') != '' && value != null){
+          return true;
+        }else{
+          return false;
+        }
     }
 
 
@@ -511,7 +520,7 @@ var global_property = GlobalProperty({
                  document.getElementById('page-cover').style="display:inline";
             }
           } else {
-            noPatient();
+            noPatient(patient_id);
           }
         }else {
           var obj = JSON.parse(this.responseText)[0];
@@ -521,7 +530,7 @@ var global_property = GlobalProperty({
           } else if (JSON.parse(this.responseText).length == 1) {
             populatePatient(obj, obj_2);
           } else {
-            noPatient();
+            noPatient(patient_id);
           }     
         }
         
@@ -529,71 +538,9 @@ var global_property = GlobalProperty({
         window.location.href = "/";
       }else if (this.status == 422) {
         var f = JSON.parse(this.responseText);
-        //sessionStorage.patientID = f.patient_id;
         sessionStorage.patientID = f.entity.patient_id;
-        window.location.href = "/views/patient/edit_demographics.html";
-      }
-    };
-    xhttp.open("GET", url, true);
-    xhttp.setRequestHeader(
-      "Authorization",
-      sessionStorage.getItem("authorization")
-    );
-    xhttp.setRequestHeader("Content-type", "application/json");
-    xhttp.send();
-  }
-
-  function getClientByMNID(patient_id) {
-    var dde_status = "";
-    var url = "";
-
-      url =
-      apiProtocol +
-      "://" +
-      apiURL +
-      ":" +
-      apiPort +
-      "/api/v1/search/patients/by_identifier?identifier=" +
-      patient_id+"&type_id="+28;
-    
-
-
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
-        //console.log("hello: ");
-        //console.log(this.responseText);
-        if (sessionStorage.dde_enabled === "true") {
-          var remotes = JSON.parse(this.responseText)["remotes"];
-          var locals = JSON.parse(this.responseText)["locals"];
-          if (remotes.length > 1 || locals.length > 1) {
-            location.href = "/views/npid_duplicates.html?health_id=" + patient_id;
-          }else if (locals.length >= 1 && remotes.length >=1) {
-            location.href = "/views/npid_duplicates.html?health_id=" + patient_id;
-          } else if (locals.length == 1) {
-            populatePatient(locals[0], locals[0]);
-          } else {
-            noPatient();
-          }
-        }else {
-          var obj = JSON.parse(this.responseText)[0];
-          var obj_2 = JSON.parse(this.responseText)[0];
-          if (JSON.parse(this.responseText).length > 1) {
-            location.href = "/views/duplicates.html?health_id=" + patient_id;
-          } else if (JSON.parse(this.responseText).length == 1) {
-            populatePatient(obj, obj_2);
-          } else {
-            noPatient();
-          }     
-        }
-        
-      } else if (this.status == 204) {
-        window.location.href = "/";
-      }else if (this.status == 422) {
-        var f = JSON.parse(this.responseText);
-        //sessionStorage.patientID = f.patient_id;
-        sessionStorage.patientID = f.entity.patient_id;
-        window.location.href = "/views/patient/edit_demographics.html";
+        document.getElementById('incomplete-demographics').style="display:inline";
+        document.getElementById('page-cover').style="display:inline";
       }
     };
     xhttp.open("GET", url, true);
@@ -637,8 +584,11 @@ var global_property = GlobalProperty({
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send();
   }
-  
+
+  var localPatient
+
   function populatePatient(obj, obj_2) {
+    localPatient = obj;
     var patient = obj;
     obj = obj["person"];
     patient_id = patient["patient_id"];
@@ -663,7 +613,7 @@ var global_property = GlobalProperty({
       var ancestry_district = document.getElementById("ancestry-district");
       var ancestry_ta = document.getElementById("ancestry-ta");
       var ancestry_village = document.getElementById("ancestry-village");
-      ancestry_district.innerHTML = obj["addresses"][0]["county_district"];
+      ancestry_district.innerHTML = obj["addresses"][0]["address2"];
       ancestry_ta.innerHTML = obj["addresses"][0]["county_district"];
       ancestry_village.innerHTML = obj["addresses"][0]["neighborhood_cell"];
 
@@ -809,14 +759,7 @@ var global_property = GlobalProperty({
         identifiersHash["Archived filing#"] = formatIdentifier(
           identifiers[i]["identifier"]
         );
-      } else if (identifiers[i]["identifier_type"] == 28 && sessionStorage.programID == 14) {
-        identifiersHash["MNID"] = formatIdentifier(
-          identifiers[i]["identifier"]
-        );
       }
-     
-      if(identifiers[i]["identifier"] == "UNKNOWN" && sessionStorage.programID == 14)
-         malawiNationalIdAlert();
     }
 
     var table = document.createElement("table");
@@ -859,21 +802,10 @@ var global_property = GlobalProperty({
               //window.location = "/views/patient/find_by_menu.html";
               assignNHID(patient_id);
           })
-      }
-
-     
-       if (!Object.keys(identifiersHash).includes("MNID") && sessionStorage.programID == 14)
-               malawiNationalIdAlert();
-               
+      } 
     var container = document.getElementById("section-body-0");
     container.appendChild(table);
   }
-
-  function malawiNationalIdAlert() {
-    // document.getElementById('malawi-national-id-message').style = "display: inline;";
-    //     document.getElementById('page-cover').style = "display: inline;";
-  }
-
   function assignNHID(person_id) {
           var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/patients/" + person_id + "/npid";
           var xhttp = new XMLHttpRequest();
@@ -882,7 +814,6 @@ var global_property = GlobalProperty({
               var obj = JSON.parse(this.responseText);
               var url = "/patients/" + patientID + "/labels/national_health_id";
               url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1" + url;
-              // console.log(obj.new_identifier);
               document.location = url;
               // var id = v.new_identifier.identifier;
               document.getElementById("continue").setAttribute("disabled", "");
@@ -920,10 +851,8 @@ var global_property = GlobalProperty({
           var table = document.createElement("table");
           table.setAttribute("class", "info-tables");
 
-
           if(identifiersHash['Current Outcome'] && identifiersHash['Current Outcome'].match(/died/i))
             patientDead = true;
-
 
           for (identifier in identifiersHash) {
             var tr = document.createElement("tr");
@@ -1405,51 +1334,6 @@ var global_property = GlobalProperty({
 </div>
 
 <div class="info-table"></div>
-<!-- <div
-  class="modal fade"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="mySmallModalLabel"
-  aria-hidden="true"
-  id="mi-modal"
-  style="width: 60%; margin-left:20%;margin-right: 20%; margin-top: 20%;"
->
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content" style="margin: 0; ">
-      <div class="modal-header">
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <h1 class="modal-title" id="myModalLabel">
-          Patient Has Died, are you sure you want to continue?
-        </h1>
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="button green"
-          id="modal-btn-si"
-          style="float:left; text-align: center; width: 100px;"
-        >
-          Yes
-        </button>
-        <button
-          type="button"
-          class="button red"
-          id="modal-btn-no"
-          style="width: 100px;"
-        >
-          No
-        </button>
-      </div>
-    </div>
-  </div>
-</div> -->
 
 <div
   class="modal fade"
@@ -1527,7 +1411,7 @@ var global_property = GlobalProperty({
           <button class="button red navButton" onmousedown="closeEnrollProgramPoP()" 
           style="float: right; width: 165px; margin-right: 30px;" id="continue"><span>Do NOT Enroll</span></button>
       </div>
-    </div> 
+    </div>
   </div>
 </div>
 
@@ -1548,8 +1432,26 @@ var global_property = GlobalProperty({
   </div>
 </div>
 
-<script>
+<div id="npid-diff">
+  <div id="enrolled-program-inner">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h1 style="text-align: center" class="text-uppercase">
+          NPID has been changed from a remote location </p>
+          Would you like to print it?
+        </h1>
+      </div>
+      <div class="modal-footer">
+          <button class="button green navButton" onmousedown="/"
+          style="float: right; width: 120px;" id="yes"><span>Yes</span></button>
+          <button class="red button navButton" onmousedown="document.getElementById('npid-diff').style = 'none', document.getElementById('page-cover').style = 'none'"
+          style="float: left; width: 120px;" id="no"><span>No</span></button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<script>
   function enrollPatient() {
         // sessionStorage.patientID = person_id;
         var http = new XMLHttpRequest();
@@ -1578,45 +1480,57 @@ var global_property = GlobalProperty({
   }
   buildInfoBoxes();
 
+  function popUpDeceasedMessage(){
+    var tstMessageBar = document.createElement('div');
+    var p = document.createElement('p');
+    p.setAttribute('style','text-align: center;font-size: 35px;');
+    p.innerHTML = "<p>Deceased client. Do you want to continue?</p>";
+    tstMessageBar.appendChild(p);
+    
+    var noBTN = document.createElement('button');
+    noBTN.innerHTML = "<span>No</span>";
+    noBTN.setAttribute('class', 'button blue navButton filing-number-btn');
+    noBTN.setAttribute('onmousedown','document.location="/";');
+    tstMessageBar.appendChild(noBTN);
+
+    var yesBTN = document.createElement('button');
+    yesBTN.innerHTML = "<span>Yes</span>";
+    yesBTN.setAttribute('class', 'button red navButton filing-number-btn');
+    yesBTN.style = 'right: 140px;'; 
+    yesBTN.setAttribute('onmousedown','nextEncounter(' + sessionStorage.patientID + ',' + sessionStorage.programID + ');');
+    tstMessageBar.appendChild(yesBTN);
+    tstMessageBar.setAttribute('id', 'address-confirmation');
+
+    var cover = document.createElement('div');
+    cover.setAttribute('id','address-confirmation-cover');
+    var bdy = document.getElementsByTagName('body')[0];
+    bdy.appendChild(cover);
+    bdy.appendChild(tstMessageBar);
+    tstMessageBar.style = 'z-index: 1000;display: inline; height: 30%; width: 50%; left: 25%;top: 10%;';
+    cover.style = 'display: inline;';
+
+    let coverPage = document.getElementById('page-cover');
+    coverPage.style = 'display: inline;';
+  }
+
   function finish(id) {
+
+    if(compleDemographics() == false && !sessionStorage.userRoles.match(/Program Manager/i)){
+      document.getElementById('incomplete-demographics').style="display:inline";
+      document.getElementById('page-cover').style="display:inline";
+      return
+    }
+
     sessionStorage.patientID = id;
-
-    if(sessionStorage.userRoles.match(/Pharmacist/i))
-      window.location = '/views/patient/dispensing.html';
-
     if(sessionStorage.programID != '1'){
       nextEncounter(sessionStorage.patientID, sessionStorage.programID);
       return;
     }
 
     if (patientDead == true) {
-      $("#mi-modal").modal("show");
-      var modalConfirm = function(callback) {
-        $("#continue").on("click", function() {
-          $("#mi-modal").modal("show");
-        });
+      popUpDeceasedMessage();
+      return;
 
-        $("#modal-btn-si").on("click", function() {
-          callback(true);
-          $("#mi-modal").modal("hide");
-        });
-
-        $("#modal-btn-no").on("click", function() {
-          callback(false);
-          $("#mi-modal").modal("hide");
-        });
-      };
-
-      modalConfirm(function(confirm) {
-        if (confirm) {
-          window.location.href =
-            "/views/patient_dashboard.html?patient_id=" + id;
-        } else {
-          $("#mi-modal").modal("hide");
-
-          window.location.href = "/";
-        }
-      });
     } else {
 
       /* .......... filing ............... */
@@ -1669,29 +1583,38 @@ var global_property = GlobalProperty({
     }
   }
 
-  function noPatient() {
-    $("#mi-modal-2").modal("show");
-    var modalConfirm = function(callback) {
-      $("#continue").on("click", function() {
-        $("#mi-modal-2").modal("show");
-      });
+  function noPatient(identifier) {
+    var tstMessageBar = document.createElement('div');
+    var p = document.createElement('p');
+    p.setAttribute('style','text-align: center;font-size: 35px;');
+    p.innerHTML = `<p>Client with ID "${identifier}" <b>NOT</b> found.</p>`;
+    tstMessageBar.appendChild(p);
+    let redirectURL;
 
-      $("#modal-btn-si-2").on("click", function() {
-        callback(true);
-        $("#mi-modal-2").modal("hide");
-      });
+    if(identifier.length == 6 || identifier.length == 13){
+      redirectURL = `/views/voided_identifiers.html?identifier=${identifier}`;
+    }else{
+      redirectURL = "/";
+    }
 
-      $("#modal-btn-no-2").on("click", function() {
-        callback(false);
-        $("#mi-modal-2").modal("hide");
-      });
-    };
+    var noBTN = document.createElement('button');
+    noBTN.innerHTML = "<span>OK</span>";
+    noBTN.setAttribute('class', 'button blue navButton filing-number-btn');
+    noBTN.setAttribute('onmousedown',`document.location="${redirectURL}";`);
+    tstMessageBar.appendChild(noBTN);
 
-    modalConfirm(function(confirm) {
-      if (confirm) {
-        window.location.href = "/";
-      }
-    });
+    tstMessageBar.setAttribute('id', 'address-confirmation');
+
+    var cover = document.createElement('div');
+    cover.setAttribute('id','address-confirmation-cover');
+    var bdy = document.getElementsByTagName('body')[0];
+    bdy.appendChild(cover);
+    bdy.appendChild(tstMessageBar);
+    tstMessageBar.style = 'z-index: 1000;display: inline; height: 30%; width: 50%; left: 25%;top: 10%;';
+    cover.style = 'display: inline;';
+
+    let coverPage = document.getElementById('page-cover');
+    coverPage.style = 'display: inline;';
   }
 
   function formatIdentifier(identifier) {
@@ -1991,8 +1914,42 @@ function checkIfEnrolled(patient_id) {
   xhttp.setRequestHeader("Content-type", "application/json");
   xhttp.send();
 }
+
+
+function createNPID(npid) {
+  var data = {"identifier": npid,
+              "patient_id": sessionStorage.patientID,
+              "identifier_type": 3};
+  var url =
+    sessionStorage.apiProtocol + "://" +
+    apiURL +
+    ":" +
+    apiPort +
+    "/api/v1/patient_identifiers/";
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", url);
+  xhr.setRequestHeader(
+    "Authorization",
+    sessionStorage.getItem("authorization")
+  );
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  xhr.onreadystatechange = function () {
+     if (xhr.readyState === 4 && xhr.status == 201) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        document.location = '/views/print/npid.html?identifier=' + npid;
+     }};
+
+  var data = JSON.stringify(data);
+
+  xhr.send(data);
+}
+
 function checkIfDemographicsUpdated(patient_id) {
-  
+  if (sessionStorage.dde_enabled !== "true")
+    return;
+
   var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/dde/patients/diff?patient_id=";
   url += sessionStorage.patientID + "&program_id="+sessionStorage.programID;
   var xhttp = new XMLHttpRequest();
@@ -2000,10 +1957,14 @@ function checkIfDemographicsUpdated(patient_id) {
     if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
       var obj = JSON.parse(this.responseText);
       
-      if(obj.diff != null && Object.keys(obj.diff).length !== 0) {
+      if(obj.diff != null && Object.keys(obj.diff).length !== 0 && obj.diff.npid != undefined) {
         document.getElementById("page-cover").style = 'display: inline;';
-        document.getElementById("update-dde-demographics").style = 'display: inline;';
-        buildDiffs(obj.diff);
+        document.getElementById("yes").setAttribute("onmousedown", `createNPID('${obj.diff.npid.remote}')`)
+        document.getElementById('npid-diff').style="display:inline";
+      } else if (obj.diff != null && Object.keys(obj.diff).length !== 0) {
+          document.getElementById("page-cover").style = 'display: inline;';
+          document.getElementById("update-dde-demographics").style = 'display: inline;';
+          buildDiffs(obj.diff);
       } 
     }
   };
@@ -2143,17 +2104,6 @@ function voidClient(void_reason){
   xhttp.send();
 }
 
-function cancelAdd(){
-  document.getElementById('malawi-national-id-message').style = "display: none;";
-  document.getElementById('page-cover').style = "display: none;";
-}
-
-function confirmAdd(){
-  // document.getElementById('malawi-national-id-message').style = "display: none;";
-  // document.getElementById('page-cover').style = "display: none;";
-  window.location.href = "/views/patient/edit_demographics/confirm_malawi_national_id.html";
-}
-
 function cancelVoid(){
   document.getElementById('void-confirm-message').style = "display: none;";
   document.getElementById('page-cover').style = "display: none;";
@@ -2206,7 +2156,7 @@ function closeEnrollProgramPoP(){
 
 <style>
 
-  #enroll-program, #incomplete-demographics {
+  #enroll-program, #incomplete-demographics, #npid-diff {
     background: #ffffff;
     border-radius: 0.5em;
     box-shadow: 0 10px 20px rgba(black, 0.2);
@@ -2243,31 +2193,6 @@ function closeEnrollProgramPoP(){
     border-color: black;
     border-style: solid;
     display: none;
-  }
-
-  #malawi-national-id-message { 
-    background: #ffffff;
-    border-radius: 0.5em;
-    box-shadow: 0 10px 20px rgba(black, 0.2);
-    left: 50%;
-    max-width: 90%;
-    position: absolute;
-    top: 40%;
-    transform: translate(-50%, -50%);
-    width: 50em;
-    text-align: left;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    z-index: 1000000;
-    border-color: black;
-    border-style: solid;
-    display: none;
-  }
-
-  #malawi-national-id-message p {
-    margin: 10px;
-    font-size: 24px;
   }
 
   #void-confirm-message p {
@@ -2309,7 +2234,7 @@ function closeEnrollProgramPoP(){
 
   .void-btns {
     border-style: solid;
-    width: 0%;
+    width: 47%;
     border-width: 1px;
     font-size: 30px;
     color: white;
@@ -2367,36 +2292,11 @@ function closeEnrollProgramPoP(){
       </div>
     </div>
   </div>
-</div>
 
-<div id="malawi-national-id-message">
-  <div class="modal-title">
-    <h1>Missing Malawi National ID</h1>
-  </div>
-  <p> Is Malawi National ID present?</p>
-  <style>
-    .national_id_btn
-    {
-      display: flex;
-      justify-content: space-between;
-    }
-  </style>
-  <div style="width: 100%;margin: 5px;">
-    <div style="display: table; width: 20%;">
-      <div class="national_id_btn">
-        <div class="void-btns" style="display: table-cell;  
-          text-align: center; padding: 10%; border-radius: 9px; margin-right: 385%;
-           background-color: red;" onmousedown="cancelAdd();">
-          No
-        </div>
-        <div class="void-btns" style="display: table-cell;  
-          text-align: center; padding: 10%; border-radius: 9px; left: 30%;
-           background-color: green;" onmousedown="confirmAdd();">
-          Yes
-        </div>
-      </div>
-    </div>
-  </div>
+
+
+
+
 </div>
 
 
@@ -2613,4 +2513,52 @@ function closeEnrollProgramPoP(){
 
   }
 
+  function fetchClientType(){
+        let url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/";
+        url += 'observations?person_id=' + sessionStorage.patientID + '&concept_id=3289';
+        url += '&page=0&page_size=1'
+
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+                let obs = JSON.parse(this.responseText);
+                if(obs && obs.length > 0) {
+                    sessionStorage.patient_type = (obs[0].value_coded == 7572 ? 'New patient' : (obs[0].value_coded == 10522 ? 'Drug refill' : 'External Consultation'));
+                }else{
+                    sessionStorage.patient_type = null;
+                }
+            }
+        };
+        xhttp.open("GET", url, true);
+        xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+        xhttp.setRequestHeader('Content-type', "application/json");
+        xhttp.send();
+    }
+
+    fetchClientType();
+
+
+    function compleDemographics(){
+      let ancestry_district = document.getElementById("ancestry-district").innerHTML;
+      let ancestry_ta = document.getElementById("ancestry-ta").innerHTML;
+      let ancestry_village = document.getElementById("ancestry-village").innerHTML;
+
+      let current_district = document.getElementById("current-district").innerHTML;
+      let current_ta = document.getElementById("current-ta").innerHTML;
+      let current_village = document.getElementById("current-village").innerHTML;
+
+      let complete_demographics = true;
+      let addresses = [
+        ancestry_district, ancestry_ta, ancestry_village, 
+        current_district, current_ta, current_village
+      ];
+
+      for(const address of addresses){
+        if(address.replace(/\s/g,'') == "")
+          complete_demographics = false;
+
+      }
+
+      return complete_demographics
+    }
 </script>

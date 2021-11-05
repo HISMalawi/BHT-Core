@@ -929,7 +929,8 @@ function voidLabOrder(reason){
                 try {
                     var addressl1 = results.person.addresses[0].city_village;
                     var addressl2 = results.person.addresses[0].address2;
-                    var phone_number = results.person.person_attributes[1].value;
+                    var phone_number = results.person.person_attributes.filter(value => value.person_attribute_type_id == 12)
+                    .map(phonenumbers => phonenumbers.value).toString();
                 }
                 catch (e) {
                     var addressl1 = "";

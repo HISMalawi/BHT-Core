@@ -98,6 +98,18 @@
   margin-left: 45%;
 }
 
+#page-cover {
+  display: none;
+  position: absolute;
+  background-color: black;
+  width: 100%;
+  height: 102%;
+  left: 0%;
+  top: 0%;
+  z-index: 999;
+  opacity: 0.65;
+}
+
 #nextButton { display: none; }
 
 #newBtn {
@@ -117,6 +129,28 @@
 	opacity: 0.5;
 
 }
+
+
+#incomplete-demographics {
+    background: #ffffff;
+    border-radius: 0.5em;
+    box-shadow: 0 10px 20px rgba(black, 0.2);
+    left: 50%;
+    max-width: 90%;
+    position: absolute;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    width: 30em;
+    text-align: left;
+    max-height: 90vh;
+    flex-direction: column;
+    z-index: 1000000;
+    border-color: black;
+    border-style: solid;
+    display: none;
+  }
+
+
 #clearButton {
   /* display: none;  */
 }
@@ -172,8 +206,8 @@
 
 </style>
 
-      <script>
-        var apiProtocol = sessionStorage.apiProtocol;
+<script>
+var apiProtocol = sessionStorage.apiProtocol;
 var apiURL = sessionStorage.apiURL;
 var apiPort = sessionStorage.apiPort;
 
@@ -183,6 +217,8 @@ var patientID = "";
 var url_string  = window.location;
 var url_value         = new URL(url_string);
 var patient_id  = url_value.searchParams.get("health_id");
+var localClients = '';
+
 patient_id = (patient_id).replace(/-/g, "");
 function getClient() {
  
@@ -202,6 +238,7 @@ function getClient() {
         loadData(obj.remotes, "remote");
       }
       if(obj.locals.length > 0) {
+        localClients = obj.locals;
         loadData(obj.locals, "local");
       }
     }else if(this.status == 204) {
@@ -288,7 +325,7 @@ function loadData(results, type) {
         var td = document.createElement('div');
         td.setAttribute('class','main-table-cell right');
         btn = document.createElement('button');
-        btn.setAttribute('onmousedown', "reassignID('" + doc_id + "','"+ person_id+"');");
+        btn.setAttribute('onmousedown', "CheckBeforeReassign('" + doc_id + "','"+ person_id+"');");
         btn.innerHTML = "<span>Re-assign ID</span>";
         td.appendChild(btn);
 
@@ -465,6 +502,45 @@ function getDocumentID(identifiers) {
 }
 
 
+function checkMandatoryFields(person){
+   let names = person.names[0]
+   let address = person.addresses[0]
+
+   if (person.addresses.length == 0) {
+    return false;
+   }
+
+   if (isValid(person.gender) && isValid(names.given_name) && isValid(names.family_name)
+         && isValid(address.address2) && isValid(address.neighborhood_cell) && isValid(address.county_district)
+      && isValid(address.state_province)  && isValid(address.township_division) && isValid(address.city_village)
+        && isValid(person.birthdate)) {
+    return true;
+   } else {
+    return false;
+   }
+}
+
+function isValid(value){
+    if(value != undefined && value.replace(/\s+/g, '') != '' && value != null){
+      return true;
+    }else{
+      return false;
+    }
+}
+
+function CheckBeforeReassign(doc_id,patient_id){
+
+  if (checkMandatoryFields(localClients.filter(id => id.patient_id == patient_id)[0].person) == true) {
+    reassignID(doc_id,patient_id);
+  } else {
+    sessionStorage.patientID = patient_id
+    document.getElementById('incomplete-demographics').style="display:inline";
+    document.getElementById('page-cover').style="display:inline";
+  }
+}
+
+
+
 </script>
 
       <form action="/dde/dde_duplicate" method="post">
@@ -474,11 +550,30 @@ function getDocumentID(identifiers) {
 
       </form>
 
+      <div  id="page-cover"></div>
+
       <div id="cover"></div>
 
       <div id="confirmPage" style="display:none">
         <p>Merging clients</p>
         <p>Please wait <span class="blinking">...</span></p>
+      </div>
+
+      <div id="incomplete-demographics">
+        <div id="enrolled-program-inner">
+          <div class="modal-content">
+            <div class="modal-body">
+              <h1 style="text-align: center" class="text-uppercase">
+                Client does not have complete Demographics </p>
+                Please update
+              </h1>
+            </div>
+            <div class="modal-footer">
+                <button class="button green navButton" onmousedown="javascript:location='/views/patient/edit_demographics.html'"
+                style="float: right; width: 120px;" id="continue"><span>Ok</span></button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <style>
