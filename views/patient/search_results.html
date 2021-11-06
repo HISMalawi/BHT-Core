@@ -101,7 +101,6 @@
         //createControlAndAssignValue("occupation", "person[occupation]",selected_person[pos+1]["Occupation"])
         //createControlAndAssignValue("national_id", "person[patient][identifiers][National id]",selected_person[pos+1]["Patient National ID"]);
       }
-
     } else {
       document.forms[0].action = "select";
       clearFields();
@@ -114,19 +113,17 @@
 
           window.location.href = "/views/patient/new.html" + parameters;
       }else if (search_redirect.length > 0){
-
         if(people[pos]["person_type"] === "local" || people[pos]["person_type"] == undefined) {
           sessionStorage.setItem("patientID", people[pos]["Person ID"]);
           if(parseInt(sessionStorage.programID) == 14)
-            window.location.href = "/apps/OPD/views/confirm.html?person_id=" + people[pos]['Person ID'];
+            window.location.href = "/apps/OPD/views/confirm.html?patient_id=" + people[pos]['NPID'];
           else
-            window.location.href = "/views/confirm.html?person_id=" + people[pos]['Person ID'];
+            window.location.href = "/views/confirm.html?patient_id=" + people[pos]['NPID'];
         }else {
- 
           if(parseInt(sessionStorage.programID) == 14)
-            window.location.href = "/apps/OPD/views/confirm.html?patient_id=" + people[pos]['Person ID'];
+            window.location.href = "/apps/OPD/views/confirm.html?patient_id=" + people[pos]['NPID'];
           else
-          window.location.href = "/views/confirm.html?patient_id=" + people[pos]['Person ID'];
+            window.location.href = "/views/confirm.html?patient_id=" + people[pos]['NPID'];
         }
         // nextEncounter(people[pos]['Person ID'] , 1, sessionStorage.programID);
       }else{
@@ -243,7 +240,6 @@ function loadPatient(){
       people[pos]["Occupation"] = "<%=data["occupation"]%>";
 			*/
 
-
       //people[pos]["Birthdate Estimated"] = found_clients[j].birthdate_estimated;;
 
       people[pos]["Home District"] = found_clients[j].home_district;
@@ -252,9 +248,9 @@ function loadPatient(){
 
       people[pos]["Current Residence"] = found_clients[j].home_village;
 
-      people[pos]["Patient National ID"] = "";
+      people[pos]["Patient National ID"] = (found_clients[j].npid ? found_clients[j].npid : null);
 
-      people[pos]["DDE Document ID"] = "";
+      people[pos]["DDE Document ID"] = (found_clients[j].doc_id ? found_clients[j].doc_id : "");
 
 			var person_id = parseInt(found_clients[j].person_id);
 
@@ -406,7 +402,7 @@ function findClients() {
     url += "&gender="+ gender + "&program_id=";
     url += sessionStorage.programID;
    }else {
-    url = "/search/people?given_name=" + first_name + "&family_name=" + last_name +"&gender=" + gender;
+    url = "/search/patients?given_name=" + first_name + "&family_name=" + last_name +"&gender=" + gender;
    }
 
    functiontobecalled = 'searchResults'
@@ -452,6 +448,40 @@ function searchResults(results){
         return value ? value : ""; 
       }
       if(sessionStorage.dde_enabled === "true") {
+        let person_type = data[x].person.person_id != null? "local" : "remote";
+        let set_person_id;
+        let npid;
+        let doc_id;
+
+        if(person_type == "local"){
+          set_person_id = data[x].patient_id;
+          let patient_identifiers = data[x].patient_identifiers;
+          for(patient_identifier of patient_identifiers){
+            if(patient_identifier.identifier_type == 3){
+              npid = patient_identifier.identifier;
+            }else if(patient_identifier.identifier_type == 27){
+              doc_id = patient_identifier.identifier;
+            }
+            
+          }
+          
+
+        }else{
+          set_person_id = null //nationalID(data[x].patient_identifiers);
+          let patient_identifiers = data[x].patient_identifiers;
+          //npid = nationalID(data[x].patient_identifiers);
+          //doc_id = data[x].doc_id;
+
+          for(patient_identifier of patient_identifiers){
+            if(patient_identifier.identifier_type == 3){
+              npid = patient_identifier.identifier;
+            }else if(patient_identifier.identifier_type == 27){
+              doc_id = patient_identifier.identifier;
+            }
+            
+          }
+        }
+
         found_clients[x] = {
           given_name: 							null_or_empty(data[x].person.names[0].given_name),
           middle_name: 							null_or_empty(data[x].person.names[0].middle_name),
@@ -466,28 +496,39 @@ function searchResults(results){
           current_ta:								null_or_empty((data[x].person.addresses[0] || {}).township_division),
           current_village:					null_or_empty((data[x].person.addresses[0] || {}).city_village),
 
-          person_type:							data[x].person.person_id != null? "local" : "remote",  
-          person_id:								data[x].person.person_id != null? data[x].person.person_id : nationalID(data[x].patient_identifiers)
+          person_type:							person_type,  
+          person_id:								set_person_id,
+          npid:                     npid,
+          doc_id:                   doc_id
   			}
       }else {
-        found_clients[x] = {
-          given_name: 							null_or_empty(data[x].names[0].given_name),
-          middle_name: 							null_or_empty(data[x].names[0].middle_name),
-          family_name: 							null_or_empty(data[x].names[0].family_name),
-          gender: 									null_or_empty(data[x].gender),
-          birthdate: 								null_or_empty(data[x].birthdate),
-          birthdate_estimated: 			null_or_empty(data[x].birthdate_estimated),
-          home_district:						null_or_empty((data[x].addresses[0] || {}).address2),
-          home_ta:									null_or_empty((data[x].addresses[0] || {}).county_district),
-          home_village:							null_or_empty((data[x].addresses[0] || {}).neighborhood_cell),
-          current_district:					null_or_empty((data[x].addresses[0] || {}).state_province),
-          current_ta:								null_or_empty((data[x].addresses[0] || {}).township_division),
-          current_village:					null_or_empty((data[x].addresses[0] || {}).city_village),
+        let person = data[x].person;
+        let identifiers = data[x].patient_identifiers;
+        let npid = null;
 
-          person_id:								data[x].person_id
-      // li.setAttribute("tag", ((i + 1)/2 > 0 ? "odd" : "even"));
+        for(const identifier of identifiers){
+          if(identifier.identifier_type == 3)
+            npid = identifier.identifier;
+
         }
 
+        found_clients[x] = {
+          given_name: 							null_or_empty(person.names[0].given_name),
+          middle_name: 							null_or_empty(person.names[0].middle_name),
+          family_name: 							null_or_empty(person.names[0].family_name),
+          gender: 									null_or_empty(person.gender),
+          birthdate: 								null_or_empty(person.birthdate),
+          birthdate_estimated: 			null_or_empty(person.birthdate_estimated),
+          home_district:						null_or_empty((person.addresses[0] || {}).address2),
+          home_ta:									null_or_empty((person.addresses[0] || {}).county_district),
+          home_village:							null_or_empty((person.addresses[0] || {}).neighborhood_cell),
+          current_district:					null_or_empty((person.addresses[0] || {}).state_province),
+          current_ta:								null_or_empty((person.addresses[0] || {}).township_division),
+          current_village:					null_or_empty((person.addresses[0] || {}).city_village),
+          person_type:              "Local",
+          person_id:								person.person_id,
+          npid:                     npid
+        }
       }
     }
   } 
@@ -509,6 +550,7 @@ function searchResults(results){
     people[pos]["Ancestral Traditional Authority(T/A)"] = found_clients[i].home_ta;
     people[pos]["Current Residence"] = found_clients[i].current_village;
     people[pos]["Person ID"]            = found_clients[i].person_id;
+    people[pos]["NPID"]            = found_clients[i].npid;
     pos++;
   }
 

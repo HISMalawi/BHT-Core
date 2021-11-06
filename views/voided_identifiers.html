@@ -1,0 +1,164 @@
+
+
+
+
+<script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
+<!-- <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/standard.js" defer="true"></script> -->
+
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/js/post_parameters.js"></script>
+<script type="text/javascript" src="/assets/js/generic_ajaxrequest.js"></script>
+<script type="text/javascript" src="/assets/js/moment.js"></script>
+<script type="text/javascript" src="/assets/js/httpUtils.js"></script>
+
+i
+<link rel="stylesheet" href="/assets/css/datatables/jquery.dataTables.min.css" type="text/css">
+
+<script type="text/javascript" src="/assets/js/datatables/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/assets/js/datatables/dataTables.fixedHeader.min.js"></script>
+
+<style>
+	#clearButton, #cancelButton {
+		display: none;
+	}
+
+	#possible-match {
+		width: 100%;
+	}
+
+	.names , .addresses {
+		text-align: left;
+		margin-left: 5px;
+	}
+
+	.birthdates, .genders, .identifiers, .btns {
+		text-align: center;
+	}
+
+
+</style>
+
+<script>
+	var mainUrl = window.location.href;
+  var parameters = new URL(mainUrl);
+  var mainIdentifier = parameters.searchParams.get("identifier");
+
+	function buildPage(){
+		let container = __$("inputFrame" + tstCurrentPage);
+		container.style = "width: 95.5%; height: 90%;";
+		let finishBTN = __$("nextButton");
+		finishBTN.setAttribute("onmousedown", "document.location='/'");
+
+		let url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/";
+    url += `search/patients/by_identifier?type_id=3&identifier=${mainIdentifier}&voided=true`;
+
+		let xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+				loadClients(JSON.parse(this.responseText));
+			}
+		};
+		xhttp.open("GET", url, true);
+		xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+		xhttp.setRequestHeader('Content-type', "application/json");
+		xhttp.send();
+	}
+
+	var dataTable;
+
+	function loadClients(data){
+		let table = `<table = id="possible-match">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Birthdate</th>
+					<th>Gender</th>
+					<th>Ancestry Home</th>
+					<th>Current ID</th>
+					<th>&nbsp;</th>
+				</tr>
+			</thead>
+		</table>`;
+		let container = __$("inputFrame" + tstCurrentPage);
+		container.innerHTML = table;
+		
+		dataTable = jQuery('#possible-match').DataTable({
+			fixedHeader:    true,
+      searching:      false,
+      deferRender:    true,
+      scroller:       true,
+      lengthChange:   false,
+      scrollY:        '65vh',
+      scrollCollapse: true,
+      paging:         false,
+      columnDefs: [
+        {"className": "names", "targets": 0},
+        {"className": "birthdates", "targets": 1},
+        {"className": "genders", "targets": 2},
+        {"className": "addresses", "targets": 3},
+        {"className": "identifiers", "targets": 4},
+        {"className": "btns", "targets": 5}
+      ]
+		});
+
+		//console.log(data)	
+		for(const client of data){
+			let given_name = client.person.names[0].given_name;
+			let family_name = client.person.names[0].family_name;
+			let birthdate = client.person.birthdate ? moment(client.person.birthdate).format("DD/MMM/YYYY") : 'N/A';
+			let gender = client.person.gender ? (client.person.gender.match(/F/i) ? "Female" : "Male") : 'N/A';
+			let patient_id = client.patient_id;
+			let patient_identifiers = client.patient_identifiers
+			let identifier_array = [];
+
+			for(const patient_identifier of patient_identifiers){
+				if(patient_identifier.identifier_type == 3)
+					identifier_array.push(patient_identifier.identifier);
+
+			}
+			
+			let address_obj = client.person.addresses[0];
+
+			let address = `<table class="homes-address">
+				<tr>
+					<td>District:</td><td>${address_obj.address2 ? address_obj.address2 : 'N/A'}</td>
+				</tr>
+				<tr>
+					<td>TA:</td><td>${address_obj.county_district ? address_obj.county_district : 'N/A'}</td>
+				</tr>
+				<tr>
+					<td>Village:</td><td>${address_obj.neighborhood_cell ? address_obj.neighborhood_cell : 'N/A'}</td>
+				</tr>
+			</table>`;
+
+
+			dataTable.row.add([`${given_name} ${family_name}`, birthdate, gender, 
+				address, identifier_array.join("<br />"), 
+				buildBTN(identifier_array[0])]).draw();
+		}
+	}
+
+	function buildBTN(identifier){
+		return `<button id="nextButton" class="button blue navButton" 
+		onmousedown="document.location='/views/confirm.html?patient_id=${identifier}'"><span>Select</span></button>`;
+	}
+</script>
+
+<body id="mateme">
+  <div id="container">
+    <div id="content">
+
+
+      <form>
+
+        <input type="text" name="summary"
+          tt_onLoad="__$('keyboard').style.display = 'none';buildPage();" 
+          tt_pageStyleClass= "NoControls" helpText="Possible match" optional = "true"/>
+
+
+      </form>
+
+   </div>
+ </div>
+</body>
+</html>

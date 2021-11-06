@@ -84,7 +84,7 @@
                 } else if (title.match(/Current District/i)) {
                     parametersPassed.current_district = (data || 'Unknown');
                 } else if (title.match(/Current TA/i)) {
-                    parametersPassed.current_traditional_authority = data;
+                    parametersPassed.current_traditional_authority = (data || 'Unknown');
                 } else if (title.match(/Current Village/i)) {
                     parametersPassed.current_village = (data || 'Unknown');
                 } else if (title.match(/Landmark/i)) {
@@ -128,6 +128,7 @@
                 }
             }
         }
+
 
         function calBirthdateFromEstimetedYear(age) {
             var currYear = new Date().getFullYear();
@@ -229,6 +230,11 @@
                     ["Register Guardian", parameter.relationship]
                 ];
             }
+
+            if(parameter.patient_type.match(/Drug refill|External/i))
+                attributes.push(["Facility Name", selectedFacility.name]);
+
+            attributes.push(["Register Guardian", parameter.relationship]);
 
             if (military_site) {
                 attributes = attributes.concat([
@@ -975,6 +981,24 @@
                     xhttp.send();
                 }
                 // getNames(__$('home_district').value, "District", "/districts?paginate=false&region_id=" + document.getElementById('current_region').value);
+
+
+            function changeCaption(field_name) {
+                let selectedRegion = document.getElementById(field_name).value
+                let helpText = field_name.match(/home/i) ? "Home" : "Current" ;
+
+                if (selectedRegion == '4') {
+                    document.getElementById(`helpText${tstCurrentPage}`).innerHTML = `${helpText} Country`;
+                    let location = document.getElementById('location-add')
+
+                    if (location) {
+                        location.setAttribute('style','display:none;')
+                    }
+                } else {
+                    document.getElementById(`helpText${tstCurrentPage}`).innerHTML = `${helpText} District`;
+                }
+            }
+
         </script>
 
         <form action="/views/patient_dashboard.html" method="POST">
@@ -1059,7 +1083,7 @@
                    setvalue=""
                    tt_pageStyleClass="NoKeyboard"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);changeCaption('home_region');"
                    tt_onUnload="jQuery('#nextButton').show();homeDistrict = getNames(__$('home_district').value, 'District', '/districts?paginate=false&district_id=' + document.getElementById('home_district').value);"
                    objectType="districts"/>
 
@@ -1105,7 +1129,7 @@
                    setvalue=""
                    tt_pageStyleClass="NoKeyboard"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('current_region').value);"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('current_region').value);changeCaption('current_region')"
                    tt_onUnload="jQuery('#nextButton').show();"
                    objectType="districts"/>
 
@@ -1195,6 +1219,7 @@
                     key="gender">
                 <option value=""></option>
                 <option value="New patient">New patient</option>
+                <option value="Drug refill">Drug refill</option>
                 <option value="External consultation">External consultation</option>
             </select>
 
@@ -1205,6 +1230,7 @@
                     helpText="Please select facility name"
                     id="facility_name"
                     tt_onLoad="setCurrentLocation();"
+                    tt_onUnLoad="fetchLocationName();"
                     name="facility_name"></select>
 
 
@@ -1456,6 +1482,7 @@
 
     var patient_type_map = {
         "New patient": 7572,
+        "Drug refill": 10522,
         "External consultation": 9684
     }
 
@@ -1474,6 +1501,13 @@
                 {concept_id: 3289, value_coded: ans}
             ]
         };
+
+        if(patient_type && patient_type.value.match(/Drug refill|consultation/i)){
+            obs.observations.push({
+                concept_id: 7054, 
+                value_text: selectedFacility.name
+            })
+        }
 
         submitParameters(obs, "/observations", "savePatienttypeThenRedirect");
     }
@@ -1668,4 +1702,27 @@
     v.removeChild(v.firstChild);
     v.append(barCodeInner);
    }
+
+  var selectedFacility;
+
+  function fetchLocationName() {
+        let location_id = __$('facility_name').value;
+        let url = apiProtocol + '://' + apiURL + ':' + apiPort + `/api/v1/locations/${location_id}`;
+        let req = new XMLHttpRequest();
+        req.onreadystatechange = function(){
+        
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    selectedFacility = JSON.parse(this.responseText);
+                }
+            }
+        };
+        try {
+        req.open('GET', url, true);
+        req.setRequestHeader('Authorization',sessionStorage.getItem('authorization'));
+        req.send(null);
+        } catch (e) {
+        
+        }
+    }
 </script>
