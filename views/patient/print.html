@@ -50,7 +50,7 @@
           var obj = JSON.parse(this.responseText);
           var type_of_pat = 'New patient';
           for(var i = 0 ; i < obj.length; i++){
-            type_of_pat = (parseInt(obj[i].value_coded) == 9684 ? 'External consultation' : 'New patient');
+            type_of_pat = (parseInt(obj[i].value_coded) == 7572 ? 'New patient' : 'other');
           }
           
           if(type_of_pat == 'New patient'){
