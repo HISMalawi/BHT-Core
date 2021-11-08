@@ -102,9 +102,7 @@
     var isValid = regex.test(mnid);
 
     if (!isValid) {
-      console.log(mnid);
-      if (mnid == 'Unknown' || mnid == 'UNKNOWN') {
-        console.log(mnid);
+      if (mnid == 'Unknown' || mnid == 'UNKNOWN' || mnid == 'N/A') {
         postMalawiNatioanlId();
         return;
       }
@@ -181,6 +179,7 @@
           for (var index = 0; index < results.patient_identifiers.length; index++) {
           if(results.patient_identifiers[index]["identifier_type"] == 28) {
           patient_identifier_id = results.patient_identifiers[index]["patient_identifier_id"];
+          console.log(patient_identifier_id);
           }
          }
 
