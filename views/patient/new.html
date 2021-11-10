@@ -177,7 +177,8 @@
                 facility_name: __$('facility_name').value,
                 relationship: (showTypeOfPatient() == true ? __$('guardian_present').value : 'No'),
             }
-
+            if(parseInt(sessionStorage.programID) == 14 )
+                parameter.patient_type = "New"
             if (military_site) {
                 parameter = Object.assign(parameter, {
                     occupation: __$('occupation').value,

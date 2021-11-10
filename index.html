@@ -377,7 +377,7 @@
     });
 
 
-    document.getElementById("client-name").innerHTML =sessionStorage.getItem("username")+ " (<span style='color: green;'>"+sessionStorage.userRoles+"</span>)";
+    document.getElementById("client-name").innerHTML =sessionStorage.getItem("username");
     document.getElementById("location-name").innerHTML =sessionStorage.getItem("userLocation");
     var loc = sessionStorage.getItem("userLocation");
     loc = loc.slice(0, loc.length);
