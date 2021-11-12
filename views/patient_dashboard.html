@@ -737,21 +737,6 @@
 
 <script>
 
-if (sessionStorage.redirectFromOPD == "true") {
-
-    function rdr() {
-        sessionStorage.redirectFromOPD = "false";
-        sessionStorage.setItem("applicationImage", "/assets/images/opd.png")
-        sessionStorage.setItem("applicationName", "OPD")
-        sessionStorage.setItem("applicationFolder", "OPD")
-        sessionStorage.setItem("programID", "14")
-        window.location = "/apps/OPD/views/encounters/presenting_complaints.html";
-    }
-
-    var nxtBtn = document.getElementById('btnNext');
-    nxtBtn.setAttribute('onclick','rdr()');
-}
-
 function confirmLabOrderVoid(order_id){
     let page_cover = document.getElementById("page-cover");
     let void_message = document.getElementById("void-confirm-message");
