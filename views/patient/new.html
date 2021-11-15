@@ -16,7 +16,9 @@
         tstUsername = "";
         tstUserKeyboardPref = "qwerty";
         tstCurrentDate = "";
-
+        var img_base64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAFKCAMAAAD2TtHjAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAADeUExURUdwTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEpG5jIAAABJdFJOUwCoIOCw2LjAMFiA+Oh4OPAYcJDI0CgIEKBoQFCIYFReNFdbI04VEyZNR0kDSkQODWJsZWQWLWkKYQlRPzoxEQdGKgZBGhw7NyfGlyHFAAAFo0lEQVR42u3TWVcUOQCAUVzQRlCJG2aYoVkEVNyAUUQd91ny//+QnVRqPRxfZp7m3O+lU6l0qrrq9tKSJEn6WQexNFsMX8b4vM4exfhssnA7DtvLU2/jTv541M1u58N33eHBeNPc6+bM74vhPzF+mVxjq5z8UDc9qrPPy+wF9/O937Tcz2ncmix6Ur56moffYtyos383N/B1sOnp8MfttrM78W3+2GumB5uejy+z+JHfJlfeifN2+K7f9FmMX8frNvoHch7jk3Y6xkftsD7lWVk3n1zmcvPqzkcvp3z1Q3dYNt3tz9T2ugXz+pRf9h4O/jWsWSrdzDeZ0qU6+yCla5OFN9KwlTx1Oy3nj+vd7I18eLc7nI03zYXmzK3F8LeU4uQa98rJO3XTB3X2Upm94H5+6Tct97Oa7k0WXS1fXc3Dhyndr7O/NjewMdh0dfjjrrSzy+l2/lhppgebrk9eb0oPJ1deTmvt8G6/6bWUNsbr7vcPZD2lq+10StfbYX3KN8u6tcllNptXtz56OeWrd7rDsumV/kxtpVuwVp/y5d7DDCywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwALr/wxrP5S2F8MXITyts0chbE4W3grDDvPUmzDPH1vdbH48Szvd4f5409wfzZn8Yr6E8Hpyjd1y8n3d9KjOPi2zF9zPn/2m5X6Ow+5k0ePy1eM8/BzCxzr7V3MDnwabHg9/3Kt2dh7e5I/DZnqw6dn4Mosf+Xly5Xk4aYc7/aabIXwar/vYP5CzEB53f8Cw1Q7rU94u604ml9lrXt3Z6OWUr77vDsumr/oztcNuwUl9yi96D/tLkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJ0n/RD/3ZSSm34sPOAAAAAElFTkSuQmCC";
+        
+        malawi_national_id: null,
         var d = new Date();
         d.toDateString();
         var homeVillage = "";
@@ -53,7 +55,7 @@
                 gender: null, birthdate: null, birthdate_estimated: null,
                 home_district: null, home_traditional_authority: null, home_village: null,
                 current_district: null, current_traditional_authority: null, current_village: null,
-                landmark: null, cell_phone_number: null, occupation: null, relationship: null,
+                landmark: null,malawi_national_id: null, cell_phone_number: null, occupation: null, relationship: null,
                 patient_type: null, facility_name: null
             }
 
@@ -88,7 +90,10 @@
                     parametersPassed.current_village = (data || 'Unknown');
                 } else if (title.match(/Landmark/i)) {
                     parametersPassed.landmark = data;
-                } else if (title.match(/Cell phone/i)) {
+                } else if (title.match(/Malawi National Id/i)) {
+                    parametersPassed.malawi_national_id = data;
+                }
+                else if (title.match(/Cell phone/i)) {
                     parametersPassed.cell_phone_number = data;
                 } else if (title.match(/Occupation/i)) {
                     parametersPassed.occupation = data;
@@ -166,6 +171,7 @@
                 home_village: __$('home_village').value,
 
                 landmark: __$('landmark').value !== 'Other' ? __$('landmark').value : __$('landmark-other').value,
+                malawi_national_id: __$('malawiNationalId').value,
                 cell_phone_number: __$('cellphone').value,
                 patient_type: __$('patient_type').value,
                 facility_name: __$('facility_name').value,
@@ -181,6 +187,9 @@
                 })
              }
 
+             if(parseInt(sessionStorage.programID) == 14 )
+                parameter.patient_type = "New"
+
             var table = document.createElement('table');
             table.setAttribute('class', 'summary-table');
             var attributes = [
@@ -195,6 +204,7 @@
                 ["Current District", parameter.current_district],
                 ["Current TA", parameter.current_traditional_authority],
                 ["Current Village", parameter.current_village],
+                ["Malawi National Id", parameter.malawi_national_id],
                 ["Landmark", parameter.landmark],
                 ["Cell phone", parameter.cell_phone_number],
                 ["Patient Type", parameter.patient_type]
@@ -1154,6 +1164,18 @@
                    tt_onLoad="$(nextButton).style.display = block;"
                    />
 
+            <div id="malawi" style="background-color: black;">
+                    <input type="text" name="malawiNationalId" id="malawiNationalId" textCase="upper"
+                    style="font-weight:bold;font-size:58px;margin-bottom: 15px;border-style: solid; border-width: 0px 0px 2px 0px; width: 99%; border-color: black;text-transform: uppercase;"
+                    tt_onLoad="addScanBody()"
+                    field_type="number"
+                    helpText="Malawi National ID"
+                    validationRule="^(?=[a-zA-Z0-9]*$)(?=\d+[a-zA-Z]|[a-zA-Z]+\d)([a-zA-Z\d]){8}$|Unknown|Not Available|N\/A"
+                    validationMessage="Not a valid MAlawi National ID"
+                    onkeyup="javascript:scanMNID(this);"
+                    helpText="Enter National ID"/>
+                </div>
+
             <input type="text" name="cellphone" id="cellphone"
                    helpText="Cell phone number"
                    field_type="number"
@@ -1552,7 +1574,7 @@
 
     function createPatient(person_id) {
         var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients';
-        var parametersPassed = JSON.stringify({person_id: person_id, program_id: sessionStorage.programID});
+        var parametersPassed = JSON.stringify({person_id: person_id, program_id: sessionStorage.programID,malawi_national_ID: parametersPassed.malawi_national_id});
 
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
@@ -1628,4 +1650,32 @@
         
         }
     }
+    
+    function addScanBody() {
+    var elements = document.getElementById('touchscreenInput16');
+    var barCodeInner = document.createElement('div');
+    var table = document.createElement('table');
+    var t_row = document.createElement('tr');
+    var t_colunm_1 = document.createElement('td');
+    var t_colunm_2 = document.createElement('td');
+    var img = document.createElement('img');
+
+    barCodeInner.setAttribute('id','barCodeInner');
+    barCodeInner.setAttribute('class','table-div-cell app-details');
+
+    img.setAttribute('src',img_base64);
+    img.setAttribute('style','height: 97px; vertical-align: middle;');
+    t_colunm_1.append(img);
+    t_row.appendChild(t_colunm_1);
+    t_colunm_2.append(elements);
+    //elements[0].remove();
+    t_row.appendChild(t_colunm_2);
+    table.append(t_row);
+    barCodeInner.append(table);
+
+
+    var v = document.getElementById('inputFrame16');
+    v.removeChild(v.firstChild);
+    v.append(barCodeInner);
+   }
 </script>

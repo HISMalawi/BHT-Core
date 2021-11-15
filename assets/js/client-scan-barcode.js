@@ -44,13 +44,20 @@ function inserBarcodeScan() {
 }
 
 function searchID(e) {
-  var lastChar = e.value.substr(e.value.length - 1); 
-  if(lastChar == '$') {
-    returnToFunction(e.value.slice(0, -1));
-    e.value = null;
+if(e.value.length > 30) {
+    var malawi_national_id =e.value.split('<')['1'].slice(3);
+    postID(malawi_national_id);
+  } 
+  else {
+    var lastChar = e.value.substr(e.value.length - 1); 
+    if(lastChar == '$') {
+      returnToFunction(e.value.slice(0, -1));
+      e.value = null;
+    }
   }
 }
-
+// BNHKYI78
+// 03~I<MWIBNHKYI78<5<<<<<<<<<<<<<<<~8604068M2204064MWI<<<<<<<<<<<0~MANDA<<JUSTINROBIN<<<<<<<<<<<<~MANDA~BNHKYI78~JUSTIN, ROBIN~~Male~06 Apr 1986~19 Sep 2017~ 
 function autoFocus() {
   var urlToSearch = new URL(window.location);
   if (sessionStorage.programID != undefined || (urlToSearch.href).match(/location.html/i)) {
@@ -76,7 +83,10 @@ function postID(identifier) {
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       // document.location = "/confirm/" + this.responseText;
-      document.location = patient_index_url + "?patient_id="+identifier;
+      if(identifier.length > 16)
+        document.location = patient_index_url + "?person_mnid="+identifier;
+      else
+        document.location = patient_index_url + "?patient_id="+identifier;
       // callbackFunction(this.responseText);
     }
   };

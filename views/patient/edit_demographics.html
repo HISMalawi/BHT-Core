@@ -232,6 +232,21 @@ function fetchDemographics(){
             function: 'editCellphone'
           });
 
+          var identifiers = results.patient_identifiers;
+            let mnid = identifiers.filter(attr => {
+              if(attr.type.patient_identifier_type_id == 28)
+              return attr.identifier;
+            });
+
+            if (mnid.length != 0)
+              mnid = mnid[0].identifier;
+            
+            values.push({
+            title: 'Malawi National ID',
+            value: `${mnid}`,
+            function: 'editMalawiNatioanlId'
+          });
+
           let table = document.getElementById("demographics");
           for(value of values){
             table.innerHTML += `<tr>
@@ -283,4 +298,8 @@ function editName() {
     document.location = url;
   }
 
+  function editMalawiNatioanlId() {
+    var url = '/views/patient/edit_demographics/malawi_national_id.html?patient_id='+sessionStorage.patientID;
+    document.location = url;
+  }
 </script>
