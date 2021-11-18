@@ -56,8 +56,7 @@ if(e.value.length > 30) {
     }
   }
 }
-// BNHKYI78
-// 03~I<MWIBNHKYI78<5<<<<<<<<<<<<<<<~8604068M2204064MWI<<<<<<<<<<<0~MANDA<<JUSTINROBIN<<<<<<<<<<<<~MANDA~BNHKYI78~JUSTIN, ROBIN~~Male~06 Apr 1986~19 Sep 2017~ 
+
 function autoFocus() {
   var urlToSearch = new URL(window.location);
   if (sessionStorage.programID != undefined || (urlToSearch.href).match(/location.html/i)) {
