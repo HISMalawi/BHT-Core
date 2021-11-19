@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+
+  <script language="javascript" defer="true">
+    tstUsername = "";
+    tstUserKeyboardPref = "qwerty";
+
+  </script>
+
+  <script type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js" defer="true"></script>
+  <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/assets/js/data.js"></script>
+  <script type="text/javascript" src="/assets/js/core.js"></script>
+
+</head>
+
+<body id="mateme">
+  <div id="container">
+    <div id="content">
+      <style>
+  #Unknown, #whitespace{ display:none; }
+  #Unknown{ display:block; }
+
+/* .tt_controls_malawi_national_id #num , #plus, #apostrophe, #star, #char, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; } */
+
+.tt_controls_guardian_malawi_national_id #num , #plus, #apostrophe, #star, #char, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+
+.tt_controls_home_phone_number #num , #plus, #apostrophe, #star, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+
+.tt_controls_office_phone_number #num , #plus, #apostrophe, #star, #abc, #date, #slash, #minus, #comma, #percent, #decimal { display:none; }
+
+#space {display:inline;}
+
+  .nota #na {
+    display: block;
+  }
+
+  #num{ display:block; }
+  #char{ display:none; }
+  #apostrophe { display:inline; }
+
+
+  .azButton .numericKeyboard #char {
+    display: block;
+  }
+      </style>
+
+      <form method='PUT'>
+        <input type="text" name="malawiNationalId" id="malawiNationalId" textCase="upper" key="malawiNationalId"
+        style="font-weight:bold;font-size:58px;margin-bottom: 15px;border-style: solid; border-width: 0px 0px 2px 0px; width: 99%; border-color: black;text-transform: uppercase;"
+          helpText="Malawi National ID"
+          field_type="number"
+          validationRule="^(?=[a-zA-Z0-9]*$)(?=\d+[a-zA-Z]|[a-zA-Z]+\d)([a-zA-Z\d]){8}$"
+          validationMessage="Not a valid Malawi National ID"
+          tt_onUnLoad="getInput();" 
+          onkeyup="javascript:scanMNID(this);"
+          tt_onLoad="prepNextButton();addScanBody();" />
+      </form>
+      <div id="footer">
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+<script type="text/javascript">
+  var patient_identifier_id ="";
+  function prepNextButton () {
+    document.getElementById('nextButton').setAttribute('onmousedown', 'validateInput()');
+  }
+
+  var tt_cancel_destination = "/views/patient/edit_demographics.html?patient_id=" + sessionStorage.patientID;
+  var url = new URL(url);
+  var apiURL = sessionStorage.getItem("apiURL");
+  var apiPort = sessionStorage.getItem("apiPort");
+  var apiProtocol = sessionStorage.getItem("apiProtocol");
+  var patient_id = sessionStorage.patientID;
+
+  function editMalawiNatioanlId() {
+    __$("nextButton").removeAttribute("onmousedown");
+    document.getElementById('touchscreenInput1').removeEventListener('keyup', checkKey, false);
+    document.getElementById('touchscreenInput1').addEventListener('keyup', function (event) {
+      event.preventDefault();
+      if (event.keyCode === 13) {
+        postMalawiNatioanlId();
+      }
+    });
+    __$("nextButton").onmousedown = function () {
+      postMalawiNatioanlId();
+    }
+
+  }
+
+  function validateInput(){
+    var mnid = value = $('touchscreenInput' + tstCurrentPage).value;
+    var regex = /^(?=[a-zA-Z0-9]*$)(?=\d+[a-zA-Z]|[a-zA-Z]+\d)([a-zA-Z\d]){8}$/;
+    var isValid = regex.test(mnid);
+
+    if (!isValid) {
+      console.log(mnid);
+      if (mnid == 'Unknown' || mnid == 'UNKNOWN') {
+        console.log(mnid);
+        postMalawiNatioanlId();
+        return;
+      }
+      showMessage("Not a valid MAlawi National ID");
+    } else {
+      postMalawiNatioanlId();
+    }
+    
+  }
+
+  function postMalawiNatioanlId() {
+
+    mnid = value = $('touchscreenInput' + tstCurrentPage).value;
+
+    var ACTION =  'PATCH';
+
+    if ( patient_identifier_id == '') {
+      ACTION = 'POST';
+    }
+    
+    var identifier_type = 28;
+
+    var http = new XMLHttpRequest();
+    var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patient_identifiers/' + patient_identifier_id;
+    
+    if(sessionStorage.dde_enabled === 'true') {
+      var params = {
+        identifier: mnid.toUpperCase(),
+        identifier_type: identifier_type,
+        patient_identifier_id : patient_identifier_id,
+        patient_id: sessionStorage.patientID
+      };
+    }else{
+      var params = {
+        identifier: mnid.toUpperCase(),
+        identifier_type: identifier_type,
+        patient_identifier_id : patient_identifier_id,
+        patient_id: sessionStorage.patientID
+      };
+    }
+    params = JSON.stringify(params);
+
+    http.open(ACTION, url, true);
+    //Send the proper header information along with the request
+    http.setRequestHeader('Content-type', 'application/json');
+    http.onreadystatechange = function () { //Call a function when the state changes.
+      if (http.readyState == 4) {
+        
+
+        if (http.status == 200) {
+          document.location = '/views/patient/edit_demographics.html?patient_id=' + sessionStorage.patientID;
+        } else if (http.status == 400) {
+          showMessage("Bad Request");
+        } else if (http.status == 201) {
+          document.location = '/views/patient/edit_demographics.html?patient_id=' + sessionStorage.patientID;
+        }else {
+          showMessage("error" + http.status);
+        }
+      }
+    }
+    http.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+    http.send(params);
+
+  }
+
+  function ajaxRequest(){
+      var url = sessionStorage.apiProtocol + '://'+apiURL+':'+apiPort+'/api/v1/patients/' + sessionStorage.patientID;
+      var req = new XMLHttpRequest();
+      req.onreadystatechange = function(){
+        if (this.readyState == 4) {
+          if (this.status == 200) {
+          var results = JSON.parse(this.responseText);
+
+          for (var index = 0; index < results.patient_identifiers.length; index++) {
+          if(results.patient_identifiers[index]["identifier_type"] == 28) {
+          patient_identifier_id = results.patient_identifiers[index]["patient_identifier_id"];
+          }
+         }
+
+          }
+        }
+      };
+      try {
+        req.open('GET', url, true);
+        req.setRequestHeader('Authorization',sessionStorage.getItem('authorization'));
+        req.send(null);
+      } catch (e) {
+      }
+    }
+
+    ajaxRequest();
+
+    function scanMNID(e) {
+      var sca =e.value.split('<');
+      if (typeof(sca) == "undefined") {
+        return;
+      }
+      else {
+        sca = sca['1'];
+        e.value = sca.slice(3);
+        return;
+      } 
+  }
+
+  var img_base64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAFKCAMAAAD2TtHjAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAADeUExURUdwTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEpG5jIAAABJdFJOUwCoIOCw2LjAMFiA+Oh4OPAYcJDI0CgIEKBoQFCIYFReNFdbI04VEyZNR0kDSkQODWJsZWQWLWkKYQlRPzoxEQdGKgZBGhw7NyfGlyHFAAAFo0lEQVR42u3TWVcUOQCAUVzQRlCJG2aYoVkEVNyAUUQd91ny//+QnVRqPRxfZp7m3O+lU6l0qrrq9tKSJEn6WQexNFsMX8b4vM4exfhssnA7DtvLU2/jTv541M1u58N33eHBeNPc6+bM74vhPzF+mVxjq5z8UDc9qrPPy+wF9/O937Tcz2ncmix6Ur56moffYtyos383N/B1sOnp8MfttrM78W3+2GumB5uejy+z+JHfJlfeifN2+K7f9FmMX8frNvoHch7jk3Y6xkftsD7lWVk3n1zmcvPqzkcvp3z1Q3dYNt3tz9T2ugXz+pRf9h4O/jWsWSrdzDeZ0qU6+yCla5OFN9KwlTx1Oy3nj+vd7I18eLc7nI03zYXmzK3F8LeU4uQa98rJO3XTB3X2Upm94H5+6Tct97Oa7k0WXS1fXc3Dhyndr7O/NjewMdh0dfjjrrSzy+l2/lhppgebrk9eb0oPJ1deTmvt8G6/6bWUNsbr7vcPZD2lq+10StfbYX3KN8u6tcllNptXtz56OeWrd7rDsumV/kxtpVuwVp/y5d7DDCywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwALr/wxrP5S2F8MXITyts0chbE4W3grDDvPUmzDPH1vdbH48Szvd4f5409wfzZn8Yr6E8Hpyjd1y8n3d9KjOPi2zF9zPn/2m5X6Ow+5k0ePy1eM8/BzCxzr7V3MDnwabHg9/3Kt2dh7e5I/DZnqw6dn4Mosf+Xly5Xk4aYc7/aabIXwar/vYP5CzEB53f8Cw1Q7rU94u604ml9lrXt3Z6OWUr77vDsumr/oztcNuwUl9yi96D/tLkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJ0n/RD/3ZSSm34sPOAAAAAElFTkSuQmCC";
+  
+  function addScanBody() {
+    var elements = document.getElementById('inputFrame0').childNodes;
+    var barCodeInner = document.createElement('div');
+    var table = document.createElement('table');
+    var t_row = document.createElement('tr');
+    var t_colunm_1 = document.createElement('td');
+    var t_colunm_2 = document.createElement('td');
+    var img = document.createElement('img');
+    barCodeInner.setAttribute('id','barCodeInner');
+    barCodeInner.setAttribute('class','table-div-cell app-details');
+    img.setAttribute('src',img_base64);
+    img.setAttribute('style','height: 97px; vertical-align: middle;');
+    t_colunm_1.append(img);
+    t_row.appendChild(t_colunm_1);
+    t_colunm_2.append(elements[0]);
+    elements[0].remove();
+    t_row.appendChild(t_colunm_2);
+    table.append(t_row);
+    barCodeInner.append(table);
+    var v = document.getElementById('inputFrame0');
+    v.append(barCodeInner);
+   }
+
+</script>
