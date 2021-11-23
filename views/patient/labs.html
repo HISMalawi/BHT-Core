@@ -57,10 +57,7 @@
 
   function configFinishBTN(){
     let btn = __$('nextButton');
-    if (sessionStorage.programID == '14')
-      btn.setAttribute('onmousedown', 'redirectOnFinishOrder();');
-    else
-      btn.setAttribute("onmousedown",`document.location='/views/patient_dashboard.html?patient_id=${sessionStorage.patientID}'`);
+    btn.setAttribute("onmousedown",`document.location='/views/patient_dashboard.html?patient_id=${sessionStorage.patientID}'`);
   }
 </script>
 
