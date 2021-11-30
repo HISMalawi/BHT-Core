@@ -895,6 +895,15 @@
                 client +=  "&birthdate_estimated=" + culBirthdate()[1];
 
                 client +=  "&home_district=" + homeDistrict;
+
+                if(homeTA === "homeTA"){
+                    homeTA = "Unknown";
+                }
+
+                if(homeVillage === "homevillage"){
+                    homeVillage = "Unknown";
+                }
+                
                 client +=  "&home_traditional_authority=" + homeTA;
                 client +=  "&home_village=" + homeVillage;
                 client +=  "&program_id=" + sessionStorage.programID;  
@@ -1053,7 +1062,7 @@
                    tt_pageStyleClass="NoKeyboard"
                    tt_requireNextClick='false'
                    tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);changeCaption('home_region');"
-                   tt_onUnload="jQuery('#nextButton').show();homeDistrict = getNames(__$('home_district').value, 'District', '/districts?paginate=false&district_id=' + document.getElementById('home_district').value);"
+                   tt_onUnload="jQuery('#nextButton').show();getNames(__$('home_district').value, 'District', '/districts?paginate=false&district_id=' + document.getElementById('home_district').value);"
                    objectType="districts"/>
 
             <input type="text" name="home_ta"
@@ -1062,7 +1071,7 @@
                    condition="$('home_region').value != '4'"
                    tt_requireNextClick='false'
                    tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('home_district').value);addLocation('TA','home_district');"
-                   tt_onUnLoad="jQuery('#nextButton').show();homeTA = getNames(__$('home_ta').value, 'TA', '/traditional_authorities?paginate=false&region_id=' + document.getElementById('home_ta').value);removeAddLocation();"
+                   tt_onUnLoad="jQuery('#nextButton').show();getNames(__$('home_ta').value, 'TA', '/traditional_authorities?paginate=false&region_id=' + document.getElementById('home_ta').value);removeAddLocation();"
                    objectType="traditional_authority"/>
                  
             <input type="text" name="home_village"
