@@ -41,6 +41,8 @@ admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="
 
 admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="military-site" onclick="redirect(this.id); "><img src="/assets/images/soldier.png" class="btn-icons"/><span>Is this a military site?</span></button>';
 
+admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="malawi-national-id" onclick="redirect(this.id); "><img src="/assets/images/edit-demographic.png" class="btn-icons"/><span>Activate Malawi National ID?</span></button>';
+
 admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="registers" onclick="redirect(this.id); "><img src="/assets/images/list.png" class="btn-icons"/><span>Manage Registers</span></button>';
 
 admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="userStats" onclick="redirect(this.id); "><img src="/assets/images/add-user.png" class="btn-icons"/><span>User Stats</span></button>';
@@ -843,6 +845,9 @@ function redirect(id) {
     //if it is a military site
     if (id === "military-site") {
         window.location.href = "/views/military_site.html";
+    } 
+    if (id === "malawi-national-id") {
+        window.location.href = "/views/malawi_nationalID.html";
     }
     //view-drug-management-settings
     if (id === "view-drug-management-settings") {

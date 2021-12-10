@@ -186,7 +186,12 @@
                     military_rank: __$('rank').value,
                 })
              }
-
+             
+             if(malawi_nationalID_status){
+                parameter = Object.assign(parameter, {
+                    malawi_national_id: __$('malawi_national_id').value,
+                })
+             }
             var table = document.createElement('table');
             table.setAttribute('class', 'summary-table');
             var attributes = [
@@ -202,7 +207,6 @@
                 ["Current TA", parameter.current_traditional_authority],
                 ["Current Village", parameter.current_village],
                 ["Landmark", parameter.landmark],
-                ["Malawi National Id", parameter.malawi_national_id],
                 ["Cell phone", parameter.cell_phone_number],
                 ["Patient Type", parameter.patient_type]
             ];
@@ -212,6 +216,12 @@
 
             attributes.push(["Register Guardian", parameter.relationship]);
 
+            if(malawi_nationalID_status)
+            {
+                attributes = attributes.concat([
+                    ["Malawi National Id", parameter.malawi_national_id]
+                ])
+            }
             if (military_site) {
                 attributes = attributes.concat([
                     ["Occupation", parameter.occupation],
@@ -371,7 +381,8 @@
     <script type="text/javascript" src="/assets/js/tt_tabs.js"></script>
     <script type="text/javascript" src="/assets/js/GlobalProperty.js"></script>
     <script type="text/javascript" src="/assets/js/military_site.js"></script>
-
+    <script type="text/javascript" src="/assets/js/malawi_nationalID.js"></script>
+    
 </head>
 <body id="mateme">
 <div id="container">
@@ -1160,9 +1171,10 @@
                    field_type="password"
                    tt_onLoad="$(nextButton).style.display = block;"
                    />
-                   <div id="malawi" style="background-color: black;">
-                    <input type="text" name="malawiNationalId" id="malawiNationalId" textCase="upper"
+                   <div style="background-color: black;">
+                    <input type="text" name="malawi_national_id" id="malawi_national_id" textCase="upper"
                     style="margin-bottom: 15px; width: 99%; border-color: black;"
+                    condition ="askMalawiNationalID()"
                     tt_onLoad="addScanBody()"
                     field_type="number"
                     tt_pageStyleClass="nota"
@@ -1505,6 +1517,7 @@
 
     function postClientParamaters(parametersPassed, attributes = null) {
         var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/people';
+        var malawi_national_id =parametersPassed.malawi_national_id;
         if (parametersPassed.birthdate_estimated === "Yes") {
             parametersPassed.birthdate_estimated = 1;
         }else {
@@ -1521,10 +1534,17 @@
 
                 if (attributes) {
                     createPersonAttributes(personId, attributes, function () {
-                        createPatient(personId,parametersPassed.malawi_national_id)
+                        if(malawi_nationalID_status){
+                            createPatient(personId,malawi_national_id)
+                        }
+                        else
+                            createPatient(personId);
                     });
                 } else {
-                    createPatient(personId);
+                    if(malawi_nationalID_status)
+                        createPatient(personId,malawi_national_id)
+                    else
+                        createPatient(personId);
                 }
                 // submitPatienttype(obj['person_id']);
             }
@@ -1567,9 +1587,12 @@
 
     var redirect_to_guardian_search = false;
 
-    function createPatient(person_id,malawi_nationalID) {
+    function createPatient(person_id,malawi_nationalID = null) {
         var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients';
-        var parametersPassed = JSON.stringify({person_id: person_id, program_id: sessionStorage.programID,malawi_national_ID: malawi_nationalID});
+        if(malawi_nationalID)
+            var parametersPassed = JSON.stringify({person_id: person_id, program_id: sessionStorage.programID,malawi_national_ID: malawi_nationalID});
+        else
+            var parametersPassed = JSON.stringify({person_id: person_id, program_id: sessionStorage.programID});
 
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
