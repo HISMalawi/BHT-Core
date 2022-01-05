@@ -1,13 +1,8 @@
-// var patientID = patient_id
-
 var url = new URL(window.location.href);
 var apiURL = sessionStorage.getItem("apiURL");
 var apiPort = sessionStorage.getItem("apiPort");
 var apiProtocol = sessionStorage.getItem("apiProtocol");
-
 var id = url.searchParams.get("user_id");
-
-
 function checkIfEncounterCaptured(encounter_name, id, redirect) {
   var applicationName = sessionStorage.applicationFolder;
   let setUrl = '/apps/' + applicationName + '/application.json';
@@ -19,9 +14,7 @@ function checkIfEncounterCaptured(encounter_name, id, redirect) {
         try {
           let available = results.encounters[encounter_name].available;
           let url = results.encounters[encounter_name].url;
-
           if (available == false) {
-
           } else if (available == true) {
             if (redirect == false ) {
               sessionStorage.setItem("nextEncounter", encounter_name);
@@ -30,9 +23,18 @@ function checkIfEncounterCaptured(encounter_name, id, redirect) {
               // window.location.href = url;
               sessionStorage.setItem("nextEncounter", encounter_name);
               sessionStorage.setItem("nextEncounterAvailable", "Available");
+              // checking related to triage
+              if (encounter_name == 'outpatient diagnosis' && sessionStorage.programID == '14') {
+                if ( sessionStorage.getItem('presenting_complaints_re_encountered') == "false"
+                     || sessionStorage.getItem('presenting_complaints_re_encountered') == null) {
+                  sessionStorage.setItem("presenting_complaints_re_encountered", "false")
+                  url = '/apps/OPD/views/encounters/presenting_complaints.html'
+                }
+              }
+
               checkIfActivitySelected(encounter_name, url);
             } 
-            
+
           }
         } catch (error) {
           // showMessage("selected encounter " + encounter_name + " is not available, continue to patient dashboard?", null, 3000);
@@ -58,8 +60,7 @@ function checkIfEncounterCaptured(encounter_name, id, redirect) {
         }
       } else if (this.status == 404) {
         showMessage("application.json missing from application configuration");
-      }
-
+      } 
     } else {
 
     }
@@ -68,10 +69,10 @@ function checkIfEncounterCaptured(encounter_name, id, redirect) {
     req.open('GET', setUrl, true);
     req.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
     req.send(null);
-  } catch (e) { }
+  } catch (e) {
 
+   }
 }
-
 function confirmCancelEntryWithMessage(save, message = "Are you sure you want to Cancel", patientDashboard, noRedirect) {     // If you want to save state set save =
   // true
   var href = noRedirect ? '' : 'window.location.href=&#034/&#034';
@@ -85,19 +86,14 @@ function confirmCancelEntryWithMessage(save, message = "Are you sure you want to
       button
     tstMessageBar.style.display = "block";
   }
-
 }
 
 function nextEncounter(patient_id, program_id, redirect) {
   let url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/workflows";
   url += "/" + program_id + "/" + patient_id + "?date=" + sessionStorage.sessionDate;
-
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function () {
-
-
     if (this.readyState == 4) {
-
       if (this.status == 200) {
         var obj = JSON.parse(this.responseText);
         checkIfEncounterCaptured(obj["name"].toLowerCase(), patient_id, redirect);
@@ -122,19 +118,15 @@ function nextEncounter(patient_id, program_id, redirect) {
       }else if((this.status == 500 || this.status == 404) && redirect != false) {
         window.location.href = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
       }
-
     }
   };
   xhttp.open("GET", url, true);
   xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
   xhttp.setRequestHeader('Content-type', "application/json");
   xhttp.send();
-
 }
-
 function checkIfActivitySelected(encounter_name, url) {
   var selected_activities = sessionStorage.userActivities;
-
   if  (parseInt(sessionStorage.programID) == 1 ){
     if (encounter_name == "art adherence" && !selected_activities.match(/ART adherence/i)) {
       window.location.href = "/views/patient_dashboard.html?patient_id=" + sessionStorage.patientID;
@@ -173,15 +165,10 @@ function checkIfActivitySelected(encounter_name, url) {
       return;
     }
   }
-
   window.location.href = url;
 }
-
 function setCurrentLocation() {
   $('touchscreenInput' + tstCurrentPage).setAttribute('ajaxURL', "/locations?name=" + sessionStorage.currentLocation);
   listSuggestions(tstCurrentPage);
-  $('touchscreenInput' + tstCurrentPage).setAttribute('ajaxURL', "/locations?name=");
-  
+  $('touchscreenInput' + tstCurrentPage).setAttribute('ajaxURL', "/locations?name="); 
 }
-
-
