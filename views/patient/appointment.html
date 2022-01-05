@@ -506,7 +506,8 @@ function setAppointmentDate() {
     encounter_type_name: 'APPOINTMENT',
     encounter_type_id:  7,
     patient_id: sessionStorage.patientID,
-    encounter_datetime: encounter_datetime
+    encounter_datetime: encounter_datetime,
+    program_id: sessionStorage.programID
   }
   submitParameters(encounter, "/encounters", "postAppointmentObs");
   /*
