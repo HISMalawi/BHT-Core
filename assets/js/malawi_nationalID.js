@@ -27,7 +27,7 @@ var global_property = GlobalProperty({
 
 global_property.isEnabled('malawi.nationalID.enabled', function (res) {
   
-  if (res) {
+  if (res && programID == 14) {
 
    malawi_nationalID_status = true; 
 
