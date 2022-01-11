@@ -33,6 +33,7 @@ function addBarcode() {
       if (this.readyState == 4) {
         if (this.status == 200) {
           var results = JSON.parse(this.responseText);
+          sessionStorage.setItem("siteUUID", results.uuid)
           sessionStorage.setItem("userLocation", results.name);
           document.location = "/";
         } else if (this.status == 404) {
