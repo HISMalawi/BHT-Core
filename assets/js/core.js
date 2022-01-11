@@ -403,7 +403,7 @@ function printFilingNumber() {
 }
 
 function printVisitSummary() {
-    print_and_redirect('/views/print/visit.html', '/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID);
+    print_and_redirect('/views/print/visit.html?visit_date='+encDate, '/views/patient_dashboard.html?patient_id=' + sessionStorage.patientID);
 }
 
 function printTransferOut() {
