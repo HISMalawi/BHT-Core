@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <link rel="stylesheet" href="/stylesheets/background.css" type="text/css">
+    <script src="/assets/js/jquery.min.js"> </script>
+    <script language="javascript" defer="true">
+        tstUsername = "";
+        tstUserKeyboardPref = "abc";
+        var d = new Date();
+        d.toDateString();
+        var choices = {};
+        var yesNoHash = {
+            "Yes": "true",
+            "No" : "false"
+        }
+
+        function submitMalawiNationalID() {
+            value = $('touchscreenInput' + tstCurrentPage).value;
+            if (value == ""){
+                showMessage("Enter a value to continue.");
+            }
+            var url = "/global_properties";
+            var global_property = {property: "malawi.nationalID.enabled", property_value: yesNoHash[value] }
+            submitParameters(global_property, url, "goHome");
+        }
+
+        function goHome(e) {
+            document.location = '/';
+        }
+
+        function changeFinishBtn() {
+            var finishButton = __$("nextButton");
+            finishButton.setAttribute('onmousedown', "submitMalawiNationalID();");
+            finishButton.setAttribute('onclick', "");
+        }
+
+    </script>
+
+    <script language="javascript" type="text/javascript" src="/public/touchscreentoolkit/lib/javascripts/touchScreenToolkit.js"
+        defer="true"></script>
+    <script language="javascript" type="text/javascript" src="/javascripts/show_category_hack.js" defer="true"></script>
+    <script language="javascript" type="text/javascript" src="/assets/js/core.js" defer="true"></script>
+    <script language="javascript" type="text/javascript" src="/assets/js/post_parameters.js" defer="true"></script>
+
+  </head>
+
+  <body id="mateme">
+  <div id="container">
+    <div id="content">
+      <div id="description" style="color:#777;position:absolute;margin-top:-70px;">
+      </div>
+      <script>
+    tt_cancel_destination = "/";
+
+</script>
+
+    <form id='military' action="/" method='post'>
+      <label for="enable">Activate Malawi National ID?</label>
+        <select id="enable" name="enable" tt_onLoad="changeFinishBtn();">
+          <option></option>
+          <option>Yes</option>
+          <option>No</option>
+        </select> 
+
+  <input type="hidden" name="property" id="property" value="malawi.nationalID" />
+
+  <input type="hidden" name="property_value" id="property_value" />
+
+
+</form>
+      <div id="footer">
+      </div>
+    </div>
+  </div>
+  </body>
+</html>

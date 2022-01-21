@@ -296,7 +296,7 @@ function enterKeypadValue(e, order_id) {
             inputBox.value = null;
         } else if (e.innerHTML.match(/Dispense/i)) {
             var amount_dispensed = document.getElementById("prescription-input").value;
-            manualDispensation(order_id, amount_dispensed);
+            manualDispensation2(order_id, amount_dispensed);
             document.getElementById("prescription-modal").style = "display: none;";
         } else if (e.innerHTML.match(/Close/i)) {
             document.getElementById("prescription-modal").style = "display: none;";
@@ -368,7 +368,9 @@ function manualDispensation(order_id) {
     } catch (e) {
     }
 }
-
+function manualDispensation2(order_id, amount_dispensed) {
+    postDispensation(order_id, amount_dispensed);
+}
 function scannedMedicationBarcode(barcode) {
     var drug_id = barcode.split("-")[0];
     var quantity = barcode.split("-")[1];

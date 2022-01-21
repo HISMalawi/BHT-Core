@@ -315,7 +315,7 @@
 
             <div class="col-sm-6 col-lg-6 col-md-6 col-xs-6" style="border: solid 0px; width: 48%; margin-left: 0%;">
                 <div class="card text-white mb-3 cards" style="width: 98%; height: 225px; overflow: hidden;"
-                   onmousedown="document.location='/views/patient/labs.html';">
+                   onmousedown="redirectToLabOrder()">
                     <div class="card-header h4 btn-success" style="margin: 3%; padding: 1%;">Lab Orders</div>
                     <div class="list-group" id="programs" style="height: 100%; overflow: hidden;">
                     </div>
@@ -736,7 +736,12 @@
 <script src="/assets/js/core.js "></script>
 
 <script>
-
+function redirectToLabOrder(){
+    if(sessionStorage.programID == 14)
+        document.location='/apps/OPD/views/encounters/labs.html';
+    else
+        document.location='/views/patient/labs.html';
+}
 function confirmLabOrderVoid(order_id){
     let page_cover = document.getElementById("page-cover");
     let void_message = document.getElementById("void-confirm-message");
