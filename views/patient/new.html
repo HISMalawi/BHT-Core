@@ -83,7 +83,7 @@
                 } else if (title.match(/Current District/i)) {
                     parametersPassed.current_district = (data || 'Unknown');
                 } else if (title.match(/Current TA/i)) {
-                    parametersPassed.current_traditional_authority = data;
+                    parametersPassed.current_traditional_authority = (data || 'Unknown');
                 } else if (title.match(/Current Village/i)) {
                     parametersPassed.current_village = (data || 'Unknown');
                 } else if (title.match(/Landmark/i)) {
@@ -123,6 +123,7 @@
                 }
             }
         }
+
 
         function calBirthdateFromEstimetedYear(age) {
             var currYear = new Date().getFullYear();
@@ -186,7 +187,7 @@
                 ["Given name", parameter.given_name],
                 ["Family name", parameter.family_name],
                 ["Gender", parameter.gender],
-                ["Birthdate", parameter.birthdate],
+                ["Birthdate", moment(parameter.birthdate).format('DD/MMM/YYYY')],
                 ["Birthdate Estimated", parameter.birthdate_estimated],
                 ["Home District", parameter.home_district],
                 ["Home TA", parameter.home_traditional_authority],
@@ -196,9 +197,13 @@
                 ["Current Village", parameter.current_village],
                 ["Landmark", parameter.landmark],
                 ["Cell phone", parameter.cell_phone_number],
-                ["Patient Type", parameter.patient_type],
-                ["Register Guardian", parameter.relationship]
+                ["Patient Type", parameter.patient_type]
             ];
+
+            if(parameter.patient_type.match(/Drug refill|External/i))
+                attributes.push(["Facility Name", selectedFacility.name]);
+
+            attributes.push(["Register Guardian", parameter.relationship]);
 
             if (military_site) {
                 attributes = attributes.concat([
@@ -254,6 +259,9 @@
             f.appendChild(table);
         }
         function disablebutton() {
+            let nextButton = document.getElementById("nextButton");
+            nextButton.setAttribute("onmousedown","");
+            nextButton.innerHTML = "<span>Select</span>";
             addButton();
         }
         
@@ -269,7 +277,7 @@
         
     function setDOCID(doc_id) {
 		var nextbtn = document.getElementById("nextButton");
-		nextbtn.setAttribute("onmousedown","importPatient('"+doc_id+"')");
+		nextbtn.setAttribute("onmousedown",`importPatient(${doc_id});`);
 		nextbtn.setAttribute("class","button navButton green");
 		nextbtn.innerHTML = "<span>Select</span>";
     }
@@ -296,20 +304,23 @@
         }
     }
     function addButton() {
-        if(document.getElementById("newBtn") == null) {
+        if(!document.getElementById("newBtn")) {
             var footer = document.getElementById('buttons');
             var newbutton = document.createElement('button');
             newbutton.setAttribute('id', 'newBtn');
-            newbutton.setAttribute('onmousedown', 'gotoNextPage();');
+            newbutton.setAttribute('onmousedown', 'removeDuplicatesButton();gotoNextPage();');
             newbutton.innerHTML="<span>Not a duplicate</span>";
-        footer.appendChild(newbutton);
+            footer.appendChild(newbutton);
         }else if(document.getElementById("newBtn").style.display != "block") {
            document.getElementById("newBtn").style.display = "block";
         }
             
     }
+
      function removeDuplicatesButton() {
-           document.getElementById("newBtn").style.display = "none";
+        if(__$("newBtn"))
+            __$("newBtn").style = "display:none;";
+
     }   
 
     function importID(reassign_link) {
@@ -801,20 +812,38 @@
 
             function potentialduplicateCheck() {
                 var inputFrame = document.getElementById('inputFrame' + tstCurrentPage);
-                helpText = __$('helpText' + tstCurrentPage);
-                helpText.innerHTML = "<b>Name:</b> " +  __$('given_name').value;
-                helpText.innerHTML += " " + __$('family_name').value;
-                helpText.innerHTML += " (" + __$('gender').value + ")";
-                helpText.innerHTML += "<br />";
-                helpText.innerHTML += "<b style='margin-left: 1.9%;'>Home district:</b> " + homeDistrict;
-                helpText.innerHTML += " <b>Home Ta:</b> " + homeTA;
-                helpText.innerHTML += " <b>Home village:</b> " +homeVillage;
-                helpText.setAttribute("style","font-size: 20px;");
+                var date_estimated = 0;
+                if (__$('person_birth_year').value !== "Unknown") {
+                    birth_date = new Date(__$('person_birth_year').value + "/" + __$('person_birth_month').value + "/" + __$('person_birth_day').value);
+                    birth_date = moment(birth_date).format("DD/MMM/YYYY");
+                } else if (__$('person_birth_year').value === "Unknown") {
+                    date_estimated = 1;
+                    birth_date = moment().subtract(parseInt(__$('person_age_estimate').value), "years").format("YYYY");
+                    birth_date = birth_date + "-07-01";
+                }
+                if (__$('person_birth_year').value !== "Unknown" && __$('person_birth_month').value === "Unknown") {
+                    date_estimated = 1;
+                    birth_date = __$('person_birth_year').value + "-07-01";
+                }
+                if (__$('person_birth_year').value !== "Unknown" && __$('person_birth_month').value !== "Unknown" && __$('person_birth_day').value === "Unknown") {
+                    date_estimated = 1;
+                    birth_date = __$('person_birth_year').value + "-" + __$('person_birth_month').value + "-15";
+                }
+
+                newClient = {
+                    given_name: __$('given_name').value,
+                    family_name: __$('family_name').value,
+                    gender: (__$('gender').value == "F" ? "Female" : "Male"),
+                    birthdate: `${moment(birth_date).format("DD/MMM/YYYY")} ${date_estimated == 1 ? "(estimated)" : ""}`,
+                    home_district: homeDistrict,
+                    home_ta: homeTA,
+                    home_village: homeVillage
+                };
 
                 tabs = new ttTabsPlugin();
                 inputView = document.getElementById('inputFrame' + tstCurrentPage);
                 inputView.setAttribute("style","height: 90%; width: 96%;");
-                tabs.load(inputView, potential_duplicates_arr);
+                tabs.load(inputView, potential_duplicates_arr, newClient);
             }
 
             function culBirthdate() {
@@ -866,6 +895,15 @@
                 client +=  "&birthdate_estimated=" + culBirthdate()[1];
 
                 client +=  "&home_district=" + homeDistrict;
+
+                if(homeTA === "homeTA"){
+                    homeTA = "Unknown";
+                }
+
+                if(homeVillage === "homevillage"){
+                    homeVillage = "Unknown";
+                }
+                
                 client +=  "&home_traditional_authority=" + homeTA;
                 client +=  "&home_village=" + homeVillage;
                 client +=  "&program_id=" + sessionStorage.programID;  
@@ -921,6 +959,24 @@
                     xhttp.send();
                 }
                 // getNames(__$('home_district').value, "District", "/districts?paginate=false&region_id=" + document.getElementById('current_region').value);
+
+
+            function changeCaption(field_name) {
+                let selectedRegion = document.getElementById(field_name).value
+                let helpText = field_name.match(/home/i) ? "Home" : "Current" ;
+
+                if (selectedRegion == '4') {
+                    document.getElementById(`helpText${tstCurrentPage}`).innerHTML = `${helpText} Country`;
+                    let location = document.getElementById('location-add')
+
+                    if (location) {
+                        location.setAttribute('style','display:none;')
+                    }
+                    searchForPotentialDuplicates()
+                } else {
+                    document.getElementById(`helpText${tstCurrentPage}`).innerHTML = `${helpText} District`;
+                }
+            }
 
         </script>
 
@@ -1006,8 +1062,8 @@
                    setvalue=""
                    tt_pageStyleClass="NoKeyboard"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);"
-                   tt_onUnload="jQuery('#nextButton').show();homeDistrict = getNames(__$('home_district').value, 'District', '/districts?paginate=false&district_id=' + document.getElementById('home_district').value);"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('home_region').value);changeCaption('home_region');"
+                   tt_onUnload="jQuery('#nextButton').show();getNames(__$('home_district').value, 'District', '/districts?paginate=false&district_id=' + document.getElementById('home_district').value);"
                    objectType="districts"/>
 
             <input type="text" name="home_ta"
@@ -1016,7 +1072,7 @@
                    condition="$('home_region').value != '4'"
                    tt_requireNextClick='false'
                    tt_onLoad="jQuery('#nextButton').hide(); clearInput();set_ajaxURL_for_suggestions('/traditional_authorities?district_id=', document.getElementById('home_district').value);addLocation('TA','home_district');"
-                   tt_onUnLoad="jQuery('#nextButton').show();homeTA = getNames(__$('home_ta').value, 'TA', '/traditional_authorities?paginate=false&region_id=' + document.getElementById('home_ta').value);removeAddLocation();"
+                   tt_onUnLoad="jQuery('#nextButton').show();getNames(__$('home_ta').value, 'TA', '/traditional_authorities?paginate=false&region_id=' + document.getElementById('home_ta').value);removeAddLocation();"
                    objectType="traditional_authority"/>
                  
             <input type="text" name="home_village"
@@ -1052,7 +1108,7 @@
                    setvalue=""
                    tt_pageStyleClass="NoKeyboard"
                    tt_requireNextClick='false'
-                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('current_region').value);"
+                   tt_onLoad="jQuery('#nextButton').hide(); clearInput();setOverFow();set_ajaxURL_for_suggestions('/districts?region_id=', document.getElementById('current_region').value);changeCaption('current_region')"
                    tt_onUnload="jQuery('#nextButton').show();"
                    objectType="districts"/>
 
@@ -1128,6 +1184,7 @@
                     key="gender">
                 <option value=""></option>
                 <option value="New patient">New patient</option>
+                <option value="Drug refill">Drug refill</option>
                 <option value="External consultation">External consultation</option>
             </select>
 
@@ -1138,6 +1195,7 @@
                     helpText="Please select facility name"
                     id="facility_name"
                     tt_onLoad="setCurrentLocation();"
+                    tt_onUnLoad="fetchLocationName();"
                     name="facility_name"></select>
 
 
@@ -1194,6 +1252,7 @@
             <select allowFreeText="false" helpText="Register guardian?"
                     id="guardian_present"
                     name="guardian_present"
+                    tt_onLoad="removeDuplicatesButton();"
                     condition="showTypeOfPatient() == true;"
                     ttMatchFromBeginning="true">
                 <option value="Yes">Yes</option>
@@ -1209,10 +1268,11 @@
             <input id="identifier" name="identifier" type="hidden" value="" />
 
             <input name="commit" type="submit" value="Create person" /> -->
-             <input  helpText="" id="duplicates" name="duplicates" 
+             <input id="duplicates" name="duplicates" 
              condition="duplicatesAvailable() == true;"
+             helpText="Possible duplicate(s)"
              optional="true" tt_onLoad="potentialduplicateCheck();removeClear(); __$('keyboard').style.display = 'none'; disablebutton();" 
-             tt_onUnLoad="addClear();removeDuplicatesButton();" tt_pageStyleClass="NoControls" type="text" />           
+             tt_onUnLoad="removeDuplicatesButton();" tt_pageStyleClass="NoControls" type="text" />           
 
             <input type="text" name="summary" id="summary"
                    tt_onLoad="summary();__$('keyboard').style.display = 'none';changeFinishBtn();"
@@ -1387,6 +1447,7 @@
 
     var patient_type_map = {
         "New patient": 7572,
+        "Drug refill": 10522,
         "External consultation": 9684
     }
 
@@ -1405,6 +1466,13 @@
                 {concept_id: 3289, value_coded: ans}
             ]
         };
+
+        if(patient_type && patient_type.value.match(/Drug refill|consultation/i)){
+            obs.observations.push({
+                concept_id: 7054, 
+                value_text: selectedFacility.name
+            })
+        }
 
         submitParameters(obs, "/observations", "savePatienttypeThenRedirect");
     }
@@ -1547,4 +1615,27 @@
   function showTypeOfPatient() {
     return sessionStorage.programID == '1' ? true : false;
   }
+
+  var selectedFacility;
+
+  function fetchLocationName() {
+        let location_id = __$('facility_name').value;
+        let url = apiProtocol + '://' + apiURL + ':' + apiPort + `/api/v1/locations/${location_id}`;
+        let req = new XMLHttpRequest();
+        req.onreadystatechange = function(){
+        
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    selectedFacility = JSON.parse(this.responseText);
+                }
+            }
+        };
+        try {
+        req.open('GET', url, true);
+        req.setRequestHeader('Authorization',sessionStorage.getItem('authorization'));
+        req.send(null);
+        } catch (e) {
+        
+        }
+    }
 </script>

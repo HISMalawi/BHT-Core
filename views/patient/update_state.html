@@ -68,22 +68,14 @@ function validateOutcomeDate() {
   setDate   = new Date(set_dob);
   
   if(setDate > currDate){
-    alert(currDate);
-    alert(setDate);
-    alert(setDate > currDate);
     showMessage("Outcome date can not be greater than the current date");
     return;
   }
- 
-  if(transferring_out == true){ 
-    gotoNextPage();
-  }else{
     submitOutcome();
-  }
 }
 function submitTO() {
         var currentTime = moment().format(' HH:mm:ss');
-        var encounter_datetime = moment(sessionStorage.sessionDate).format('YYYY-MM-DD');
+        var encounter_datetime = moment(getOutcomeDate()).format('YYYY-MM-DD');
         encounter_datetime += currentTime;
 
         var encounter = {
@@ -107,7 +99,7 @@ function submitTO() {
             }]
         };
 
-        submitParameters(obs, "/observations", null);
+        submitParameters(obs, "/observations", 'finishState');
     }
 
 function setOutcomeDate() {
@@ -230,6 +222,11 @@ function submitOutcome() {
   if(tro) {
     submitTO();
   }
+  else {
+    finishState();
+  }
+}
+function finishState() {
   var outcome_date = getOutcomeDate();
 
   if(transferring_out == true) {
@@ -287,7 +284,7 @@ function postState(state) {
     },
     function (error) {
       console.error(error)
-      showMessage('Outcome date cannot be less than date enrolled')
+      showMessage('An error has occured, please check the console for more information')
       setTimeout(function() {
         // document.location = '/views/patient/programs.html'
         // document.location = '/views/patient/programs.html?patient_id=' + sessionStorage.patientID;
@@ -338,12 +335,7 @@ function estimateOutcomeDate() {
   var sessionDate = sessionStorage.sessionDate
 
   estimated_outcome_date = moment(sessionDate, 'YYYY-MM-DD').subtract(integerPart, stringPart).format('YYYY-MM-DD')
-
-  if (transferring_out === true) {
-    gotoNextPage()
-  } else {
     submitOutcome()
-  }
 }
 
 function fetchStatesUrl () {
@@ -375,7 +367,7 @@ function fetchStatesUrl () {
           helpText="Please select facility name" 
           id="facility_name" 
           tt_onUnload="transferring_out = true"
-          tt_onLoad="setCurrentLocation();"
+          tt_onLoad=""
           name="facility_name"></select>
 
         <input type="text" name="state_year" id="outcome_year" helpText="Outcome year" field_type="number" absoluteMin="1900"

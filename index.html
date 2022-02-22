@@ -292,9 +292,10 @@
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
-                var obj = JSON.parse(this.responseText);
-                document.getElementById("facility-name").innerHTML = obj.name;
-                sessionStorage.currentLocation = obj.name;
+                    var obj = JSON.parse(this.responseText);
+                    document.getElementById("facility-name").innerHTML = obj.name;
+                    sessionStorage.setItem("vboxID", obj.uuid);
+                    sessionStorage.currentLocation = obj.name;
                 }
             };
             xhttp.open("GET", url, true);

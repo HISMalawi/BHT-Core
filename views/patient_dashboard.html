@@ -27,7 +27,7 @@
     
     <!-- ...................... -->
 
-
+    <link rel="stylesheet" href="/assets/css/void_order_popup.css" type="text/css">
 </head>
 <body>
 <script src="/assets/js/generic_ajaxrequest.js">
@@ -132,6 +132,7 @@
     }
 
 </style>
+
 
 <!-- container -->
 <div class="container" style="width: 100%; margin-bottom: 1%;">
@@ -673,12 +674,133 @@
      <!-- /tasks modal-->
     <!-- /container -->
 </div>
+
+
+
+
+<!-- Void Order Popup -->
+
+
+
+
+<div  id="page-cover"></div>
+<div id="void-confirm-message">
+  <div class="modal-title">
+    <h1>Warning</h1>
+  </div>
+  <p>Are you sure you want to void this order?</p>
+
+  <div style="width: 97%; display: table; padding: 5px; margin-left:5px;">
+    <div style="display: table-row;">
+      <div style="display: table-cell; 
+      border-top-left-radius: 9px; border-top-right-radius: 9px;" 
+        onmousedown="selectVoidReason('Duplicate order', this)" class="void-reason">Duplicate order</div>
+    </div>
+    <!--div style="display: table-row;">
+      <div style="display: table-cell;" 
+        onmousedown="selectVoidReason('Wrong client', this)" class="void-reason">Wrong client</div>
+    </div-->
+    <div style="display: table-row;">
+      <div style="display: table-cell;border-bottom-left-radius: 9px;
+        border-bottom-right-radius: 9px;" onmousedown="selectVoidReason('Wrong client', this)" 
+        class="void-reason">Wrong client</div>
+    </div>
+  </div>
+
+  <div style="width: 100%;margin: 5px;">
+    <div style="display: table; width: 97%;">
+      <div style="display: table-row;">
+        <div class="void-btns" style="display: table-cell;  
+          text-align: center; padding: 10%; border-top-left-radius: 9px;
+          border-bottom-left-radius: 9px; background-color: green;" onmousedown="closeConfirmLabOrderVoid();">
+          Cancel
+        </div>
+        <div class="void-btns" style="display: table-cell;  
+          text-align: center; padding: 10%; border-top-right-radius: 9px;
+          border-bottom-right-radius: 9px; background-color: lightgray;" id="voidButton">
+          Void
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Void Order Popup ends -->
+
+
+
+
+
 <!-- /body -->
 </body>
 
 <script src="/assets/js/core.js "></script>
 
 <script>
+
+function confirmLabOrderVoid(order_id){
+    let page_cover = document.getElementById("page-cover");
+    let void_message = document.getElementById("void-confirm-message");
+    page_cover.style = "display: inline;";
+    void_message.style = "display: inline;";
+    void_message.setAttribute("order_id", order_id);
+}
+
+function closeConfirmLabOrderVoid(){
+    let page_cover = document.getElementById("page-cover");
+    let void_message = document.getElementById("void-confirm-message");
+    page_cover.style = "display: none;";
+    void_message.style = "display: none;";
+}
+
+function selectVoidReason(reason, e){
+  let cells = document.getElementsByClassName('void-reason');
+  for(let i =  0; i < cells.length; i++){
+    cells[i].setAttribute("class", "void-reason unselected-cells");
+  }
+  e.setAttribute("class", "void-reason selected-cells");
+  let voidButton = document.getElementById("voidButton");
+  voidButton.setAttribute("onmousedown","voidLabOrder('" + reason + "');");
+  voidButton.style.backgroundColor="red";
+}
+
+function voidLabOrder(reason){
+    closeConfirmLabOrderVoid();
+
+    let order_id = document.getElementById('void-confirm-message').getAttribute("order_id");
+    let url = sessionStorage.apiProtocol+ '://' + sessionStorage.apiURL + ':' 
+      url += sessionStorage.apiPort + `/api/v1/lab/orders/${order_id}`;
+      url +=  `?reason=${reason}`;
+
+      var req = new XMLHttpRequest();
+      req.onreadystatechange = function () {
+          if (this.readyState == 4) {
+              if (this.status == 204) {
+                let buttons = document.getElementsByClassName('application-btn');
+                let btn;
+
+                for(let i = 0; i < buttons.length; i++){
+                    if(buttons[i].getAttribute("style").match(/color: white/))
+                        btn = buttons[i];
+                    
+                }
+                fetchOrderData(moment(btn.innerHTML).format('YYYY-MM-DD'));
+              }
+          }
+      };
+
+      req.open("DELETE", url, true);
+      req.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+      req.setRequestHeader('Content-type', "application/json");
+      req.send(); 
+}
+
+
+
+
+
+
+
+
 
     if(sessionStorage.programID == '23'){
         document.getElementById("all-programs").style = "display: none;";
@@ -807,7 +929,8 @@
                 try {
                     var addressl1 = results.person.addresses[0].city_village;
                     var addressl2 = results.person.addresses[0].address2;
-                    var phone_number = results.person.person_attributes[1].value;
+                    var phone_number = results.person.person_attributes.filter(value => value.person_attribute_type_id == 12)
+                    .map(phonenumbers => phonenumbers.value).toString();
                 }
                 catch (e) {
                     var addressl1 = "";

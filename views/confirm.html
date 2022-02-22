@@ -113,92 +113,6 @@
     z-index: 10;
   }
 
-  /*.buttonsDIV button {
-    margin: 5px 0px 0px;
-    margin-right: 10px;
-    height: 60px;
-    font-size: 2rem;
-  }
-
-  .blue {
-    border: 1px solid #7eb9d0;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    font-size: 28px;
-    font-family: helvetica;
-    padding: 10px 10px 10px 10px;
-    text-decoration: none;
-    display: inline-block;
-    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
-    font-weight: bold;
-    color: #ffffff;
-    background-color: #a7cfdf;
-    background-image: -webkit-gradient(
-      linear,
-      left top,
-      left bottom,
-      from(#a7cfdf),
-      to(#23538a)
-    );
-    background-image: -webkit-linear-gradient(top, #a7cfdf, #23538a);
-    background-image: -moz-linear-gradient(top, #a7cfdf, #23538a);
-    background-image: -ms-linear-gradient(top, #a7cfdf, #23538a);
-    background-image: -o-linear-gradient(top, #a7cfdf, #23538a);
-    background-image: linear-gradient(to bottom, #a7cfdf, #23538a);
-    filter: progid: DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#a7cfdf, endColorstr=#23538a);
-  }
-
-  .red {
-    border: 1px solid #ff0011;
-    background-image: linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -o-linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -moz-linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -webkit-linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -ms-linear-gradient(
-      bottom,
-      rgb(255, 0, 17) 0%,
-      rgb(255, 0, 17) 100%
-    );
-    background-image: -webkit-gradient(
-      color-stop(0, rgb(255, 0, 17)),
-      color-stop(1, rgb(255, 0, 17))
-    ) !important;
-    background-color: #5c0707;
-
-    border: 1px solid #450111;
-    background-color: #77021d;
-    background-image: -webkit-gradient(
-      linear,
-      left top,
-      left bottom,
-      from(#77021d),
-      to(#3a000d)
-    );
-    background-image: -webkit-linear-gradient(top, #77021d, #3a000d);
-    background-image: -moz-linear-gradient(top, #77021d, #3a000d);
-    background-image: -ms-linear-gradient(top, #77021d, #3a000d);
-    background-image: -o-linear-gradient(top, #77021d, #3a000d);
-    background-image: linear-gradient(to bottom, #77021d, #3a000d);
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#77021d, endColorstr=#3a000d);
-    color: #fff;
-  }*/
 
   .info-tables {
     width: 99%;
@@ -252,7 +166,7 @@
   z-index: 991;
 }
 
-#address-confirmation-cover {
+#a4dress-confirmation-cover {
   display: none;
   position: absolute;
   background-color: black;
@@ -444,6 +358,29 @@
   color: black;
 }
 
+#deceasesed-message {
+  z-index: 1000;
+  margin: auto;
+  display: inline; 
+  height: 30%; 
+  width: 50%; 
+  left: 30%;
+  top: 10%;
+}
+.ajs-button {
+  background: #23538a;
+}
+
+.demo-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+tr.demo-table {
+  text-align: left;
+  padding: 8px;
+}
+
 </style>
 
 <script>
@@ -541,6 +478,28 @@ var global_property = GlobalProperty({
       patient_id;
     }
 
+    function checkMandatoryFields(person){
+       let names = person.person.names[0]
+       let address = person.person.addresses[0]
+
+       if (isValid(person.person.gender) && isValid(names.given_name) && isValid(names.family_name)
+             && isValid(address.address2) && isValid(address.neighborhood_cell) && isValid(address.county_district)
+          && isValid(address.state_province)  && isValid(address.township_division) && isValid(address.city_village)
+            && isValid(person.person.birthdate)) {
+        return true;
+       } else {
+        return false;
+       }
+    }
+
+    function isValid(value){
+        if(value != undefined && value.replace(/\s+/g, '') != '' && value != null){
+          return true;
+        }else{
+          return false;
+        }
+    }
+
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -553,9 +512,15 @@ var global_property = GlobalProperty({
           }else if (locals.length >= 1 && remotes.length >=1) {
             location.href = "/views/npid_duplicates.html?health_id=" + patient_id;
           } else if (locals.length == 1) {
-            populatePatient(locals[0], locals[0]);
+            if (checkMandatoryFields(locals[0]) == true) {
+               populatePatient(locals[0], locals[0]);
+            } else {
+                 sessionStorage.patientID = locals[0].patient_id
+                 document.getElementById('incomplete-demographics').style="display:inline";
+                 document.getElementById('page-cover').style="display:inline";
+            }
           } else {
-            noPatient();
+            noPatient(patient_id);
           }
         }else {
           var obj = JSON.parse(this.responseText)[0];
@@ -565,7 +530,7 @@ var global_property = GlobalProperty({
           } else if (JSON.parse(this.responseText).length == 1) {
             populatePatient(obj, obj_2);
           } else {
-            noPatient();
+            noPatient(patient_id);
           }     
         }
         
@@ -573,9 +538,9 @@ var global_property = GlobalProperty({
         window.location.href = "/";
       }else if (this.status == 422) {
         var f = JSON.parse(this.responseText);
-        //sessionStorage.patientID = f.patient_id;
         sessionStorage.patientID = f.entity.patient_id;
-        window.location.href = "/views/patient/edit_demographics.html";
+        document.getElementById('incomplete-demographics').style="display:inline";
+        document.getElementById('page-cover').style="display:inline";
       }
     };
     xhttp.open("GET", url, true);
@@ -619,7 +584,11 @@ var global_property = GlobalProperty({
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send();
   }
+
+  var localPatient
+
   function populatePatient(obj, obj_2) {
+    localPatient = obj;
     var patient = obj;
     obj = obj["person"];
     patient_id = patient["patient_id"];
@@ -644,7 +613,7 @@ var global_property = GlobalProperty({
       var ancestry_district = document.getElementById("ancestry-district");
       var ancestry_ta = document.getElementById("ancestry-ta");
       var ancestry_village = document.getElementById("ancestry-village");
-      ancestry_district.innerHTML = obj["addresses"][0]["county_district"];
+      ancestry_district.innerHTML = obj["addresses"][0]["address2"];
       ancestry_ta.innerHTML = obj["addresses"][0]["county_district"];
       ancestry_village.innerHTML = obj["addresses"][0]["neighborhood_cell"];
 
@@ -845,7 +814,6 @@ var global_property = GlobalProperty({
               var obj = JSON.parse(this.responseText);
               var url = "/patients/" + patientID + "/labels/national_health_id";
               url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1" + url;
-              // console.log(obj.new_identifier);
               document.location = url;
               // var id = v.new_identifier.identifier;
               document.getElementById("continue").setAttribute("disabled", "");
@@ -882,6 +850,9 @@ var global_property = GlobalProperty({
               : "No Outcome Available";buildInfoBoxes
           var table = document.createElement("table");
           table.setAttribute("class", "info-tables");
+
+          if(identifiersHash['Current Outcome'] && identifiersHash['Current Outcome'].match(/died/i))
+            patientDead = true;
 
           for (identifier in identifiersHash) {
             var tr = document.createElement("tr");
@@ -978,6 +949,36 @@ var global_property = GlobalProperty({
       );
       req.send(null);
     } catch (e) {}
+  }
+
+  function updateDDE(diff) {
+      var url =
+        sessionStorage.apiProtocol + "://" +
+        apiURL +
+        ":" +
+        apiPort +
+        "/api/v1/people/" +
+        patient_id;
+      var xhr = new XMLHttpRequest();
+      xhr.open("PUT", url);
+      xhr.setRequestHeader(
+        "Authorization",
+        sessionStorage.getItem("authorization")
+      );
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      xhr.onreadystatechange = function () {
+         if (xhr.readyState === 4) {
+            console.log(xhr.status);
+            console.log(xhr.responseText);
+            location.reload();
+         }};
+
+      diff.program_id = sessionStorage.programID
+
+      var data = JSON.stringify(diff);
+
+      xhr.send(data);
   }
 
   function buildAlerts(patient_id) {
@@ -1333,51 +1334,6 @@ var global_property = GlobalProperty({
 </div>
 
 <div class="info-table"></div>
-<div
-  class="modal fade"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="mySmallModalLabel"
-  aria-hidden="true"
-  id="mi-modal"
-  style="width: 60%; margin-left:20%;margin-right: 20%; margin-top: 20%;"
->
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content" style="margin: 0; ">
-      <div class="modal-header">
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <h1 class="modal-title" id="myModalLabel">
-          Patient Has Died, are you sure you want to continue?
-        </h1>
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="button green"
-          id="modal-btn-si"
-          style="float:left; text-align: center; width: 100px;"
-        >
-          Yes
-        </button>
-        <button
-          type="button"
-          class="button red"
-          id="modal-btn-no"
-          style="width: 100px;"
-        >
-          No
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div
   class="modal fade"
@@ -1440,14 +1396,56 @@ var global_property = GlobalProperty({
   </div>
 </div>
 
-<div class="modal fade" id="enroll-program" role="dialog">
-  <div class="modal-dialog modal-lg">
+<div id="enroll-program">
+  <div id="enrolled-program-inner">
     <div class="modal-content">
       <div class="modal-body">
-        <h1 style="text-align: center" class="text-uppercase">Patient Is not enrolled in program, enroll now?</h1>
+        <h1 style="text-align: center" class="text-uppercase">
+          Patient is not enrolled in program, enroll now?
+        </h1>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal" style="float: left" onclick="enrollPatient()">Yes</button> <button type="button" class="btn btn-danger btn-lg" data-dismiss="modal">No</button>
+          <button class="button green navButton" onmousedown="enrollPatient()" 
+          style="float: right; width: 120px;" id="continue"><span>Enroll</span></button>
+
+          <button class="button red navButton" onmousedown="closeEnrollProgramPoP()" 
+          style="float: right; width: 165px; margin-right: 30px;" id="continue"><span>Do NOT Enroll</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="incomplete-demographics">
+  <div id="enrolled-program-inner">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h1 style="text-align: center" class="text-uppercase">
+          Client does not have complete Demographics </p>
+          Please update
+        </h1>
+      </div>
+      <div class="modal-footer">
+          <button class="button green navButton" onmousedown="javascript:location='/views/patient/edit_demographics.html'"
+          style="float: right; width: 120px;" id="continue"><span>Ok</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="npid-diff">
+  <div id="enrolled-program-inner">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h1 style="text-align: center" class="text-uppercase">
+          NPID has been changed from a remote location </p>
+          Would you like to print it?
+        </h1>
+      </div>
+      <div class="modal-footer">
+          <button class="button green navButton" onmousedown="/"
+          style="float: right; width: 120px;" id="yes"><span>Yes</span></button>
+          <button class="red button navButton" onmousedown="document.getElementById('npid-diff').style = 'none', document.getElementById('page-cover').style = 'none'"
+          style="float: left; width: 120px;" id="no"><span>No</span></button>
       </div>
     </div>
   </div>
@@ -1469,7 +1467,7 @@ var global_property = GlobalProperty({
             if (http.readyState == 4) {
                 if (http.status == 201) {
                     var v = JSON.parse(http.responseText);
-                    $('#myModal').modal('hide');
+                    closeEnrollProgramPoP();
                 } else if (http.status == 409) {
                     alert('Username already exists');
                 } else {
@@ -1482,47 +1480,57 @@ var global_property = GlobalProperty({
   }
   buildInfoBoxes();
 
+  function popUpDeceasedMessage(){
+    var tstMessageBar = document.createElement('div');
+    var p = document.createElement('p');
+    p.setAttribute('style','text-align: center;font-size: 35px;');
+    p.innerHTML = "<p>Deceased client. Do you want to continue?</p>";
+    tstMessageBar.appendChild(p);
+    
+    var noBTN = document.createElement('button');
+    noBTN.innerHTML = "<span>No</span>";
+    noBTN.setAttribute('class', 'button blue navButton filing-number-btn');
+    noBTN.setAttribute('onmousedown','document.location="/";');
+    tstMessageBar.appendChild(noBTN);
+
+    var yesBTN = document.createElement('button');
+    yesBTN.innerHTML = "<span>Yes</span>";
+    yesBTN.setAttribute('class', 'button red navButton filing-number-btn');
+    yesBTN.style = 'right: 140px;'; 
+    yesBTN.setAttribute('onmousedown','nextEncounter(' + sessionStorage.patientID + ',' + sessionStorage.programID + ');');
+    tstMessageBar.appendChild(yesBTN);
+    tstMessageBar.setAttribute('id', 'address-confirmation');
+
+    var cover = document.createElement('div');
+    cover.setAttribute('id','address-confirmation-cover');
+    var bdy = document.getElementsByTagName('body')[0];
+    bdy.appendChild(cover);
+    bdy.appendChild(tstMessageBar);
+    tstMessageBar.style = 'z-index: 1000;display: inline; height: 30%; width: 50%; left: 25%;top: 10%;';
+    cover.style = 'display: inline;';
+
+    let coverPage = document.getElementById('page-cover');
+    coverPage.style = 'display: inline;';
+  }
+
   function finish(id) {
+
+    if(compleDemographics() == false && !sessionStorage.userRoles.match(/Program Manager/i)){
+      document.getElementById('incomplete-demographics').style="display:inline";
+      document.getElementById('page-cover').style="display:inline";
+      return
+    }
+
     sessionStorage.patientID = id;
     if(sessionStorage.programID != '1'){
       nextEncounter(sessionStorage.patientID, sessionStorage.programID);
       return;
     }
 
-    /*if(parseInt(sessionStorage.programID) == 23){
-      var labDashboardURL = "/apps/" + sessionStorage.applicationFolder;
-      labDashboardURL += "/views/patient_dashboard.html?patient_id=" + id;
-      window.location = labDashboardURL;
-    }*/
-
     if (patientDead == true) {
-      $("#mi-modal").modal("show");
-      var modalConfirm = function(callback) {
-        $("#continue").on("click", function() {
-          $("#mi-modal").modal("show");
-        });
+      popUpDeceasedMessage();
+      return;
 
-        $("#modal-btn-si").on("click", function() {
-          callback(true);
-          $("#mi-modal").modal("hide");
-        });
-
-        $("#modal-btn-no").on("click", function() {
-          callback(false);
-          $("#mi-modal").modal("hide");
-        });
-      };
-
-      modalConfirm(function(confirm) {
-        if (confirm) {
-          window.location.href =
-            "/views/patient_dashboard.html?patient_id=" + id;
-        } else {
-          $("#mi-modal").modal("hide");
-
-          window.location.href = "/";
-        }
-      });
     } else {
 
       /* .......... filing ............... */
@@ -1575,29 +1583,38 @@ var global_property = GlobalProperty({
     }
   }
 
-  function noPatient() {
-    $("#mi-modal-2").modal("show");
-    var modalConfirm = function(callback) {
-      $("#continue").on("click", function() {
-        $("#mi-modal-2").modal("show");
-      });
+  function noPatient(identifier) {
+    var tstMessageBar = document.createElement('div');
+    var p = document.createElement('p');
+    p.setAttribute('style','text-align: center;font-size: 35px;');
+    p.innerHTML = `<p>Client with ID "${identifier}" <b>NOT</b> found.</p>`;
+    tstMessageBar.appendChild(p);
+    let redirectURL;
 
-      $("#modal-btn-si-2").on("click", function() {
-        callback(true);
-        $("#mi-modal-2").modal("hide");
-      });
+    if(identifier.length == 6 || identifier.length == 13){
+      redirectURL = `/views/voided_identifiers.html?identifier=${identifier}`;
+    }else{
+      redirectURL = "/";
+    }
 
-      $("#modal-btn-no-2").on("click", function() {
-        callback(false);
-        $("#mi-modal-2").modal("hide");
-      });
-    };
+    var noBTN = document.createElement('button');
+    noBTN.innerHTML = "<span>OK</span>";
+    noBTN.setAttribute('class', 'button blue navButton filing-number-btn');
+    noBTN.setAttribute('onmousedown',`document.location="${redirectURL}";`);
+    tstMessageBar.appendChild(noBTN);
 
-    modalConfirm(function(confirm) {
-      if (confirm) {
-        window.location.href = "/";
-      }
-    });
+    tstMessageBar.setAttribute('id', 'address-confirmation');
+
+    var cover = document.createElement('div');
+    cover.setAttribute('id','address-confirmation-cover');
+    var bdy = document.getElementsByTagName('body')[0];
+    bdy.appendChild(cover);
+    bdy.appendChild(tstMessageBar);
+    tstMessageBar.style = 'z-index: 1000;display: inline; height: 30%; width: 50%; left: 25%;top: 10%;';
+    cover.style = 'display: inline;';
+
+    let coverPage = document.getElementById('page-cover');
+    coverPage.style = 'display: inline;';
   }
 
   function formatIdentifier(identifier) {
@@ -1648,12 +1665,9 @@ function calculateMonthsOnART(art_start_date) {
 }            
 
 function dateDiffInMonths(d2, d1) {
-  var d1Y = d1.getFullYear();
-  var d2Y = d2.getFullYear();
-  var d1M = d1.getMonth();
-  var d2M = d2.getMonth();
-
-  return (d2M+12*d2Y)-(d1M+12*d1Y);
+  let a = moment(d1);
+  let b = moment(d2);
+  return b.diff(a, 'months');
 }
 
 var current_person_addresses;
@@ -1888,8 +1902,86 @@ function checkIfEnrolled(patient_id) {
         }
       }
       if (enrolled == false){
-          $("#enroll-program").modal();
+          //$("#enroll-program").modal();
+          enrollProgramPoP();
+      } else {
+          checkIfDemographicsUpdated(patient_id);
       }
+    }
+  };
+  xhttp.open("GET", url, true);
+  xhttp.setRequestHeader("Authorization",sessionStorage.getItem("authorization"));
+  xhttp.setRequestHeader("Content-type", "application/json");
+  xhttp.send();
+}
+
+
+function createNPID(npid) {
+  var data = {"identifier": npid,
+              "patient_id": sessionStorage.patientID,
+              "identifier_type": 3};
+  var url =
+    sessionStorage.apiProtocol + "://" +
+    apiURL +
+    ":" +
+    apiPort +
+    "/api/v1/patient_identifiers/";
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", url);
+  xhr.setRequestHeader(
+    "Authorization",
+    sessionStorage.getItem("authorization")
+  );
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  xhr.onreadystatechange = function () {
+     if (xhr.readyState === 4 && xhr.status == 201) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        document.location = '/views/print/npid.html?identifier=' + npid;
+     }};
+
+  var data = JSON.stringify(data);
+
+  xhr.send(data);
+}
+
+function checkIfDemographicsUpdated(patient_id) {
+  if (sessionStorage.dde_enabled !== "true")
+    return;
+
+  var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/dde/patients/diff?patient_id=";
+  url += sessionStorage.patientID + "&program_id="+sessionStorage.programID;
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+      var obj = JSON.parse(this.responseText);
+      
+      if(obj.diff != null && Object.keys(obj.diff).length !== 0 && obj.diff.npid != undefined) {
+        document.getElementById("page-cover").style = 'display: inline;';
+        document.getElementById("yes").setAttribute("onmousedown", `createNPID('${obj.diff.npid.remote}')`)
+        document.getElementById('npid-diff').style="display:inline";
+      } else if (obj.diff != null && Object.keys(obj.diff).length !== 0) {
+          document.getElementById("page-cover").style = 'display: inline;';
+          document.getElementById("update-dde-demographics").style = 'display: inline;';
+          buildDiffs(obj.diff);
+      } 
+    }
+  };
+  xhttp.open("GET", url, true);
+  xhttp.setRequestHeader("Authorization",sessionStorage.getItem("authorization"));
+  xhttp.setRequestHeader("Content-type", "application/json");
+  xhttp.send();
+}
+function refreshDemographics(patient_id) {
+  
+  var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/dde/patients/refresh?patient_id=";
+  url += sessionStorage.patientID + "&program_id="+sessionStorage.programID;
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+      var obj = JSON.parse(this.responseText);
+      location.reload();
     }
   };
   xhttp.open("GET", url, true);
@@ -1951,6 +2043,10 @@ function userFilingNumbers() {
         }catch(e) {
           user_filing_numbers = false;
         }
+        
+        if(user_filing_numbers)
+          filingNumberPrefix();
+
       }
     }
  };
@@ -1985,7 +2081,6 @@ function closeFilingNumPopUP() {
 }
 
 userFilingNumbers();
-filingNumberPrefix();
 
 if(sessionStorage.userRoles.match(/super|admin/i)){
   document.getElementById('voidBTN').style = "display: inline; float: left; margin-left: 40px;";
@@ -1995,13 +2090,7 @@ if(sessionStorage.userRoles.match(/super|admin/i)){
 
 function voidClient(void_reason){
   document.getElementById('void-confirm-message').style = "display: none;";
-  let passedPatient = window.location.href;
-  let patient = new URL(passedPatient);
-  let person_id = patient.searchParams.get("person_id");
-
-  let url = apiProtocol + "://" + apiURL + ":" + apiPort;
-  url += "/api/v1/patients/" + person_id;
-  url += "?reason=" + void_reason;
+  const url = `${apiProtocol}://${apiURL}:${apiPort}/api/v1/patients/${sessionStorage.patientID}?reason=${void_reason}`
 
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
@@ -2047,11 +2136,44 @@ function selectReason(reason, e){
   voidButton.style.backgroundColor="red";
 }
 
+function enrollProgramPoP() {
+  const box = document.getElementById('enroll-program');
+  const page_cover = document.getElementById('page-cover');
+  page_cover.style = 'display: inline;';
+  box.style = 'display:inline;';
+}
+
+function closeEnrollProgramPoP(){
+  const box = document.getElementById('enroll-program');
+  const page_cover = document.getElementById('page-cover');
+  page_cover.style = 'display: none;';
+  box.style = 'display:none;';
+  checkIfDemographicsUpdated(sessionStorage.patientID);
+}
 </script>
 <script src="/assets/js/show.lab.orders.js"></script>
 
 
 <style>
+
+  #enroll-program, #incomplete-demographics, #npid-diff {
+    background: #ffffff;
+    border-radius: 0.5em;
+    box-shadow: 0 10px 20px rgba(black, 0.2);
+    left: 50%;
+    max-width: 90%;
+    position: absolute;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    width: 30em;
+    text-align: left;
+    max-height: 90vh;
+    flex-direction: column;
+    z-index: 1000000;
+    border-color: black;
+    border-style: solid;
+    display: none;
+  }
 
   #void-confirm-message {
     background: #ffffff;
@@ -2176,3 +2298,267 @@ function selectReason(reason, e){
 
 
 </div>
+
+
+<div id="update-dde-demographics">
+  Here ...
+</div>
+
+<style>
+  #update-dde-demographics {
+    background: #ffffff;
+    border-radius: 0.5em;
+    box-shadow: 0 10px 20px rgba(black, 0.2);
+    left: 50%;
+    max-width: 90%;
+    position: absolute;
+    top: 45%;
+    transform: translate(-50%, -50%);
+    width: 50em;
+    text-align: left;
+    max-height: 90vh;
+    flex-direction: column;
+    z-index: 1000000;
+    border-color: black;
+    border-style: solid;
+    display: none;
+  }
+  
+  #update-dde-demographics-table{
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  #update-dde-demographics-table td, #update-dde-demographics-table th {
+    border-width: 0px 0px 1px 0px;
+    border-style: solid;
+    line-height: 40px;
+    text-align: left;
+    padding-left: 10px;
+    border-color: #e1e1e1;
+    font-weight: bold;
+  }
+
+  .headers {
+    font-weight: normal !important;
+  }
+
+  #update-dde-demographics-table button {
+    float: left !important;
+    width: 150px;
+  }
+
+  #update-dde-demographics-table caption {
+    font-weight: bolder;
+    font-size: 20px;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+  }
+  
+  #mi-modal-2, #confirm-VL {
+    display: none;
+  }
+
+</style>
+
+
+<script>
+  let local_differences = {}
+
+  function buildDiffs(diffs) {
+
+    let box = document.getElementById("update-dde-demographics");
+    let table = `
+    <table id="update-dde-demographics-table">
+      <thead>
+        <caption>Demographics mismatch</caption>
+        <tr>
+          <th style="width: 20%;">&nbsp;</th>
+          <th style="width: 40%;">Local</th>
+          <th style="width: 40%;">Remote</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="headers">First name</td>
+          <td id="local_given_name">&nbsp;</td>
+          <td id="remote_given_name">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Last name</td>
+          <td id="local_family_name">&nbsp;</td>
+          <td id="remote_family_name">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Gender</td>
+          <td id="local_gender">&nbsp;</td>
+          <td id="remote_gender">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Birthdate</td>
+          <td id="local_birthdate">&nbsp;</td>
+          <td id="remote_birthdate">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Home district</td>
+          <td id="local_home_district">&nbsp;</td>
+          <td id="remote_home_district">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Home TA</td>
+          <td id="local_home_traditional_authority">&nbsp;</td>
+          <td id="remote_home_traditional_authority">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Home village</td>
+          <td id="local_home_village">&nbsp;</td>
+          <td id="remote_home_village">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Current district</td>
+          <td id="local_current_district">&nbsp;</td>
+          <td id="remote_current_district">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Current TA</td>
+          <td id="local_current_traditional_authority">&nbsp;</td>
+          <td id="remote_current_traditional_authority">&nbsp;</td>
+        </tr>
+        <tr>
+          <td class="headers">Current village</td>
+          <td id="local_current_village">&nbsp;</td>
+          <td id="remote_current_village">&nbsp;</td>
+        </tr>
+      <tbody>
+      <tfooter>
+        <tr>
+          <td>&nbsp;</td>
+          <td><button class="button blue navButton" onmousedown="updateDDE(local_differences)"
+            style="float: right;" id="continue"><span>Use local</span>
+            </button></td>
+          <td><button class="button blue navButton" onmousedown="refreshDemographics(sessionStorage.patient_id)"
+            style="float: right;" id="continue"><span>Use remote</span>
+            </button></td>
+        </tr>
+      </tfooter>
+    </table>`;
+
+    let params = ['given_name', 'family_name', 'gender', 'birthdate', 
+      'home_district', 'home_traditional_authority', 'home_village',
+      'current_traditional_authority', 'current_district', 'current_village'];
+    //
+
+    let first_name = sessionStorage.given_name;
+    let last_name = sessionStorage.family_name;
+
+    let gender = sessionStorage.patientGender;
+    let birthdate = sessionStorage.patientDOB;
+
+
+    let ancestry_district = document.getElementById('ancestry-district').innerHTML;
+    let ancestry_ta = document.getElementById('ancestry-ta').innerHTML;
+    let ancestry_village = document.getElementById('ancestry-village').innerHTML;
+    
+    let current_district = document.getElementById('current-district').innerHTML;
+    let current_ta = document.getElementById('current-ta').innerHTML;
+    let current_village = document.getElementById('current-village').innerHTML;
+    box.innerHTML = table;
+
+    for(const el of params){
+      e = document.getElementById(`remote_${el}`);
+      e2 = document.getElementById(`local_${el}`);
+      if(el.match(/given_name/)){
+        e.innerHTML = first_name;
+        e2.innerHTML = first_name;
+      } else if (el.match(/family_name/)){
+        e.innerHTML = last_name;
+        e2.innerHTML = last_name;
+      } else if (el.match(/gender/)){
+        e.innerHTML = gender;
+        e2.innerHTML = gender;
+      } else if (el.match(/birthdate/)){
+        e.innerHTML = birthdate;
+        e2.innerHTML = birthdate;
+      } else if (el.match(/home_district/)){
+        e.innerHTML = ancestry_district;
+        e2.innerHTML = ancestry_district;
+      } else if (el.match(/home_traditional_authority/)){
+        e.innerHTML = ancestry_ta;
+        e2.innerHTML = ancestry_ta;
+      } else if (el.match(/home_village/)){
+        e.innerHTML = ancestry_village;
+        e2.innerHTML = ancestry_village;
+      } else if (el.match(/current_district/)){
+        e.innerHTML = current_district;
+        e2.innerHTML = current_district;
+      } else if (el.match(/current_traditional_authority/)){
+        e.innerHTML = current_ta;
+        e2.innerHTML = current_ta;
+      } else if (el.match(/current_village/)){
+        e.innerHTML = current_village;
+        e2.innerHTML = current_village;
+      }
+    }
+
+
+    Object.keys(diffs).forEach(element => {
+      let el = document.getElementById(`local_${element}`);
+      let el2 = document.getElementById(`remote_${element}`);
+      el.innerHTML = (element.match(/birthdate/i) ? moment(diffs[element].local).format("DD/MMM/YYYY") : diffs[element].local);
+      el2.innerHTML = (element.match(/birthdate/i) ? moment(diffs[element].remote).format("DD/MMM/YYYY") : diffs[element].remote);
+      let tr = el.parentElement;
+      local_differences[element] = document.getElementById(`local_${element}`).innerHTML
+      tr.style = "font-weight: bold; background-color:#f8d7da; color:#721c24;";
+    });
+
+  }
+
+  function fetchClientType(){
+        let url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/";
+        url += 'observations?person_id=' + sessionStorage.patientID + '&concept_id=3289';
+        url += '&page=0&page_size=1'
+
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+                let obs = JSON.parse(this.responseText);
+                if(obs && obs.length > 0) {
+                    sessionStorage.patient_type = (obs[0].value_coded == 7572 ? 'New patient' : (obs[0].value_coded == 10522 ? 'Drug refill' : 'External Consultation'));
+                }else{
+                    sessionStorage.patient_type = null;
+                }
+            }
+        };
+        xhttp.open("GET", url, true);
+        xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+        xhttp.setRequestHeader('Content-type', "application/json");
+        xhttp.send();
+    }
+
+    fetchClientType();
+
+
+    function compleDemographics(){
+      let ancestry_district = document.getElementById("ancestry-district").innerHTML;
+      let ancestry_ta = document.getElementById("ancestry-ta").innerHTML;
+      let ancestry_village = document.getElementById("ancestry-village").innerHTML;
+
+      let current_district = document.getElementById("current-district").innerHTML;
+      let current_ta = document.getElementById("current-ta").innerHTML;
+      let current_village = document.getElementById("current-village").innerHTML;
+
+      let complete_demographics = true;
+      let addresses = [
+        ancestry_district, ancestry_ta, ancestry_village, 
+        current_district, current_ta, current_village
+      ];
+
+      for(const address of addresses){
+        if(address.replace(/\s/g,'') == "")
+          complete_demographics = false;
+
+      }
+
+      return complete_demographics
+    }
+</script>

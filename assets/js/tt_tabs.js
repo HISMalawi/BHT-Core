@@ -1,106 +1,171 @@
 // use 'esversion: 6';
 
 class ttTabsPlugin {
-    load(target, items) {
-        let content = document.createElement('div');
-        content.setAttribute("id", "ttp-tabs-content");
-        target.appendChild(content);
-
-        let tabSelectPane = document.createElement('div');
-        tabSelectPane.setAttribute("id", "ttp-tabs-select-pane");
-        tabSelectPane.setAttribute("class", "ttp-tabs-container");
-        content.appendChild(tabSelectPane);
-
-        let tabView = document.createElement('div');
-        tabView.setAttribute("id", "tt-tabs-tab-view");
-        tabView.setAttribute("class", "ttp-tabs-container");
-        content.appendChild(tabView);
-        
-        let tabPills = document.createElement('ul');
-        tabSelectPane.appendChild(tabPills);
-
-        items.forEach((item) => {
-            let person = item.person;
-            let li = document.createElement("li");
-            let ul2 = document.createElement("ul");
-            ul2.style.padding = 0;
-            let li2 = document.createElement("li");
-            li2.style.marginLeft = "10%";
-            li2.setAttribute("class", "list2");
-            li.setAttribute("id", "duplicate_" + person.id);
-            li.setAttribute("onmousedown", "setDOCID('" + person.id + "')");
-            li2.setAttribute("id", person.given_name);
-            li2.innerHTML= "<strong>DOB:</strong> " + person.birthdate + " <br> <strong>home village:</strong>" + person.home_village;
-            // li2.innerHTML = person.home_village;
-            li.innerHTML = person.given_name + " " + person.family_name;
-            li.addEventListener("click", () => {
-                this._clearSelection(tabSelectPane);
-                li.classList.add('ttp-selected-item');
-                this._displayDuplicate(item, tabView);
-            });
-            tabPills.appendChild(li);
-            li.appendChild(ul2);
-            ul2.appendChild(li2);
+    load(target, records, newClient) {
+        let left_content = `<div class="inner-duplicate-table">`;
+        let unsorted_score = [];
+        records.forEach((item) => {
+            let score = item.score * 100;
+            unsorted_score.push(score);
         });
 
-        // Open first tab
-        let tabSelector = tabSelectPane.querySelector("li:first-child");
-        tabSelector.classList.add('ttp-selected-item');
-        this._displayDuplicate(items[0], tabView);
+        unsorted_score = unsorted_score.sort().reverse();
+        let clients = [];
+
+        for(const sc of unsorted_score){
+            records.forEach((item) => {
+                if(sc != (item.score * 100))
+                    return;
+
+                if(clients.indexOf(item.person) >= 0)
+                    return;
+
+                clients.push(item.person);
+                let person = item.person;
+                let birthdate = (person.birthdate ? moment(person.birthdate).format("DD/MMM/YYYY") : 'N/A');
+                left_content += `<div class="inner-duplicate-table-row">
+                    <div id="client-${person.id}" class="inner-duplicate-table-cell client-cards">
+                        <table>
+                            <tr>
+                                <th colspan="2" style="border-style: solid; border-width: 0px 0px 1px 0px;font-size: 20px; 
+                                    text-align: right; padding-bottom: 10px;">
+                                        ${item.score * 100}%
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Name:</td><th>${person.given_name}&nbsp;${person.family_name}</th>
+                            </tr>
+                            <tr>
+                                <td>DOB:</td><th>${birthdate}&nbsp;${person.gender ? '(' + person.gender + ')' : null}&nbsp;</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>`;
+            });
+         }
+
+        clients = [];
+        left_content += "</div>";
+
+        let innerContent = `<div class="duplicate-table">
+            <div class="duplicate-table-row">
+                <div class="duplicate-table-cell" id="duplicate-table-cell-left">
+                    <div style="overflow: auto; height: 70vh;">${left_content}</div>
+                </div>
+                <div class="duplicate-table-cell" id="duplicate-table-cell-right">${this.rightDiv(newClient)}</div>
+            </div>
+        </div>`;
+
+        target.innerHTML = innerContent;
+        records.forEach((item) => {
+            let person = item.person;
+            let div = document.getElementById(`client-${person.id}`);
+            div.addEventListener("click", () => {
+                setDOCID(`'${person.id}'`);
+                this.calculateScore(item, newClient);
+            });
+        });
     }
 
-    _displayDuplicate(duplicate, cell) {
-        let {score, person} = duplicate;
-
-        // Clear cell
-        cell.innerHTML = '';
-
-        let heading = document.createElement("h1");
-        heading.innerHTML = (score * 100) + '% match';
-        cell.appendChild(heading);
-
-        let personTable = document.createElement("table");
-        cell.appendChild(personTable);
+    calculateScore(el, newClient){
+        const score = el.score * 100;
+        const person = el.person;
+        let birthdate = (person.birthdate ? moment(person.birthdate).format("DD/MMM/YYYY") : 'N/A');
+        let gender = person.gender ? person.gender.toUpperCase() : '';
+        let innerContent = `<div class="score-table">
+            <div class="score-table-row">
+                <div class="score-table-cell">
+                  <h1>Match Score&nbsp;<span id="percentage-score">${score}%</span></h1>
+                </div>
+            </div>
+            <div class="score-table-row">
+                <div class="score-table-cell">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width:20%;">&nbsp;</td>
+                            <td style="width:40%;">New client</td>
+                            <td  style="width:80%;">Existing client</td>
+                        </tr>
+                        <tr><td colspan="3"><hr /></td></tr>
+                        <tr>
+                            <td>First name:</td><th>${newClient.given_name}</th><th>${person.given_name}</th>
+                        </tr>
+                        <tr>
+                            <td>Last name:</td><th>${newClient.family_name}</th><th>${person.family_name}</th>
+                        </tr>
+                        <tr>
+                            <td>Birthdate:</td><th>${newClient.birthdate}</th><th>${birthdate}</th>
+                        </tr>
+                        <tr>
+                            <td>Gender:</td><th>${newClient.gender}</th>
+                            <th>${gender.match(/F/i) ? 'Female' : (gender == '' ? 'N/A' : 'Male')}</th>
+                        </tr>
+                        <tr>
+                            <td>Home district:</td><th>${newClient.home_district}</th><th>${person.home_district}</th>
+                        </tr>
+                        <tr>
+                            <td>Home TA:</td><th>${newClient.home_ta}</th><th>${person.home_traditional_authority}</th>
+                        </tr>
+                        <tr>
+                            <td>Home village:</td><th>${newClient.home_village}</th><th>${person.home_village}</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>`;
         
-        let personTableBody = document.createElement("tbody");
-        personTable.appendChild(personTableBody);
-
-        for (let field in person) {
-            if (field.match(/_soundex$/) || field.match(/^id$/)) {
-                continue;
-            }
-            this.addRowToTable(personTableBody, field, person);
+        let selectedCard = document.getElementById(`client-${person.id}`);
+        let cards = document.getElementsByClassName('client-cards');
+        for(const card of cards) {
+         card.style = "background: hsl(0 0% 100%);";
         }
-    }
-
-    _clearSelection(tabSelectPane) {
-        let selected = tabSelectPane.getElementsByClassName("ttp-selected-item");
-        for (let i = 0; i < selected.length; i++) {
-            let tabSelector = selected[i];
-            tabSelector.classList.remove("ttp-selected-item");
-        }
-    }
-
-    addRowToTable(table, field, person) {
-        let value = person[field] ;
-
-        let row = document.createElement("tr");
-        table.appendChild(row);
-
-    
-            let titleCell = document.createElement("td");
-            titleCell.innerHTML = field.replace(/_+/, ' ') + ": ";
-            row.appendChild(titleCell);
         
-        if (field === 'given_name') {
-            let valueCell = document.createElement("td");
-            // let filename = person.gender.toUpperCase() === "M" ? "male.gif" : "female.gif";
-            valueCell.innerHTML = /* '<img src="touchscreentoolkit/lib/images/' + filename + '" />' + */ value;
-            row.appendChild(valueCell);
-        } else {
-            let valueCell = document.createElement("td");
-            valueCell.innerHTML = value;
-            row.appendChild(valueCell);
-        }
+        selectedCard.style = "background: lightblue;"
+        document.getElementById("duplicate-table-cell-right").innerHTML = innerContent;
     }
+
+    rightDiv(newClient){
+        return `<div class="score-table">
+            <div class="score-table-row">
+                <div class="score-table-cell">
+                  <h1>Match Score&nbsp;<span id="percentage-score">&nbsp;-&nbsp;</span></h1>
+                </div>
+            </div>
+            <div class="score-table-row">
+                <div class="score-table-cell">
+                    <table>
+                        <tr>
+                            <td style="width:20%;">&nbsp;</td>
+                            <td style="width:40%;">New client</td>
+                            <td style="width:40%;">Existing client</td>
+                        </tr>
+                        <tr><td colspan="3"><hr /></td></tr>
+                        <tr>
+                            <td>First name:</td><th>${newClient.given_name}</th><th>&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td>Last name:</td><th>${newClient.family_name}</th><th>&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td>Birthdate:</td><th>${newClient.birthdate}</th><th>&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td>Gender:</td><th>${newClient.gender}</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td>Home district:</td><th>${newClient.home_district}</th><th>&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td>Home TA:</td><th>${newClient.home_ta}</th><th>&nbsp;</th>
+                        </tr>
+                        <tr>
+                            <td>Home village:</td><th>${newClient.home_village}</th><th>&nbsp;</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>`;
+    }
+
 }

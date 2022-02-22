@@ -15,8 +15,29 @@
 
     function pullLastPatientType(){
         let nextBTN = document.getElementById('nextButton');
-        nextBTN.setAttribute("onmousedown","submitSelection();");
+        nextBTN.setAttribute("onmousedown","");
+        nextBTN.innerHTML = "<span>Finish</span>";
+        addAttributes();
         fetchLastObs();
+    }
+
+    function addAttributes(){
+        let lists = __$('tt_currentUnorderedListOptions').getElementsByTagName("li");
+        for(let li of lists){
+            li.setAttribute("onclick", "null; updateTouchscreenInputForSelect(this); changeNextBTN(this);")
+        }
+    }
+
+    function changeNextBTN(e){
+        let nextBTN = document.getElementById('nextButton');
+
+        if(e.innerHTML.match(/New/i)){
+            nextBTN.setAttribute("onmousedown", "submitSelection();");
+            nextBTN.innerHTML = "<span>Finish</span>";
+        }else{
+            nextBTN.setAttribute("onmousedown", "gotoNextPage();");
+            nextBTN.innerHTML = "<span>Next</span>";
+        }
     }
 
     var current_type;
@@ -32,8 +53,8 @@
             if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
                 let obs = JSON.parse(this.responseText);
                 let helpText = `<span style="font-size: 14px">&nbsp;(Current type:`;
-                if(obs) {
-                    current_type = (obs[0].value_coded == 7572 ? 'New patient' : 'External Consultation');
+                if(obs && obs.length > 0) {
+                    current_type = (obs[0].value_coded == 7572 ? 'New patient' : (obs[0].value_coded == 10522 ? 'Drug refill' : 'External Consultation'));
                     helpText += ` <b>${current_type}</b>)</span>`
                 }else{
                     helpText += ` <b>Not set</b>)</span>`
@@ -50,7 +71,35 @@
 
     function submitSelection(){
         let selected_option = document.getElementById('touchscreenInput' + tstCurrentPage).value;
-        let valid_input = (selected_option == 'External consultation' || selected_option == 'New patient');
+        let selected_location;
+
+        if(!selected_option.match(/New/i)){
+            selected_option = document.getElementById('patient_type').value;
+            selected_location = document.getElementById('touchscreenInput' + tstCurrentPage).value;
+
+            if(selected_location.length < 1){
+                showMessage('Please select a valid location');
+                return;
+            }
+
+            let ul = __$('options').getElementsByTagName("ul")[0];
+            let lists = ul.getElementsByTagName("li");
+            let valid_location = false;
+
+            for(const li of lists){
+                if(selected_location === li.textContent)
+                    valid_location = true;
+
+            }
+
+            if(!valid_location){
+                showMessage('Please select a valid location');
+                return;
+            }
+        }
+
+        let valid_input = (selected_option == 'External consultation' || 
+            selected_option == 'New patient' || selected_option == 'Drug refill');
         if(!valid_input){
             showMessage('Please select a valid option.');
             return;
@@ -76,7 +125,15 @@
 
     function postObs(encounter){
         let selected_option = document.getElementById('touchscreenInput' + tstCurrentPage).value;
-        let patient_type = selected_option == 'New patient' ? 7572 : 9684
+        let selected_location;
+
+        if(!selected_option.match(/New/i)){
+            selected_option = document.getElementById('patient_type').value;
+            selected_location = document.getElementById('touchscreenInput' + tstCurrentPage).value;
+
+        }
+        
+        let patient_type = selected_option == 'New patient' ? 7572 : (selected_option == 'Drug refill' ? 10522 : 9684);
         var currentTime = moment().format(' HH:mm:ss');
         var obs_datetime = moment(sessionStorage.sessionDate).format('YYYY-MM-DD');
 
@@ -87,6 +144,15 @@
                 obs_datetime: obs_datetime
             }]
         }
+
+        if(selected_location != undefined){
+            obs.observations.push({
+                concept_id: 7054,
+                value_text: selected_location
+            })
+        }
+
+        sessionStorage.patient_type = selected_option;
         submitParameters(obs, "/observations", "nextPage")
     }
 
@@ -116,8 +182,17 @@
             key="gender">
                 <option value=""></option>
                 <option value="New patient">New patient</option>
+                <option value="Drug refill">Drug refill</option>
                 <option value="External consultation">External consultation</option>
         </select>
+
+        <select objectType="location" ajaxURL="/locations?name="
+                    allowFreeText="true"
+                    field_type="alpha"
+                    helpText="Please select facility name"
+                    id="facility_name"
+                    tt_onLoad="__$('nextButton').setAttribute('onmousedown','submitSelection();');"
+                    name="facility_name"></select>
 
         </form>
   
