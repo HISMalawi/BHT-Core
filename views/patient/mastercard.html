@@ -888,6 +888,7 @@
         var visits_dates_url = sessionStorage.apiProtocol + '://' + apiURL + ':' + apiPort;
         visits_dates_url += '/api/v1/patients/' + sessionStorage.patientID;
         visits_dates_url +=  '/visits?program_id=' + sessionStorage.programID;
+        visits_dates_url += '&include_defaulter_dates=true';
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
