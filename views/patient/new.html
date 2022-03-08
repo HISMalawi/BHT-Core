@@ -222,7 +222,8 @@
                     ["Malawi National Id", parameter.malawi_national_id]
                 ])
             }
-            if (military_site) {
+            
+            if (military_site && checkAge() ) {
                 attributes = attributes.concat([
                     ["Occupation", parameter.occupation],
                     ["Regiment ID", parameter.regiment_id],
@@ -995,7 +996,23 @@
                     document.getElementById(`helpText${tstCurrentPage}`).innerHTML = `${helpText} District`;
                 }
             }
-
+            function checkAge(){
+                var dateBirth = culBirthdate();
+                if(getAge(dateBirth[0]) > 18)
+                    return true;
+                else
+                    return false;
+            }
+            function getAge(dateString) {
+                var today = new Date();
+                var birthDate = new Date(dateString);
+                var age = today.getFullYear() - birthDate.getFullYear();
+                var m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                return age;
+            }
         </script>
 
         <form action="/views/patient_dashboard.html" method="POST">
@@ -1015,13 +1032,15 @@
                    condition="$(&quot;family_name&quot;).value == &quot;&quot;"/>
             
 
-            <input type="text" name="person[birth_year]" id="person_birth_year" helpText="Year of Birth"
+            <input type="text" name="person[birth_year]" id="person_birth_year" helpText="Year of Birth" 
+                   validationRule="^(19|20)\d{2}$|Unknown"   
                    field_type="number"
                    absoluteMin="1900" min="1900" tt_onLoad="setAbsoluteMaxBirthYear(); addMaxValue();"
                    tt_pageStyleClass="Numeric NumbersOnly"/>
 
             <select name="person[birth_month]" id="person_birth_month" helpText="Month of Birth"
                     condition="$('person_birth_year').value.toLowerCase() != 'unknown'"
+                    validationRule="^[a-zA-Z ]*$|Unknown" 
                     validationMessage="Please enter a valid date" tt_onUnLoad="resetFinishBtn();"
                     tt_onLoad=" validateMonth();__$(keyboard).style.display = none;">
                 <option value=""></option>
@@ -1042,7 +1061,8 @@
 
             <input type="text" name="person[age_estimate]" id="person_age_estimate" helpText="Age Estimate"
                    absoluteMax="120" field_type="number"
-                   condition="$('person_birth_year').value == 'Unknown';"
+                   condition="$('person_birth_year').value == 'Unknown';" 
+                   validationRule="^(12[0-7]|1[01][0-9]|[1-9]?[0-9])$"
                    tt_onLoad="" tt_pageStyleClass="Numeric NumbersOnly"/>
 
             <!--input type="text" name="person[age_estimate]" id="person_age_estimate" helpText="Age Estimate"
@@ -1054,6 +1074,7 @@
                    id="person_birth_day"
                    field_type="number" helpText="Birth Day"
                    condition="($('person_birth_year').value != 'Unknown') && ($('person_birth_month').value != 'Unknown')"
+                   validationRule="^(3[01]|[12][0-9]|[1-9])$|Unknown"
                    tt_onLoad="getDayOfMonthPicker($('person_birth_year').value, $('person_birth_month').value);setUpPageForDateValidation();"
                    tt_onUnLoad="resetFinishBtn();"/>
 
@@ -1232,8 +1253,10 @@
                     helpText="Occupation" 
                     allowFreeText="false" 
                     tt_onLoad="seen(tstCurrentPage);__$('keyboard').style.display = 'none'" 
-                    condition="askMilitarySite();"
-                    ttMatchFromBeginning="true"><option value="MDF Active">MDF Active</option>
+                    condition="askMilitarySite();checkAge();"
+                    ttMatchFromBeginning="true">
+                        <option value=""></option>
+                        <option value="MDF Active">MDF Active</option>
                         <option value="MDF Reserve">MDF Reserve</option>
                         <option value="MDF Retired">MDF Retired</option>
                         <option value="Civilian">Civilian</option></select>
@@ -1243,7 +1266,7 @@
                     field_type="number" 
                     tt_onLoad="__$('Unknown').style.display = 'none';" 
                     helpText="Regiment ID" 
-                    condition="__$('occupation').value.match(/MDF/i) && askMilitarySite();" />
+                    condition="__$('occupation').value.match(/MDF/i) && askMilitarySite();checkAge();" />
 
 
             <input type="text" 
@@ -1253,13 +1276,15 @@
                       allowFreeText="true"
                       tt_pageStyleClass="Date DatesOnly"
                       tt_onLoad="__$('Unknown').style.display = 'none';"
-                      condition="__$('occupation').value.match(/MDF/i) && askMilitarySite();"
+                      condition="__$('occupation').value.match(/MDF/i) && askMilitarySite();checkAge();"
                       helptext="Date Joined MDF" />
 
             <select name="person[military_rank]" id="rank" 
                     helpText="Rank" 
                     allowFreeText="false" 
-                    condition="__$('occupation').value.match(/MDF/i) && askMilitarySite();"><option value="Second Lieutenant">Second Lieutenant</option>
+                    condition="__$('occupation').value.match(/MDF/i) && askMilitarySite();checkAge();">
+                        <option value=""></option>
+                        <option value="Second Lieutenant">Second Lieutenant</option>
                         <option value="First Lieutenant">First Lieutenant</option>
                         <option value="Captain">Captain</option>
                         <option value="Major">Major</option>
