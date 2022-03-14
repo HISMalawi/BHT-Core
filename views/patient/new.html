@@ -1014,6 +1014,13 @@
                 else
                 return true
             }
+            function checkOccupationAge(){
+                if(checkAge() && checkOccupation())
+                 return true
+                else
+                 return false
+                
+            }
             function getAge(dateString) {
                 var today = new Date();
                 var birthDate = new Date(dateString);
@@ -1267,7 +1274,7 @@
                     helpText="Occupation" 
                     allowFreeText="false" 
                     tt_onLoad="seen(tstCurrentPage);__$('keyboard').style.display = 'none'" 
-                    condition="askMilitarySite();checkAge();"
+                    condition="askMilitarySite() && checkAge();"
                     ttMatchFromBeginning="true">
                         <option value=""></option>
                         <option value="MDF Active">MDF Active</option>
@@ -1277,7 +1284,7 @@
 
             <input type="text" name="person[regiment_id]" 
                     id="person_regiment_id" 
-                    condition="askMilitarySite();checkAge();checkOccupation();"
+                    condition="askMilitarySite() && checkOccupationAge();"
                     field_type="number" 
                     tt_onLoad="__$('Unknown').style.display = 'none';" 
                     helpText="Regiment ID" 
@@ -1291,13 +1298,13 @@
                       allowFreeText="true"
                       tt_pageStyleClass="Date DatesOnly"
                       tt_onLoad="__$('Unknown').style.display = 'none';"
-                      condition="askMilitarySite();checkAge();checkOccupation();"
+                      condition="askMilitarySite() && checkOccupationAge();"
                       helptext="Date Joined MDF" />
 
             <select name="person[military_rank]" id="rank" 
                     helpText="Rank" 
                     allowFreeText="false" 
-                    condition="askMilitarySite();checkAge();checkOccupation();">
+                    condition="askMilitarySite() && checkOccupationAge();">
                         <option value=""></option>
                         <option value="Second Lieutenant">Second Lieutenant</option>
                         <option value="First Lieutenant">First Lieutenant</option>
