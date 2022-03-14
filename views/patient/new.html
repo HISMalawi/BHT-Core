@@ -1047,12 +1047,13 @@
                    validationRule="^(19|20)\d{2}$|Unknown"   
                    field_type="number"
                    absoluteMin="1900" min="1900" tt_onLoad="setAbsoluteMaxBirthYear(); addMaxValue();"
+                   validationMessage="Please enter a valid year"
                    tt_pageStyleClass="Numeric NumbersOnly"/>
 
             <select name="person[birth_month]" id="person_birth_month" helpText="Month of Birth"
                     condition="$('person_birth_year').value.toLowerCase() != 'unknown'"
                     validationRule="^[a-zA-Z ]*$|Unknown" 
-                    validationMessage="Please enter a valid date" tt_onUnLoad="resetFinishBtn();"
+                    validationMessage="Please enter a valid month" tt_onUnLoad="resetFinishBtn();"
                     tt_onLoad=" validateMonth();__$(keyboard).style.display = none;">
                 <option value=""></option>
                 <option value="1">Jan</option>
@@ -1074,6 +1075,7 @@
                    absoluteMax="120" field_type="number"
                    condition="$('person_birth_year').value == 'Unknown';" 
                    validationRule="^(12[0-7]|1[01][0-9]|[1-9]?[0-9])$"
+                   validationMessage="Please enter a valid estimated age"
                    tt_onLoad="" tt_pageStyleClass="Numeric NumbersOnly"/>
 
             <!--input type="text" name="person[age_estimate]" id="person_age_estimate" helpText="Age Estimate"
@@ -1086,6 +1088,7 @@
                    field_type="number" helpText="Birth Day"
                    condition="($('person_birth_year').value != 'Unknown') && ($('person_birth_month').value != 'Unknown')"
                    validationRule="^(3[01]|[12][0-9]|[1-9])$|Unknown"
+                   validationMessage="Please enter a valid day"
                    tt_onLoad="getDayOfMonthPicker($('person_birth_year').value, $('person_birth_month').value);setUpPageForDateValidation();"
                    tt_onUnLoad="resetFinishBtn();"/>
 
