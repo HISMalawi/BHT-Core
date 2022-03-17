@@ -600,7 +600,16 @@
         document.getElementById("vitals-Temp").setAttribute("class", "app-btn button-diabled");
         document.getElementById("vitals-input").value = vitalsEntered[nextVital.id];
     }
-
+    function validateOPDPatient(){
+        if(sessionStorage.programID == 14)
+        {
+            if(patient_age <= 5)
+                return true;
+            else
+                return false;
+        } else
+        return true;
+    }
     function validateWeight(weight) {
         var minValue = 2;
         var absMinValue = 1;
@@ -616,8 +625,13 @@
 
         let converted_weight = parseFloat(weight).toFixed(1);
         if(converted_weight.toString() != weight){
-            showMessage("Please enter a valid weight. Not forgetting to add a decimal.<br />For example; 45.6");
-            return false;
+            if(weight == "" && !validateOPDPatient()){
+                return true
+            }
+            else{
+                showMessage("Please enter a valid weight. Not forgetting to add a decimal.<br />For example; 45.6");
+                return false;
+            }
         }
 
         if (!(weight.indexOf(".") != -1)) {
@@ -642,8 +656,13 @@
     function validateHeight(height) {
         let converted_height = parseInt(height);
         if(converted_height.toString() != height){
-            showMessage("Please enter a valid number, do <b>NOT</b> add a decimal.<br />For example; 160");
-            return false;
+            if(height == "" && !validateOPDPatient())
+                return true
+            else
+            {
+                showMessage("Please enter a valid number, do <b>NOT</b> add a decimal.<br />For example; 160");
+                return false;
+            }
         }
 
         if (!(parseInt(height) >= 40 && parseInt(height) <= 220)) {
@@ -777,13 +796,13 @@
             return;
         }else{
             if(show_bp_only == false) {
-                if (document.getElementById("td-Weight").innerHTML.length < 1) {
+                if (document.getElementById("td-Weight").innerHTML.length < 1 && validateOPDPatient()) {
                     showMessage("Weight can not be empty");
                     return;
-                }else if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.patientAge < 18) {
+                }else if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.patientAge < 18 && validateOPDPatient()) {
                     showMessage("Height can not be empty");
                     return;
-                }else if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.currentHeight == 0) {
+                }else if (document.getElementById("td-Height").innerHTML.length < 1 && sessionStorage.currentHeight == 0 && validateOPDPatient()) {
                     showMessage("Height can not be empty");
                     return;
                 }
@@ -900,7 +919,10 @@
                 obs.observations.push({concept_id: treatment_status_concept_id, value_text: treatment_status_value})
             }
 
-        submitParameters(obs, "/observations", "nextPage")
+            if(obs.observations.length > 0)
+                submitParameters(obs, "/observations", "nextPage")
+            else
+                nextPage();
 
 
     }
