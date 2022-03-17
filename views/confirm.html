@@ -12,12 +12,10 @@
 <script src="/assets/js/jquery.min.js"></script>
 <script src="/assets/js/moment.js"></script>
 <script src="/assets/js/bmi.js"></script>
+<script src="/assets/js/patientType.js"></script>
 <script src="/assets/js/bootstrap/bootstrap.min.js"></script>
 <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
-<script
-  type="text/javascript"
-  src="/assets/js/does_connection_exist.js"
-></script>
+<script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
 
 <script src="/assets/js/httpUtils.js"></script>
 <script src="/assets/js/uiUtils.js"></script>
@@ -862,6 +860,7 @@ var global_property = GlobalProperty({
 
             var td = document.createElement("td");
             td.innerHTML = identifiersHash[identifier];
+            patient_outcome = identifiersHash[identifier];
             tr.appendChild(td);
             table.appendChild(tr);
           }
@@ -1521,6 +1520,14 @@ var global_property = GlobalProperty({
       return
     }
 
+    if(active_tranferred_out_popup && patient_outcome == "Patient transferred out" && sessionStorage.programID == "1"){
+      document.getElementById('transferred-out-patient').style="display:inline";
+      document.getElementById('page-cover').style="display:inline";
+      active_tranferred_out_popup = false;
+      return
+    }
+
+    sessionStorage.patientID = id;
     sessionStorage.patientID = id;
     if(sessionStorage.programID != '1'){
       nextEncounter(sessionStorage.patientID, sessionStorage.programID);
@@ -2248,9 +2255,73 @@ function closeEnrollProgramPoP(){
     background-color: lightblue;
   }
 
+  #transferred-out-patient {
+    background: #ffffff;
+    border-radius: 0.5em;
+    box-shadow: 0 10px 20px rgba(black, 0.2);
+    left: 50%;
+    max-width: 90%;
+    position: absolute;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    width: 50em;
+    text-align: left;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000000;
+    border-color: black;
+    border-style: solid;
+    display: none;
+  }
+
+  .action-btns {
+    font-family: "Nimbus Sans L", "Arial Narrow", sans-serif;
+    border-style: solid;
+    width: 33.3%;
+    border-width: 1px;
+    font-size: 1.3em;
+    color: white;
+  }
 </style>
 
 <div  id="page-cover"></div>
+
+<!-- new popup -->
+<div id="transferred-out-patient">
+  <div class="modal-title">
+    <h1>Patient transferred out</h1>
+  </div>
+
+  <div style="text-align: center; width: 97%; display: table; padding: 5px; font-size: 1.5em;">
+    <p>Transferred out client.</p>
+    <p>Please select purpose of the visit.</p>
+  </div>
+  
+  <div style="width: 100%;margin: 5px;">
+    <div style="display: table; width: 99%;">
+      <div style="display: table-row;">
+        <div class="action-btns" style="display: table-cell;  
+          text-align: center; padding: 10%; border-top-left-radius: 9px;
+          border-bottom-left-radius: 9px; background-color: #82bbd1;" onmousedown="visitPurpose('Drug refill');">
+          Drug refill
+        </div>
+        <div class="action-btns" style="display: table-cell;  
+          text-align: center; padding: 10%;
+          background-color: #82bbd1;" onmousedown="visitPurpose('External Consultation');">
+          Consultation
+        </div>
+        <div class="action-btns" style="display: table-cell;  
+          text-align: center; padding: 10%; border-top-right-radius: 9px;
+          border-bottom-right-radius: 9px; background-color: #36780f;" 
+          onmousedown="visitPurpose('Transfer In');">
+          Transfer In
+        </div>
+      </div>
+    </div>
+</div>
+<!-- new popup -->
+
 <div id="void-confirm-message">
   <div class="modal-title">
     <h1>Warning</h1>
