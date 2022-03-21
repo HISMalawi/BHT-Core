@@ -35,7 +35,7 @@
 			"applicationName": "OPD",
 	      	"programID": "14",
 			"applicationFolder": "OPD/",
-			"url": "",
+			"url": "apps/OPD/views/activities.html",
 			"applicationIcon": "/assets/images/opd.png",
 			"applicationDescription": "Outpatient Program",
 			"comment": "these are examples, add another application with this template at the end of these curly braces by adding a comma and copying this template"

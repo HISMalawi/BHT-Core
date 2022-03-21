@@ -13,6 +13,7 @@
 
     <script type="text/javascript" src="/assets/js/add.locations.js"></script>
     <script language="javascript">
+        var img_base64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAFKCAMAAAD2TtHjAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAADeUExURUdwTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEpG5jIAAABJdFJOUwCoIOCw2LjAMFiA+Oh4OPAYcJDI0CgIEKBoQFCIYFReNFdbI04VEyZNR0kDSkQODWJsZWQWLWkKYQlRPzoxEQdGKgZBGhw7NyfGlyHFAAAFo0lEQVR42u3TWVcUOQCAUVzQRlCJG2aYoVkEVNyAUUQd91ny//+QnVRqPRxfZp7m3O+lU6l0qrrq9tKSJEn6WQexNFsMX8b4vM4exfhssnA7DtvLU2/jTv541M1u58N33eHBeNPc6+bM74vhPzF+mVxjq5z8UDc9qrPPy+wF9/O937Tcz2ncmix6Ur56moffYtyos383N/B1sOnp8MfttrM78W3+2GumB5uejy+z+JHfJlfeifN2+K7f9FmMX8frNvoHch7jk3Y6xkftsD7lWVk3n1zmcvPqzkcvp3z1Q3dYNt3tz9T2ugXz+pRf9h4O/jWsWSrdzDeZ0qU6+yCla5OFN9KwlTx1Oy3nj+vd7I18eLc7nI03zYXmzK3F8LeU4uQa98rJO3XTB3X2Upm94H5+6Tct97Oa7k0WXS1fXc3Dhyndr7O/NjewMdh0dfjjrrSzy+l2/lhppgebrk9eb0oPJ1deTmvt8G6/6bWUNsbr7vcPZD2lq+10StfbYX3KN8u6tcllNptXtz56OeWrd7rDsumV/kxtpVuwVp/y5d7DDCywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwAILLLDAAgsssMACCyywwALr/wxrP5S2F8MXITyts0chbE4W3grDDvPUmzDPH1vdbH48Szvd4f5409wfzZn8Yr6E8Hpyjd1y8n3d9KjOPi2zF9zPn/2m5X6Ow+5k0ePy1eM8/BzCxzr7V3MDnwabHg9/3Kt2dh7e5I/DZnqw6dn4Mosf+Xly5Xk4aYc7/aabIXwar/vYP5CzEB53f8Cw1Q7rU94u604ml9lrXt3Z6OWUr77vDsumr/oztcNuwUl9yi96D/tLkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJ0n/RD/3ZSSm34sPOAAAAAElFTkSuQmCC";
         tstUsername = "";
         tstUserKeyboardPref = "qwerty";
         tstCurrentDate = "";
@@ -53,7 +54,7 @@
                 gender: null, birthdate: null, birthdate_estimated: null,
                 home_district: null, home_traditional_authority: null, home_village: null,
                 current_district: null, current_traditional_authority: null, current_village: null,
-                landmark: null, cell_phone_number: null, occupation: null, relationship: null,
+                landmark: null,malawi_national_id: null, cell_phone_number: null, occupation: null, relationship: null,
                 patient_type: null, facility_name: null
             }
 
@@ -88,7 +89,9 @@
                     parametersPassed.current_village = (data || 'Unknown');
                 } else if (title.match(/Landmark/i)) {
                     parametersPassed.landmark = data;
-                } else if (title.match(/Cell phone/i)) {
+                } else if (title.match(/Malawi National Id/i)) {
+                    parametersPassed.malawi_national_id = data;
+                }else if (title.match(/Cell phone/i)) {
                     parametersPassed.cell_phone_number = data;
                 } else if (title.match(/Occupation/i)) {
                     parametersPassed.occupation = data;
@@ -106,6 +109,8 @@
                     parametersPassed.facility_name = data;
                 }
             }
+            sessionStorage.patientAge = Math.round(moment().diff(parametersPassed.birthdate, 'years', true));
+            sessionStorage.patientGender = parametersPassed.gender;
             sessionStorage.birthdate = parametersPassed.birthdate
              postClientParamaters(parametersPassed, patientAttributes);
         }
@@ -171,7 +176,8 @@
                 facility_name: __$('facility_name').value,
                 relationship: (showTypeOfPatient() == true ? __$('guardian_present').value : 'No'),
             }
-
+            if(parseInt(sessionStorage.programID) == 14 )
+                parameter.patient_type = "New"
             if (military_site) {
                 parameter = Object.assign(parameter, {
                     occupation: __$('occupation').value,
@@ -180,7 +186,12 @@
                     military_rank: __$('rank').value,
                 })
              }
-
+             
+             if(malawi_nationalID_status){
+                parameter = Object.assign(parameter, {
+                    malawi_national_id: __$('malawi_national_id').value,
+                })
+             }
             var table = document.createElement('table');
             table.setAttribute('class', 'summary-table');
             var attributes = [
@@ -205,7 +216,19 @@
 
             attributes.push(["Register Guardian", parameter.relationship]);
 
-            if (military_site) {
+            if(malawi_nationalID_status)
+            {
+                attributes = attributes.concat([
+                    ["Malawi National Id", parameter.malawi_national_id]
+                ])
+            }
+            
+            if(__$('occupation').value == "Civilian"){
+                attributes = attributes.concat([
+                    ["Occupation", __$('occupation').value]
+                ])
+            }else
+            if (military_site && checkAge() ) {
                 attributes = attributes.concat([
                     ["Occupation", parameter.occupation],
                     ["Regiment ID", parameter.regiment_id],
@@ -364,7 +387,8 @@
     <script type="text/javascript" src="/assets/js/tt_tabs.js"></script>
     <script type="text/javascript" src="/assets/js/GlobalProperty.js"></script>
     <script type="text/javascript" src="/assets/js/military_site.js"></script>
-
+    <script type="text/javascript" src="/assets/js/malawi_nationalID.js"></script>
+    
 </head>
 <body id="mateme">
 <div id="container">
@@ -977,7 +1001,36 @@
                     document.getElementById(`helpText${tstCurrentPage}`).innerHTML = `${helpText} District`;
                 }
             }
-
+            function checkAge(){
+                var dateBirth = culBirthdate();
+                if(getAge(dateBirth[0]) > 18)
+                    return true;
+                else
+                    return false;
+            }
+            function checkOccupation(){
+                if(__$('occupation').value == "Civilian")
+                    return false;
+                else
+                return true
+            }
+            function checkOccupationAge(){
+                if(checkAge() && checkOccupation())
+                 return true
+                else
+                 return false
+                
+            }
+            function getAge(dateString) {
+                var today = new Date();
+                var birthDate = new Date(dateString);
+                var age = today.getFullYear() - birthDate.getFullYear();
+                var m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                return age;
+            }
         </script>
 
         <form action="/views/patient_dashboard.html" method="POST">
@@ -997,14 +1050,17 @@
                    condition="$(&quot;family_name&quot;).value == &quot;&quot;"/>
             
 
-            <input type="text" name="person[birth_year]" id="person_birth_year" helpText="Year of Birth"
+            <input type="text" name="person[birth_year]" id="person_birth_year" helpText="Year of Birth" 
+                   validationRule="^(19|20)\d{2}$|Unknown"   
                    field_type="number"
                    absoluteMin="1900" min="1900" tt_onLoad="setAbsoluteMaxBirthYear(); addMaxValue();"
+                   validationMessage="Please enter a valid year"
                    tt_pageStyleClass="Numeric NumbersOnly"/>
 
             <select name="person[birth_month]" id="person_birth_month" helpText="Month of Birth"
                     condition="$('person_birth_year').value.toLowerCase() != 'unknown'"
-                    validationMessage="Please enter a valid date" tt_onUnLoad="resetFinishBtn();"
+                    validationRule="^[a-zA-Z ]*$|Unknown" 
+                    validationMessage="Please enter a valid month" tt_onUnLoad="resetFinishBtn();"
                     tt_onLoad=" validateMonth();__$(keyboard).style.display = none;">
                 <option value=""></option>
                 <option value="1">Jan</option>
@@ -1024,7 +1080,9 @@
 
             <input type="text" name="person[age_estimate]" id="person_age_estimate" helpText="Age Estimate"
                    absoluteMax="120" field_type="number"
-                   condition="$('person_birth_year').value == 'Unknown';"
+                   condition="$('person_birth_year').value == 'Unknown';" 
+                   validationRule="^(12[0-7]|1[01][0-9]|[1-9]?[0-9])$"
+                   validationMessage="Please enter a valid estimated age"
                    tt_onLoad="" tt_pageStyleClass="Numeric NumbersOnly"/>
 
             <!--input type="text" name="person[age_estimate]" id="person_age_estimate" helpText="Age Estimate"
@@ -1036,6 +1094,8 @@
                    id="person_birth_day"
                    field_type="number" helpText="Birth Day"
                    condition="($('person_birth_year').value != 'Unknown') && ($('person_birth_month').value != 'Unknown')"
+                   validationRule="^(3[01]|[12][0-9]|[1-9])$|Unknown"
+                   validationMessage="Please enter a valid day"
                    tt_onLoad="getDayOfMonthPicker($('person_birth_year').value, $('person_birth_month').value);setUpPageForDateValidation();"
                    tt_onUnLoad="resetFinishBtn();"/>
 
@@ -1163,7 +1223,18 @@
                    field_type="password"
                    tt_onLoad="$(nextButton).style.display = block;"
                    />
-
+                   <div style="background-color: black;">
+                    <input type="text" name="malawi_national_id" id="malawi_national_id" textCase="upper"
+                    style="margin-bottom: 15px; width: 99%; border-color: black;"
+                    condition ="askMalawiNationalID()"
+                    tt_onLoad="addScanBody()"
+                    field_type="alpha"
+                    tt_pageStyleClass="nota"
+                    helpText="Malawi National ID"
+                    validationRule="^(?=[a-zA-Z0-9]*$)(?=\d+[a-zA-Z]|[a-zA-Z]+\d)([a-zA-Z\d]){8}$|Unknown|Not Available|N\/A"
+                    validationMessage="Not a valid MAlawi National ID"
+                    helpText="Enter National ID"/>
+                </div>
             <input type="text" name="cellphone" id="cellphone"
                    helpText="Cell phone number"
                    field_type="number"
@@ -1203,18 +1274,21 @@
                     helpText="Occupation" 
                     allowFreeText="false" 
                     tt_onLoad="seen(tstCurrentPage);__$('keyboard').style.display = 'none'" 
-                    condition="askMilitarySite();"
-                    ttMatchFromBeginning="true"><option value="MDF Active">MDF Active</option>
+                    condition="askMilitarySite() && checkAge();"
+                    ttMatchFromBeginning="true">
+                        <option value=""></option>
+                        <option value="MDF Active">MDF Active</option>
                         <option value="MDF Reserve">MDF Reserve</option>
                         <option value="MDF Retired">MDF Retired</option>
                         <option value="Civilian">Civilian</option></select>
 
             <input type="text" name="person[regiment_id]" 
                     id="person_regiment_id" 
+                    condition="askMilitarySite() && checkOccupationAge();"
                     field_type="number" 
                     tt_onLoad="__$('Unknown').style.display = 'none';" 
                     helpText="Regiment ID" 
-                    condition="__$('occupation').value.match(/MDF/i) && askMilitarySite();" />
+                     />
 
 
             <input type="text" 
@@ -1224,13 +1298,15 @@
                       allowFreeText="true"
                       tt_pageStyleClass="Date DatesOnly"
                       tt_onLoad="__$('Unknown').style.display = 'none';"
-                      condition="__$('occupation').value.match(/MDF/i) && askMilitarySite();"
+                      condition="askMilitarySite() && checkOccupationAge();"
                       helptext="Date Joined MDF" />
 
             <select name="person[military_rank]" id="rank" 
                     helpText="Rank" 
                     allowFreeText="false" 
-                    condition="__$('occupation').value.match(/MDF/i) && askMilitarySite();"><option value="Second Lieutenant">Second Lieutenant</option>
+                    condition="askMilitarySite() && checkOccupationAge();">
+                        <option value=""></option>
+                        <option value="Second Lieutenant">Second Lieutenant</option>
                         <option value="First Lieutenant">First Lieutenant</option>
                         <option value="Captain">Captain</option>
                         <option value="Major">Major</option>
@@ -1498,6 +1574,7 @@
 
     function postClientParamaters(parametersPassed, attributes = null) {
         var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/people';
+        var malawi_national_id =parametersPassed.malawi_national_id;
         if (parametersPassed.birthdate_estimated === "Yes") {
             parametersPassed.birthdate_estimated = 1;
         }else {
@@ -1514,10 +1591,17 @@
 
                 if (attributes) {
                     createPersonAttributes(personId, attributes, function () {
-                        createPatient(personId)
+                        if(malawi_nationalID_status){
+                            createPatient(personId,malawi_national_id)
+                        }
+                        else
+                            createPatient(personId);
                     });
                 } else {
-                    createPatient(personId);
+                    if(malawi_nationalID_status)
+                        createPatient(personId,malawi_national_id)
+                    else
+                        createPatient(personId);
                 }
                 // submitPatienttype(obj['person_id']);
             }
@@ -1560,9 +1644,12 @@
 
     var redirect_to_guardian_search = false;
 
-    function createPatient(person_id) {
+    function createPatient(person_id,malawi_nationalID = null) {
         var url = apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/patients';
-        var parametersPassed = JSON.stringify({person_id: person_id, program_id: sessionStorage.programID});
+        if(malawi_nationalID)
+            var parametersPassed = JSON.stringify({person_id: person_id, program_id: sessionStorage.programID,malawi_national_ID: malawi_nationalID});
+        else
+            var parametersPassed = JSON.stringify({person_id: person_id, program_id: sessionStorage.programID});
 
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
@@ -1638,4 +1725,33 @@
         
         }
     }
+
+    function addScanBody() {
+    var elements = document.getElementById('touchscreenInput16');
+    var barCodeInner = document.createElement('div');
+    var table = document.createElement('table');
+    var t_row = document.createElement('tr');
+    var t_colunm_1 = document.createElement('td');
+    var t_colunm_2 = document.createElement('td');
+    t_colunm_2.style = "width: 97%";
+    var img = document.createElement('img');
+
+    barCodeInner.setAttribute('id','barCodeInner');
+    barCodeInner.setAttribute('class','table-div-cell app-details');
+
+    img.setAttribute('src',img_base64);
+    img.setAttribute('style','height: 50px; vertical-align: middle;');
+    t_colunm_1.append(img);
+    t_row.appendChild(t_colunm_1);
+    t_colunm_2.append(elements);
+    //elements[0].remove();
+    t_row.appendChild(t_colunm_2);
+    table.append(t_row);
+    barCodeInner.append(table);
+
+
+    var v = document.getElementById('inputFrame16');
+    v.removeChild(v.firstChild);
+    v.append(barCodeInner);
+   }
 </script>
