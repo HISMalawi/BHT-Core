@@ -1049,7 +1049,39 @@ function loadTabContent(id) {
 // }
 
 function signIn() {
-    checkCredentials(sessionStorage.getItem("username"), sessionStorage.getItem("userPassword"));
+    checkDate();
+    // checkCredentials(sessionStorage.getItem("username"), sessionStorage.getItem("userPassword"));
+}
+function checkDate(){
+            var url = 'http://' + apiURL + ':' + apiPort + '/api/v1/current_time';
+            var req = new XMLHttpRequest();
+            req.onreadystatechange = function(){
+
+                if (this.readyState == 4) {
+                    if (this.status == 200) {
+                        var results = JSON.parse(this.responseText);
+                            var sessionDate = moment(results.date).format('YYYY-MM-DD');
+                            var date = moment(results.date)
+                            var now = moment().format('YYYY-MM-DD');
+
+                            if (now !== sessionDate) {
+                              // date is past
+                              dateAlert();
+                              console.log('device date is not the same as server date')
+                            } else {
+                              // date is future
+                              checkCredentials(sessionStorage.getItem("username"), sessionStorage.getItem("userPassword"));
+                              console.log('device date is the same as server date')
+                            }
+                    }
+                }
+            };
+            try {
+                req.open('GET', url, true);
+                req.setRequestHeader('Authorization',sessionStorage.getItem('authorization'));
+                req.send(null);
+            } catch (e) {
+            }
 }
 
 function checkCredentials(username, password) {
