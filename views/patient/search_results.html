@@ -117,14 +117,38 @@
           window.location.href = "/views/confirm.html?patient_id=" + people[pos]['NPID'];
           sessionStorage.setItem("patientID", people[pos]["Person ID"]);
         }else {
-          window.location.href = "/views/confirm.html?patient_id=" + people[pos]['NPID'];
+          if(people[pos]['NPID'] === null) {
+                            alertify
+                             .alert("Missing National ID", "Patient was found BUT has no National ID.<br />The system is going to assign the patient with a new ID", function () {
+                                 //window.location = "/views/patient/find_by_menu.html";
+                                 assignNHID(people[pos]["Person ID"]);
+                             })
+          }else {
+
+            window.location.href = "/views/confirm.html?patient_id=" + people[pos]['NPID'];
+          }
+          sessionStorage.setItem("patientID", people[pos]["Person ID"]);
         }
         // nextEncounter(people[pos]['Person ID'] , 1, sessionStorage.programID);
       }else{
           showMessage("Select value to continue");
       }
     }
+  function assignNHID(person_id) {
+          var url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1/patients/" + person_id + "/npid";
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+              var obj = JSON.parse(this.responseText);
+              window.location = "/views/confirm.html?patient_id=" + obj.new_identifier.identifier;
+            }
+          };
 
+          xhttp.open("POST", url, true);
+          xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+          xhttp.setRequestHeader('Content-type', "application/json");
+          xhttp.send();
+      }
       addFields();
 
       try{
