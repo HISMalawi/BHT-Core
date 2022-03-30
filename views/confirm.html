@@ -1512,6 +1512,17 @@ var global_property = GlobalProperty({
     coverPage.style = 'display: inline;';
   }
 
+  function showReason(patient_type) {
+    var cols = document.getElementsByClassName('visit-type');
+    for (let index = 0; index < cols.length; index++) {
+      cols[index].innerHTML = patient_type;
+      
+    }
+
+      document.getElementById('transferred-out-patient').style="display:inline";
+      document.getElementById('page-cover').style="display:inline";
+      active_tranferred_out_popup = false;
+  }
   function finish(id) {
 
     if(compleDemographics() == false && !sessionStorage.userRoles.match(/Program Manager/i)){
@@ -1521,12 +1532,14 @@ var global_property = GlobalProperty({
     }
 
     if(active_tranferred_out_popup && patient_outcome == "Patient transferred out" && sessionStorage.programID == "1"){
-      document.getElementById('transferred-out-patient').style="display:inline";
-      document.getElementById('page-cover').style="display:inline";
-      active_tranferred_out_popup = false;
+      showReason("Patient transferred out");
       return
     }
 
+    if(active_tranferred_out_popup && sessionStorage.patient_type !== "New Patient" && sessionStorage.programID == "1"){
+      showReason(sessionStorage.patient_type);
+      return
+    }
     sessionStorage.patientID = id;
     sessionStorage.patientID = id;
     if(sessionStorage.programID != '1'){
@@ -2290,11 +2303,11 @@ function closeEnrollProgramPoP(){
 <!-- new popup -->
 <div id="transferred-out-patient">
   <div class="modal-title">
-    <h1>Patient transferred out</h1>
+    <h1 class="visit-type">Patient transferred out</h1>
   </div>
 
   <div style="text-align: center; width: 97%; display: table; padding: 5px; font-size: 1.5em;">
-    <p>Transferred out client.</p>
+    <p class="visit-type">Transferred out client.</p>
     <p>Please select purpose of the visit.</p>
   </div>
   
@@ -2315,7 +2328,7 @@ function closeEnrollProgramPoP(){
           text-align: center; padding: 10%; border-top-right-radius: 9px;
           border-bottom-right-radius: 9px; background-color: #36780f;" 
           onmousedown="visitPurpose('Transfer In');">
-          Transfer In
+          Continue
         </div>
       </div>
     </div>
