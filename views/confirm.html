@@ -1536,7 +1536,7 @@ var global_property = GlobalProperty({
       return
     }
 
-    if(active_tranferred_out_popup && sessionStorage.patient_type !== "New Patient" && sessionStorage.programID == "1"){
+    if(active_tranferred_out_popup && sessionStorage.patient_type.match(/drug|consultation/i) && sessionStorage.programID == "1"){
       showReason(sessionStorage.patient_type);
       return
     }
