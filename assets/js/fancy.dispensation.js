@@ -199,7 +199,8 @@ function packSizes(order) {
         '1039': [ 30,60,90 ],
         '1043': [ 60 ],
         '1044': [ 30],
-        '1056': [ 24 ]
+        '1056': [ 24 ],
+        '980':  [90]
     }
     return (!packs[drug_id] ? [ 30 ] : packs[drug_id]);
 
