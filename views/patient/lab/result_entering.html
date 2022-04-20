@@ -375,22 +375,24 @@ function validateNumericResults(){
 function validateVLresultsEntry(modifier, result){
 
   if(orderSpecimen.name.match(/DBS/i)){
-    if(modifier.match(/</) && !result.match(/ldl|400|550|839/i)){
-      return false;
-    }else if(modifier.match(/=/) && !(parseFloat(result) >= 400)){
-      return false;
+    if(modifier.match(/</) && result.match(/ldl|400|550|839/i)){
+      return true;
+    }else if(modifier.match(/=/) && (parseFloat(result) >= 400)){
+      return true;
     }else if(modifier == '>'){
+      return false;
+    }else{
       return false;
     }
   }
 
-  if(modifier.match(/</) && !result.match(/ldl|20|40|150/i)){
-    return false;
+  if(modifier.match(/</) && result.match(/ldl|20|30|40|150/i)){
+    return true;
   }else if(modifier.match(/=/) && !(parseFloat(result) >= 20)){
-    return false;
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 function showInvalidVLresultMessage(modifier, result, textNumeric){
