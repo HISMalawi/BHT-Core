@@ -1612,7 +1612,9 @@ var global_property = GlobalProperty({
     let redirectURL;
 
     if(identifier.length == 6 || identifier.length == 13){
-      redirectURL = `/views/voided_identifiers.html?identifier=${identifier}`;
+      // redirectURL = `/views/voided_identifiers.html?identifier=${identifier}`;
+      // stop gap feature to aid in cleaning of voided identifiers, will add a better algorithm for handling this in the future
+      redirectURL = `/views/patient/search.html`;
     }else{
       redirectURL = "/";
     }
