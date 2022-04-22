@@ -1223,8 +1223,73 @@ var global_property = GlobalProperty({
     );
   }
 
-  function populateANCProgramInfo(){
+  /* 
+    * This function will show the new Pregnancy button if last menstrual period was more than 6 months ago
+  */
+  function updateANCNewPregnancyBtn (lmpDate) {
+    if (lmpDate) {
+      var lmp = moment(lmpDate);
+      var today = moment(sessionStorage.getItem("sessionDate"));
+      var diff = today.diff(lmp, "months");
+      if (diff >= 6) {
+        document.getElementById("anc_new_pregnancy").style.display = "block";
+      } else {
+        document.getElementById("anc_new_pregnancy").style.display = "none";
+      }
+    } else {
+      document.getElementById("anc_new_pregnancy").style.display = "none";
+    }
+  }
 
+  /*
+  * Create a new ANC Registration encounter with new Pregnancy status
+  */
+  function setANCPregnancyAsNew() {
+    var reqEnc = new XMLHttpRequest();
+    reqEnc.onreadystatechange = function () {
+      if (this.readyState == 4) {
+        if (this.status == 201) {
+          var enc = JSON.parse(this.responseText);
+          var reqObs = new XMLHttpRequest();
+          reqObs.onreadystatechange = function () {
+            if (this.readyState == 4) {
+              if (this.status == 201) {
+                nextEncounter(sessionStorage.patientID, sessionStorage.programID);
+              } else {
+                alert('Unable to set new ANC pregnancy')
+              }
+            }
+          }
+          reqObs.open('POST', apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/observations', true)
+          reqObs.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
+          reqObs.setRequestHeader('Content-type', "application/json");
+          reqObs.send(JSON.stringify({
+            encounter_id: enc["encounter_id"],
+            observations: [
+              //Pregnancy status = New
+              {
+                concept_id: 5272, value_coded: 6328
+              }
+            ]
+          }))
+        } else {
+          alert('Unable to create New Pregnancy')
+        }
+      }
+    }
+    reqEnc.open('POST', apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/encounters', true);
+    reqEnc.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
+    reqEnc.setRequestHeader('Content-type', "application/json");
+    reqEnc.send(JSON.stringify({
+      encounter_type_name: 'REGISTRATION',
+      encounter_type_id: 5,
+      patient_id: sessionStorage.patientID,
+      program_id: sessionStorage.programID,
+      encounter_datetime: sessionStorage.sessionDate
+    }));
+  }
+
+  function populateANCProgramInfo(){
     gestation = document.getElementById("gest_age");
     
     lmp = document.getElementById("date_of_lmp");
@@ -1238,7 +1303,7 @@ var global_property = GlobalProperty({
     var req = new XMLHttpRequest();
 
     req.onreadystatechange = function () {
-
+      document.getElementById('page-cover').style = 'none';
       if (this.readyState == 4) {
 
         if (this.status == 200) {
@@ -1252,12 +1317,13 @@ var global_property = GlobalProperty({
           
           }
 
-          if (results.date_of_lnmp){
+          if (results.date_of_lnmp) {
 
             sessionStorage.dateOfLMP = results.date_of_lnmp;
 
             lmp.innerHTML = moment(sessionStorage.dateOfLMP).format("DD/MMM/YYYY");
 
+            updateANCNewPregnancyBtn(sessionStorage.dateOfLMP)
           }
 
           if (results.edod){
@@ -1377,8 +1443,13 @@ var global_property = GlobalProperty({
       onmousedown="location='/'"><span>Cancel</span></button>
   <button class="button red navButton" onmousedown="confirmVoid();" 
     id="voidBTN"><span>Void client</span></button>
+
   <button class="button green navButton" onmousedown="getFilingNumberType()" 
     style="float: right;" id="continue"><span>Continue</span></button>
+
+  <button class="button blue navButton" onmousedown="setANCPregnancyAsNew()" 
+    style="display: none; float: right;" id="anc_new_pregnancy"><span>New Pregnancy</span>
+  </button>
 </div>
 
 <!-- Modal -->
