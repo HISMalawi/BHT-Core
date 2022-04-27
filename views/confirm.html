@@ -383,6 +383,7 @@ tr.demo-table {
 
 <script>
 const HIV_PROGRAM_ID = 1
+sessionStorage.dateOfLMP = ""
 var global_property = GlobalProperty({
   authToken: sessionStorage.authorization,
   path: apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1'
@@ -1630,7 +1631,7 @@ var global_property = GlobalProperty({
       showReason(sessionStorage.patient_type);
       return
     }
-    
+
     if (sessionStorage.programID === "12" && sessionStorage.dateOfLMP) {
       var lmp = moment(sessionStorage.dateOfLMP);
       var today = moment(sessionStorage.getItem("sessionDate"));
