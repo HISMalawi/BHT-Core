@@ -1281,8 +1281,8 @@ var global_property = GlobalProperty({
     reqEnc.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
     reqEnc.setRequestHeader('Content-type', "application/json");
     reqEnc.send(JSON.stringify({
-      encounter_type_name: 'REGISTRATION',
-      encounter_type_id: 5,
+      encounter_type_name: 'PREGNANCY STATUS',
+      encounter_type_id: 111,
       patient_id: sessionStorage.patientID,
       program_id: sessionStorage.programID,
       encounter_datetime: sessionStorage.sessionDate
