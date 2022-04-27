@@ -1453,6 +1453,26 @@ var global_property = GlobalProperty({
 </div>
 
 <!-- Modal -->
+<div class="modal fade" id="new-anc-pregnancy-alert" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h2 style="text-align: center" class="text-uppercase">
+          LMP is more than 42 weeks old, do you want to continue as New Pregnancy?
+        </h2>
+      </div>
+      <div class="modal-footer">
+        <button class="button red navButton" onmousedown="nextEncounter(sessionStorage.patientID, sessionStorage.programID)" 
+          style="float: right; width: 165px;" id="continue"><span>No</span>
+       </button>
+        <button class="button green navButton" onmousedown="setANCPregnancyAsNew()" 
+          style="float: right; width: 165px; margin-right: 30px;" id="continue"><span>Yes</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="confirm-VL" role="dialog">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -1595,7 +1615,6 @@ var global_property = GlobalProperty({
       active_tranferred_out_popup = false;
   }
   function finish(id) {
-
     if(compleDemographics() == false && !sessionStorage.userRoles.match(/Program Manager/i)){
       document.getElementById('incomplete-demographics').style="display:inline";
       document.getElementById('page-cover').style="display:inline";
@@ -1611,6 +1630,16 @@ var global_property = GlobalProperty({
       showReason(sessionStorage.patient_type);
       return
     }
+    
+    if (sessionStorage.programID === "12" && sessionStorage.dateOfLMP) {
+      var lmp = moment(sessionStorage.dateOfLMP);
+      var today = moment(sessionStorage.getItem("sessionDate"));
+      if (today.diff(lmp, "months") >= 9) {
+        ancNewPregnacyPoP();
+        return;
+      }
+    }
+
     sessionStorage.patientID = id;
     sessionStorage.patientID = id;
     if(sessionStorage.programID != '1'){
@@ -2227,6 +2256,13 @@ function selectReason(reason, e){
   voidButton.style.backgroundColor="red";
 }
 
+function ancNewPregnacyPoP() {
+  const box = document.getElementById('new-anc-pregnancy-alert');
+  const page_cover = document.getElementById('page-cover');
+  page_cover.style = 'display: inline;';
+  box.style = 'display:inline;';
+}
+
 function enrollProgramPoP() {
   const box = document.getElementById('enroll-program');
   const page_cover = document.getElementById('page-cover');
@@ -2246,8 +2282,7 @@ function closeEnrollProgramPoP(){
 
 
 <style>
-
-  #enroll-program, #incomplete-demographics, #npid-diff {
+  #new-anc-pregnancy-alert, #enroll-program, #incomplete-demographics, #npid-diff {
     background: #ffffff;
     border-radius: 0.5em;
     box-shadow: 0 10px 20px rgba(black, 0.2);
@@ -2404,6 +2439,7 @@ function closeEnrollProgramPoP(){
       </div>
     </div>
 </div>
+
 <!-- new popup -->
 
 <div id="void-confirm-message">
