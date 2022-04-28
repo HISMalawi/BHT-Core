@@ -25,11 +25,14 @@ if(sessionStorage.userRoles && sessionStorage.userRoles.match(/Program Manager|S
   admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="view-user" onclick="redirect(this.id); "><img src="/assets/images/edit-user.png" class="btn-icons"/><span>View user</span></button>';
 
   admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="view-sys-settings" onclick="redirect(this.id); "><img src="/assets/images/sys-setting.png" class="btn-icons"/><span>System settings</span></button>';
+  
   if(parseInt(sessionStorage.programID) == 1){
     admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="view-drug-management-settings" onclick="redirect(this.id); "><img src="/assets/images/drug.png" class="btn-icons"/><span>Drug management</span></button>';
     admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="view-data-management-settings" onclick="redirect(this.id); "><img src="/assets/images/clean.jpg" class="btn-icons"/><span>Data management</span></button>';
   }
-
+  if (parseInt(sessionStorage.programID) == 12) {
+    admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="view-data-management-settings" onclick="redirect(this.id); "><img src="/assets/images/clean.jpg" class="btn-icons"/><span>Data management</span></button>';      
+  }
   admin_tab_content += '<button class="overview-btns overview-btns-2nd-class" id="enable-portal" onclick="redirect(this.id); "><img src="/assets/images/portal.png" class="btn-icons"/><span>Portal Settings</span></button>';
 }
 
