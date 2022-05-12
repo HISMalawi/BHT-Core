@@ -6,13 +6,17 @@
  <script type="text/javascript" charset="utf8" src="/assets/js/datatables/jquery-3.3.1.js"></script>
  <script type="text/javascript" charset="utf8" src="/assets/js/datatables/jquery.dataTables.min.js"></script>
  <script type="text/javascript" charset="utf8" src="/assets/js/virtual.keyboard.js"></script>
-
-
-
-
+  <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
+    <link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
 
 
 <style>
+.ajs-button {
+  background: #23538a;
+}
+.ajs-ok {
+  background: rgb(138, 38, 38);
+}
   .title-table {
     display: table;
     width: 100%;
@@ -224,6 +228,14 @@ var identifier_type_id;
         tr.appendChild(td); 
 
         var td = document.createElement("td");
+        if (sessionStorage.userRoles && sessionStorage.userRoles.match(/Program Manager|Superuser|System Developer/i)) {
+
+        var btn = document.createElement('button');
+        btn.innerHTML = '<span>Void</span>';
+        btn.setAttribute('class', 'button red navButton');
+        btn.setAttribute('onclick', "confirmVoid('"+obj[index].identifier+"')");
+        td.appendChild(btn);
+        }
         var btn = document.createElement('button');
         btn.innerHTML = '<span>View</span>';
         btn.setAttribute('class', 'button blue navButton');
@@ -232,6 +244,34 @@ var identifier_type_id;
         tr.appendChild(td);
     }
     initTable();
+  }
+ function confirmVoid(identifier) {
+    alertify.confirm('Void identifier', 'Are you sure you want to void this identifier?', function(){ 
+      voidIdentifier(identifier)
+    }
+                , function(){ alertify.error('Cancel')});
+  }
+  function voidIdentifier(identifier) {
+        var http = new XMLHttpRequest();
+        var url = sessionStorage.apiProtocol + '://' + sessionStorage.apiURL + ':' + sessionStorage.apiPort + '/api/v1/duplicate_identifier';
+        var params = JSON.stringify({
+            identifier: identifier
+        });
+        http.open('POST', url, true);
+        //Send the proper header information along with the request
+        http.setRequestHeader('Content-type', 'application/json');
+        http.onreadystatechange = function () { //Call a function when the state changes.
+            if (http.readyState == 4) {
+                if (http.status == 201 || http.status == 200) {
+                  alertify.success('Successful')
+                  window.location.href = "/"
+                }  else {
+                    alert('error' + http.status);
+                }
+            }
+        }
+        http.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
+        http.send(params);
   }
 
   dTable = null;
