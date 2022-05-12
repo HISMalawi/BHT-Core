@@ -12,12 +12,10 @@
 <script src="/assets/js/jquery.min.js"></script>
 <script src="/assets/js/moment.js"></script>
 <script src="/assets/js/bmi.js"></script>
+<script src="/assets/js/patientType.js"></script>
 <script src="/assets/js/bootstrap/bootstrap.min.js"></script>
 <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
-<script
-  type="text/javascript"
-  src="/assets/js/does_connection_exist.js"
-></script>
+<script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
 
 <script src="/assets/js/httpUtils.js"></script>
 <script src="/assets/js/uiUtils.js"></script>
@@ -385,6 +383,7 @@ tr.demo-table {
 
 <script>
 const HIV_PROGRAM_ID = 1
+sessionStorage.dateOfLMP = ""
 var global_property = GlobalProperty({
   authToken: sessionStorage.authorization,
   path: apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1'
@@ -862,6 +861,7 @@ var global_property = GlobalProperty({
 
             var td = document.createElement("td");
             td.innerHTML = identifiersHash[identifier];
+            patient_outcome = identifiersHash[identifier];
             tr.appendChild(td);
             table.appendChild(tr);
           }
@@ -1224,8 +1224,73 @@ var global_property = GlobalProperty({
     );
   }
 
-  function populateANCProgramInfo(){
+  /* 
+    * This function will show the new Pregnancy button if last menstrual period was more than 6 months ago
+  */
+  function updateANCNewPregnancyBtn (lmpDate) {
+    if (lmpDate) {
+      var lmp = moment(lmpDate);
+      var today = moment(sessionStorage.getItem("sessionDate"));
+      var diff = today.diff(lmp, "months");
+      if (diff >= 6) {
+        document.getElementById("anc_new_pregnancy").style.display = "block";
+      } else {
+        document.getElementById("anc_new_pregnancy").style.display = "none";
+      }
+    } else {
+      document.getElementById("anc_new_pregnancy").style.display = "none";
+    }
+  }
 
+  /*
+  * Create a new ANC Registration encounter with new Pregnancy status
+  */
+  function setANCPregnancyAsNew() {
+    var reqEnc = new XMLHttpRequest();
+    reqEnc.onreadystatechange = function () {
+      if (this.readyState == 4) {
+        if (this.status == 201) {
+          var enc = JSON.parse(this.responseText);
+          var reqObs = new XMLHttpRequest();
+          reqObs.onreadystatechange = function () {
+            if (this.readyState == 4) {
+              if (this.status == 201) {
+                nextEncounter(sessionStorage.patientID, sessionStorage.programID);
+              } else {
+                alert('Unable to set new ANC pregnancy')
+              }
+            }
+          }
+          reqObs.open('POST', apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/observations', true)
+          reqObs.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
+          reqObs.setRequestHeader('Content-type', "application/json");
+          reqObs.send(JSON.stringify({
+            encounter_id: enc["encounter_id"],
+            observations: [
+              //Pregnancy status = New
+              {
+                concept_id: 5272, value_coded: 6328
+              }
+            ]
+          }))
+        } else {
+          alert('Unable to create New Pregnancy')
+        }
+      }
+    }
+    reqEnc.open('POST', apiProtocol + '://' + apiURL + ':' + apiPort + '/api/v1/encounters', true);
+    reqEnc.setRequestHeader('Authorization', sessionStorage.getItem('authorization'));
+    reqEnc.setRequestHeader('Content-type', "application/json");
+    reqEnc.send(JSON.stringify({
+      encounter_type_name: 'PREGNANCY STATUS',
+      encounter_type_id: 111,
+      patient_id: sessionStorage.patientID,
+      program_id: sessionStorage.programID,
+      encounter_datetime: sessionStorage.sessionDate
+    }));
+  }
+
+  function populateANCProgramInfo(){
     gestation = document.getElementById("gest_age");
     
     lmp = document.getElementById("date_of_lmp");
@@ -1239,7 +1304,7 @@ var global_property = GlobalProperty({
     var req = new XMLHttpRequest();
 
     req.onreadystatechange = function () {
-
+      document.getElementById('page-cover').style = 'none';
       if (this.readyState == 4) {
 
         if (this.status == 200) {
@@ -1253,12 +1318,13 @@ var global_property = GlobalProperty({
           
           }
 
-          if (results.date_of_lnmp){
+          if (results.date_of_lnmp) {
 
             sessionStorage.dateOfLMP = results.date_of_lnmp;
 
             lmp.innerHTML = moment(sessionStorage.dateOfLMP).format("DD/MMM/YYYY");
 
+            updateANCNewPregnancyBtn(sessionStorage.dateOfLMP)
           }
 
           if (results.edod){
@@ -1378,11 +1444,36 @@ var global_property = GlobalProperty({
       onmousedown="location='/'"><span>Cancel</span></button>
   <button class="button red navButton" onmousedown="confirmVoid();" 
     id="voidBTN"><span>Void client</span></button>
+
   <button class="button green navButton" onmousedown="getFilingNumberType()" 
     style="float: right;" id="continue"><span>Continue</span></button>
+
+  <button class="button blue navButton" onmousedown="setANCPregnancyAsNew()" 
+    style="display: none; float: right;" id="anc_new_pregnancy"><span>New Pregnancy</span>
+  </button>
 </div>
 
 <!-- Modal -->
+<div class="modal fade" id="new-anc-pregnancy-alert" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h2 style="text-align: center" class="text-uppercase">
+          LMP is more than 42 weeks old, do you want to continue as New Pregnancy?
+        </h2>
+      </div>
+      <div class="modal-footer">
+        <button class="button red navButton" onmousedown="nextEncounter(sessionStorage.patientID, sessionStorage.programID)" 
+          style="float: right; width: 165px;" id="continue"><span>No</span>
+       </button>
+        <button class="button green navButton" onmousedown="setANCPregnancyAsNew()" 
+          style="float: right; width: 165px; margin-right: 30px;" id="continue"><span>Yes</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="confirm-VL" role="dialog">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -1513,14 +1604,44 @@ var global_property = GlobalProperty({
     coverPage.style = 'display: inline;';
   }
 
-  function finish(id) {
+  function showReason(patient_type) {
+    var cols = document.getElementsByClassName('visit-type');
+    for (let index = 0; index < cols.length; index++) {
+      cols[index].innerHTML = patient_type;
+      
+    }
 
+      document.getElementById('transferred-out-patient').style="display:inline";
+      document.getElementById('page-cover').style="display:inline";
+      active_tranferred_out_popup = false;
+  }
+  function finish(id) {
     if(compleDemographics() == false && !sessionStorage.userRoles.match(/Program Manager/i)){
       document.getElementById('incomplete-demographics').style="display:inline";
       document.getElementById('page-cover').style="display:inline";
       return
     }
 
+    if(active_tranferred_out_popup && patient_outcome == "Patient transferred out" && sessionStorage.programID == "1"){
+      showReason("Patient transferred out");
+      return
+    }
+
+    if(active_tranferred_out_popup && sessionStorage.patient_type.match(/drug|consultation/i) && sessionStorage.programID == "1"){
+      showReason(sessionStorage.patient_type);
+      return
+    }
+
+    if (sessionStorage.programID === "12" && sessionStorage.dateOfLMP) {
+      var lmp = moment(sessionStorage.dateOfLMP);
+      var today = moment(sessionStorage.getItem("sessionDate"));
+      if (today.diff(lmp, "months") >= 9) {
+        ancNewPregnacyPoP();
+        return;
+      }
+    }
+
+    sessionStorage.patientID = id;
     sessionStorage.patientID = id;
     if(sessionStorage.programID != '1'){
       nextEncounter(sessionStorage.patientID, sessionStorage.programID);
@@ -1592,7 +1713,9 @@ var global_property = GlobalProperty({
     let redirectURL;
 
     if(identifier.length == 6 || identifier.length == 13){
-      redirectURL = `/views/voided_identifiers.html?identifier=${identifier}`;
+      // redirectURL = `/views/voided_identifiers.html?identifier=${identifier}`;
+      // stop gap feature to aid in cleaning of voided identifiers, will add a better algorithm for handling this in the future
+      redirectURL = `/views/patient/search.html`;
     }else{
       redirectURL = "/";
     }
@@ -2136,6 +2259,13 @@ function selectReason(reason, e){
   voidButton.style.backgroundColor="red";
 }
 
+function ancNewPregnacyPoP() {
+  const box = document.getElementById('new-anc-pregnancy-alert');
+  const page_cover = document.getElementById('page-cover');
+  page_cover.style = 'display: inline;';
+  box.style = 'display:inline;';
+}
+
 function enrollProgramPoP() {
   const box = document.getElementById('enroll-program');
   const page_cover = document.getElementById('page-cover');
@@ -2155,8 +2285,7 @@ function closeEnrollProgramPoP(){
 
 
 <style>
-
-  #enroll-program, #incomplete-demographics, #npid-diff {
+  #new-anc-pregnancy-alert, #enroll-program, #incomplete-demographics, #npid-diff {
     background: #ffffff;
     border-radius: 0.5em;
     box-shadow: 0 10px 20px rgba(black, 0.2);
@@ -2248,9 +2377,74 @@ function closeEnrollProgramPoP(){
     background-color: lightblue;
   }
 
+  #transferred-out-patient {
+    background: #ffffff;
+    border-radius: 0.5em;
+    box-shadow: 0 10px 20px rgba(black, 0.2);
+    left: 50%;
+    max-width: 90%;
+    position: absolute;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    width: 50em;
+    text-align: left;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000000;
+    border-color: black;
+    border-style: solid;
+    display: none;
+  }
+
+  .action-btns {
+    font-family: "Nimbus Sans L", "Arial Narrow", sans-serif;
+    border-style: solid;
+    width: 33.3%;
+    border-width: 1px;
+    font-size: 1.3em;
+    color: white;
+  }
 </style>
 
 <div  id="page-cover"></div>
+
+<!-- new popup -->
+<div id="transferred-out-patient">
+  <div class="modal-title">
+    <h1 class="visit-type">Patient transferred out</h1>
+  </div>
+
+  <div style="text-align: center; width: 97%; display: table; padding: 5px; font-size: 1.5em;">
+    <p class="visit-type">Transferred out client.</p>
+    <p>Please select purpose of the visit.</p>
+  </div>
+  
+  <div style="width: 100%;margin: 5px;">
+    <div style="display: table; width: 99%;">
+      <div style="display: table-row;">
+        <div class="action-btns" style="display: table-cell;  
+          text-align: center; padding: 10%; border-top-left-radius: 9px;
+          border-bottom-left-radius: 9px; background-color: #82bbd1;" onmousedown="visitPurpose('Drug refill');">
+          Drug refill
+        </div>
+        <div class="action-btns" style="display: table-cell;  
+          text-align: center; padding: 10%;
+          background-color: #82bbd1;" onmousedown="visitPurpose('External Consultation');">
+          Consultation
+        </div>
+        <div class="action-btns" style="display: table-cell;  
+          text-align: center; padding: 10%; border-top-right-radius: 9px;
+          border-bottom-right-radius: 9px; background-color: #36780f;" 
+          onmousedown="visitPurpose('Transfer In');">
+          Continue
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- new popup -->
+
 <div id="void-confirm-message">
   <div class="modal-title">
     <h1>Warning</h1>

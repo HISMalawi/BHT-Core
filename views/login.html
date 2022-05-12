@@ -243,7 +243,35 @@ body {
   z-index: 990;
   opacity: 0.65;
 }
+#alert-div-1 {
+  display: none;
+  background-color: #F4F4F4;
+  border: 2px solid #E0E0E0;
+  border-radius: 15px;
+  height: 183px;
+  padding: 5px;
+  position: absolute;
+  top: 20%;
+  /*margin-top: 100px;
+  */
+  width: 560px;
+  /*margin-left: 430px;
+  */
+  left: 25%;
+  z-index: 991;
+}
 
+#alert-cover-1{
+  display: none;
+  position: absolute;
+  background-color: black;
+  width: 100%;
+  height: 102%;
+  left: 0%;
+  top: 0%;
+  z-index: 990;
+  opacity: 0.65;
+}
 #alert-OK-btn{
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -274,10 +302,10 @@ body {
 <script type="text/javascript" src="/assets/js/alertifyjs/alertify.js"></script>
 <script type="text/javascript" src="/assets/js/does_connection_exist.js"></script>
 
+<script src="/assets/js/moment.js"></script>
 <link rel="stylesheet" href="/assets/css/alertifyjs/css/alertify.css" type="text/css">
 <script>
   sessionStorage.clear();
-
   function hideKeyboard() {
     try {
       var keyboard = document.getElementById("keyboard");
@@ -416,6 +444,15 @@ function wrongPasswordUsernameAlert() {
   document.getElementById("alert-cover").style.display = 'inline';
 }
 
+function hidedateAlert() {
+  document.getElementById("alert-div-1").style.display = 'none';
+  document.getElementById("alert-cover-1").style.display = 'none';
+}
+
+function dateAlert() {
+  document.getElementById("alert-div-1").style.display = 'inline';
+  document.getElementById("alert-cover-1").style.display = 'inline';
+}
 </script>
 
 <body>
@@ -481,5 +518,17 @@ function wrongPasswordUsernameAlert() {
       style="position: relative;">Ok</span>
     </div>
   </div>
-
+  <div id="alert-cover-1"></div>
+  
+  <div id="alert-div-1">
+    <div style="text-align: center; color: white; border-style: solid; 
+      border-color: black;font-size: 25px;border-width: 0px 0px 1px 0px;
+      border-radius: 9px 9px 0px 0px;background-color: slategray;">Notice</div>
+    <p style="text-align: center; color: black; font-size: 25px;">Server date and Device date do not match. Please contact HIS officer to fix this</p>
+    <div style="padding-top: 65px;">
+      <span id="alert-ok-btn" 
+      onclick="hidedateAlert();" 
+      style="position: relative;">Ok</span>
+    </div>
+  </div>
 </body>

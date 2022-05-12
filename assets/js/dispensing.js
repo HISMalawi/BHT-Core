@@ -1222,9 +1222,9 @@ function calculate_complete_pack(drug, units) {
     var smallest_available_tab = parseInt(drug_order_barcodes[0].tabs)
     var complete_pack = parseInt(drug_order_barcodes[drug_order_barcodes.length - 1].tabs)
 
-    while (complete_pack < units) {
-        complete_pack += smallest_available_tab
-    }
+    // while (complete_pack < units) {
+    //     complete_pack += smallest_available_tab
+    // }
 
     return complete_pack
 

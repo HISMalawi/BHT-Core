@@ -62,8 +62,8 @@
   var apiURL = sessionStorage.getItem("apiURL");
   var apiPort = sessionStorage.getItem("apiPort");
   var apiProtocol = sessionStorage.getItem("apiProtocol");
-
-  var url = "/programs/"+sessionStorage.programID+"/patients/" + sessionStorage.patientID + "/labels/visits?date=" + sessionStorage.sessionDate
+  var date = url.searchParams.get("visit_date") ? url.searchParams.get("visit_date") : sessionStorage.sessionDate;
+  var url = "/programs/"+sessionStorage.programID+"/patients/" + sessionStorage.patientID + "/labels/visits?date=" + date
   url = apiProtocol + "://" + apiURL + ":" + apiPort + "/api/v1" + url;
   document.location = url;
 
