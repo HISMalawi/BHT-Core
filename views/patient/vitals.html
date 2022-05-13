@@ -247,6 +247,8 @@
                 var obj = JSON.parse(this.responseText);
                 if (obj.length > 0) {
                     sessionStorage.currentHeightObsID = obj[0].obs_id;
+                    var dateAtHeight = moment(obj[0].obs_datetime).diff(moment(sessionStorage.patientDOB), 'years');
+                    heightDoneBeforeAge = !(dateAtHeight < 18);
                     var height = parseInt(obj[0].value_numeric);
                     if (height > 0) {
                         sessionStorage.currentHeight = height;
@@ -277,6 +279,7 @@
 <script>
 
     var show_bp_only = false;
+    var heightDoneBeforeAge = true;
     try {
       var url = window.location.href;
       url = new URL(url);
@@ -385,7 +388,7 @@
         var btnCont = document.createElement('div')
         btnCont.setAttribute('class', "table-main");
         for (var i = 0; i < buttons.length; i++) {
-            if (vitalsAssigned[i][0] === "Height" && sessionStorage.patientAge > 18 && sessionStorage.currentHeight != 0 && sessionStorage.currentHeight != "null") {
+            if (vitalsAssigned[i][0] === "Height" && sessionStorage.patientAge > 18 && sessionStorage.currentHeight != 0 && sessionStorage.currentHeight != "null" && heightDoneBeforeAge) {
                 // table.innerHTML += "<tr><th>Height<td id='previous-Height'></td><td>"+sessionStorage.currentHeight+" (CM)</td></th></tr>";
             } else {
                 var btnContRow = document.createElement('div')
