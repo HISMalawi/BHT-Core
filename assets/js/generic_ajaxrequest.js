@@ -23,36 +23,8 @@ function checkIfEncounterCaptured(encounter_name, id, redirect) {
               // window.location.href = url;
               sessionStorage.setItem("nextEncounter", encounter_name);
               sessionStorage.setItem("nextEncounterAvailable", "Available");
-              // checking related to triage
-
-              if (sessionStorage.programID == '14') {
-              
-                if (encounter_name == 'outpatient diagnosis') {
-                  
-                  if(sessionStorage.getItem('patientID_re_encountered') == id  ){
-                    //alert('true')
-                    sessionStorage.setItem("presenting_complaints_re_encountered", "true");
-                    //url = '/apps/OPD/views/encounters/presenting_complaints.html'
-                  }
-                  else{
-                    sessionStorage.setItem("presenting_complaints_re_encountered", "false");
-                  }
-                  if ( sessionStorage.getItem('presenting_complaints_re_encountered') == "false"
-                      || sessionStorage.getItem('presenting_complaints_re_encountered') == null) {
-                    //sessionStorage.setItem("presenting_complaints_re_encountered", "false");
-                    sessionStorage.setItem("patientID_re_encountered", id)
-                    if (sessionStorage.getItem('patientID_re_encountered') == 'true') {
-
-                    } else {
-                      url = '/apps/OPD/views/encounters/presenting_complaints.html'
-                    }
-                  }
-                }
-              }
-
               checkIfActivitySelected(encounter_name, url);
-            } 
-
+            }
           }
         } catch (error) {
           // showMessage("selected encounter " + encounter_name + " is not available, continue to patient dashboard?", null, 3000);
@@ -189,4 +161,28 @@ function setCurrentLocation() {
   $('touchscreenInput' + tstCurrentPage).setAttribute('ajaxURL', "/locations?name=" + sessionStorage.currentLocation);
   listSuggestions(tstCurrentPage);
   $('touchscreenInput' + tstCurrentPage).setAttribute('ajaxURL', "/locations?name="); 
+}
+
+function getTriageObs(callback) {
+  var obsUrl = apiProtocol + "://" + apiURL + ":" + apiPort;
+      obsUrl += '/api/v1/observations?person_id=' + sessionStorage.patientID;
+      obsUrl += '&concept_id=' +10539;
+      obsUrl += '&end_date=' + sessionStorage.sessionDate + "&start_date=" + sessionStorage.sessionDate;
+      obsUrl += '&program_id=' + sessionStorage.programID;
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && (this.status == 201 || this.status == 200)) {
+      
+      data = JSON.parse(this.responseText);
+      if((data.length > 0)) {
+        callback
+      }
+
+    }
+  };
+  xhttp.open("GET", obsUrl, true);
+  xhttp.setRequestHeader('Authorization', sessionStorage.getItem("authorization"));
+  xhttp.setRequestHeader('Content-type', "application/json");
+  xhttp.send();  
 }
